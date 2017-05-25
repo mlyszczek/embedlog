@@ -79,7 +79,7 @@ static void el_ts_time
 static void el_ts_clock_gettime
 (
     long           *s,     /* seconds will be stored here */
-    long           *us     /* microseconds will be stored here */
+    long           *us,    /* microseconds will be stored here */
     clockid_t       clkid  /* clock id */
 )
 {
@@ -89,7 +89,7 @@ static void el_ts_clock_gettime
     clock_gettime(clkid, &tp);
 
     *s  = tp.tv_sec;
-    *us = tp.tv_usec / 1000;
+    *us = tp.tv_nsec / 1000;
 }
 
 #endif

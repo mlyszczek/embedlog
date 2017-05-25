@@ -171,18 +171,18 @@ int el_option
     #if ENABLE_TIMESTAMP
 
     case EL_OPT_TS:
-        VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_LONG);
+        VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_OFF);
 
         g_options.timestamp = value;
         return 0;
 
     case EL_OPT_TS_TM:
-        VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_TM_CLOCK);
+        VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_TM_MONOTONIC);
 
         g_options.timestamp_timer = value;
         return 0;
 
-    #endif /* ENABLE_TIMEOUT */
+    #endif /* ENABLE_TIMESTAMP */
 
     #if ENABLE_FINFO
 
@@ -192,7 +192,7 @@ int el_option
         g_options.finfo = value;
         return 0;
 
-    #endif /* ENABLE_TIMEOUT */
+    #endif /* ENABLE_FINFO */
 
     default:
         /*

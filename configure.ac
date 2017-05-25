@@ -23,11 +23,72 @@ AC_ARG_ENABLE([out-stderr],
 AS_IF([test "x$enable_out_stderr" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr])
-    AC_CHECK_FUNCS([fputs],, AC_MSG_ERROR(fputs() was not found))
+    AC_CHECK_FUNCS([fputs],,
+        AC_MSG_ERROR(not found, needed by --enable-out-stderr))
 ],
 # else
 [
     enable_out_stderr="no"
+])
+
+
+#
+# --enable-timestamp
+#
+
+
+AC_ARG_ENABLE([timestamp],
+    AS_HELP_STRING([--enable-timestamp], [Enable printing timestamp with log]))
+
+AS_IF([test "x$enable_timestamp" = "xyes"],
+[
+    AC_DEFINE([ENABLE_TIMESTAMP], [1], [Enable printing timestamp with log])
+    AC_CHECK_FUNCS([clock time],,
+        AC_MSG_ERROR(not found, needed by --enable-timestamp))
+],
+#else
+[
+    enable_timestamp="no"
+])
+
+
+#
+# --enable-realtime
+#
+
+
+AC_ARG_ENABLE([realtime],
+    AS_HELP_STRING([--enable-realtime], [Enable using CLOCK_REALTIME in log]))
+
+AS_IF([test "x$enable_realtime" = "xyes"],
+[
+    AC_DEFINE([ENABLE_REALTIME], [1], [Enable using CLOCK_REALTIME in log])
+    AC_CHECK_FUNCS([clock_gettime],,
+        AC_MSG_ERROR(not found, needed by --enable-realtime))
+],
+#else
+[
+    enable_realtime="no"
+])
+
+
+#
+# --enable-monotonic
+#
+
+
+AC_ARG_ENABLE([monotonic],
+    AS_HELP_STRING([--enable-monotonic], [Enable using CLOCK_MONOTONIC in log]))
+
+AS_IF([test "x$enable_monotonic" = "xyes"],
+[
+    AC_DEFINE([ENABLE_MONOTONIC], [1], [Enable using CLOCK_MONOTONIC in log])
+    AC_CHECK_FUNCS([clock_gettime],,
+        AC_MSG_ERROR(not found, needed by --enable-monotonic))
+],
+#else
+[
+    enable_monotonic="no"
 ])
 
 
@@ -53,4 +114,7 @@ echo
 echo "embedlog compilation configuration summary"
 echo
 echo "print to stderr............. : $enable_out_stderr"
+echo "print timestamp enabled..... : $enable_timestamp"
+echo "clock_realtime timestamp.... : $enable_realtime"
+echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "maximum log message......... : $EL_LOG_MAX"

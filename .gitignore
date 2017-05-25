@@ -1,5 +1,6 @@
 *.o
 .*
+*libembedlog*
 Makefile
 Makefile.in
 aclocal.m4
