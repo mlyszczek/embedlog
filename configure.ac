@@ -93,6 +93,26 @@ AS_IF([test "x$enable_monotonic" = "xyes"],
 
 
 #
+# --enable-finfo
+#
+
+
+AC_ARG_ENABLE([finfo],
+    AS_HELP_STRING([--enable-finfo], [Enable printing file info with log]))
+
+AS_IF([test "x$enable_finfo" = "xyes"],
+[
+    AC_DEFINE([ENABLE_FINFO], [1], [Enable printing file info with log])
+    AC_CHECK_FUNCS([strncat],,
+        AC_MSG_ERROR(not found, needed by --enable-finfo))
+],
+#else
+[
+    enable_finfo="no"
+])
+
+
+#
 # VARIABLES=value options
 #
 
@@ -107,6 +127,16 @@ AS_IF([test "x$EL_LOG_MAX" = x], [EL_LOG_MAX="2 * 1024"])
 AC_DEFINE_UNQUOTED([EL_LOG_MAX], [$EL_LOG_MAX], [Maximum size of log message])
 
 
+#
+# EL_FLEN_MAX
+#
+
+
+AC_ARG_VAR([EL_FLEN_MAX], [Maximum size of file in message])
+AS_IF([test "x$EL_FLEN_MAX" = x], [EL_FLEN_MAX="32"])
+AC_DEFINE_UNQUOTED([EL_FLEN_MAX], [$EL_FLEN_MAX], [Maximum size of file in message])
+
+
 AC_OUTPUT
 
 
@@ -117,4 +147,6 @@ echo "print to stderr............. : $enable_out_stderr"
 echo "print timestamp enabled..... : $enable_timestamp"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"
+echo "print file info with log.... : $enable_finfo"
+echo "maimum file length.......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"

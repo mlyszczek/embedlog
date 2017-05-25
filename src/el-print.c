@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 /* ==== private variables =================================================== */
 
@@ -219,6 +220,8 @@ static const char *el_basename
     const char  *base;  /* */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+    base = s;
+
     for (; *s; ++s)
     {
         if (s[0] == '/' && s[1] != '\0')
@@ -263,12 +266,11 @@ static size_t el_finfo
 
     buf[0] = '[';
     buf[1] = '\0';
-    strncat(buf, EL_PRE_FINFO_LEN, base);
-    fl = strlen(buf);
+    strncat(buf, base, EL_PRE_FINFO_LEN);
+    fl  = strlen(buf);
+    fl += sprintf(buf + fl, ":%d]", num);
 
-    len += sprintf(buf + fl, ":%d]", num);
-
-    return len;
+    return fl;
 
 #else
     return 0;

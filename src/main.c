@@ -6,6 +6,8 @@ int main(void)
     el_output_enable(EL_OUT_STDERR);
 
     el_option(EL_OPT_TS, EL_OPT_TS_OFF);
+    el_option(EL_OPT_FINFO, 1);
+    el_option(EL_OPT_TS_TM, EL_OPT_TS_TM_REALTIME);
 
     el_print(ELE, "err message");
     el_print(ELW, "wrn message");
@@ -26,10 +28,21 @@ int main(void)
 
     el_option(EL_OPT_TS_TM, EL_OPT_TS_TM_REALTIME);
     el_print(ELE, "realtime timestamp");
+    el_print(ELE, "realtime timestamp");
+    el_print(ELE, "realtime timestamp");
+    el_print(ELE, "realtime timestamp");
 
     el_option(EL_OPT_TS_TM, EL_OPT_TS_TM_MONOTONIC);
     el_print(ELE, "monotonic timestamp");
+    el_print(ELE, "monotonic timestamp");
+    el_print(ELE, "monotonic timestamp");
+    el_print(ELE, "monotonic timestamp");
 
+    el_option(EL_OPT_FINFO, 0);
+    el_print(ELE, "without info");
+
+    el_option(EL_OPT_TS, EL_OPT_TS_OFF);
+    el_print(ELE, "and without ts");
 
     return 0;
 }
