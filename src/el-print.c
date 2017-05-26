@@ -27,7 +27,69 @@
 static const char char_level[4] = { 'e', 'w', 'i', 'd' };
 
 
+#if ENABLE_COLORS
+
+/*
+ * index to remove all formatting
+ */
+
+
+#define COLOR_RESET 4
+
+
+/*
+ * colors indexes are synced with log level
+ */
+
+
+static const char *color[] =
+{
+    "\e[31m",  /* red */
+    "\e[33m",  /* yellow */
+    "\e[32m",  /* green */
+    "\e[34m",  /* blue */
+    "\e[0m"    /* remove all formats */
+};
+
+#endif
+
+
 /* ==== private functions =================================================== */
+
+
+/* ==========================================================================
+    adds color information to 'buf' based on  'level'.   Returns  number  of
+    bytes stored in buf.  If colors are disabled, function will return 0 and
+    nothing will be stored int 'buf'.
+
+    color can be one of log levels passed directly, or COLOR_RESET macro, which
+    will reset colors.
+   ========================================================================== */
+
+
+static size_t el_color
+(
+    char *buf,   /* buffer where to store color info */
+    int   level  /* log level or COLOR_RESET */
+)
+{
+#if ENABLE_COLORS
+    if (g_options.colors == 0)
+    {
+        /*
+         * no colors, you got it!
+         */
+
+        return 0;
+    }
+
+    strcpy(buf, color[level]);
+    return strlen(color[level]);
+
+#else
+    return 0;
+#endif
+}
 
 
 /* ==========================================================================
@@ -346,7 +408,7 @@ int el_print
                    ...                   /* additional parameters for fmt */
 )
 {
-    char           buf[EL_BUF_MAX + 1];  /* buffer for message to print */
+    char           buf[EL_BUF_MAX + 2];  /* buffer for message to print */
     size_t         w;                    /* bytes written to buf */
     size_t         flen;                 /* length of the parsed fmt output */
     va_list        va;                   /* arguments '...' for fmt */
@@ -361,13 +423,14 @@ int el_print
     e = 0;
 
     /*
-     * add preamble to log line buf
+     * add preamble and colors to log line buf
      */
 
-    w  = el_timestamp(buf);
+    w  = el_color(buf, level);
+    w += el_timestamp(buf + w);
     w += el_finfo(buf + w, file, num);
 
-    if (w)
+    if (w != 0 && buf[w - 1] == ']')
     {
         /*
          * at least one preamble has been added, add space beetween current
@@ -381,34 +444,39 @@ int el_print
     w += sprintf(buf + w, "%c/", char_level[level]);
 
     /*
-     * add requested log from format
+     * add requested log from format, we add + 1 to include null termination
      */
 
     va_start(va, fmt);
-    flen = vsnprintf(buf + w, sizeof(buf) - w, fmt, va);
+    flen = vsnprintf(buf + w, EL_LOG_MAX + 1, fmt, va);
     va_end(va);
 
-    if (flen > sizeof(buf) - w)
+    if (flen > EL_LOG_MAX)
     {
         /*
          * overflow would have occur, not all bytes have been copied, output
          * will truncated. Correct flen to number of bytes actually stored in
-         * buf. We also subtrack 1, as 'size' in vsnprintf contains null
-         * terminator, but returned value doesn't.
+         * buf.
          */
 
-        flen = sizeof(buf) - w - 1;
+        flen = EL_LOG_MAX;
         e = ENOBUFS;
     }
 
     w += flen;
 
     /*
+     * add terminal formatting reset sequence
+     */
+
+    w += el_color(buf + w, COLOR_RESET);
+
+    /*
      * make sure buf is always null terminated and contains new line character
      */
 
-    buf[w + 0] = '\n';
-    buf[w + 1] = '\0';
+    buf[w++] = '\n';
+    buf[w++] = '\0';
 
     el_puts(buf);
 

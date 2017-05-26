@@ -143,13 +143,27 @@
 
 
 /* ==========================================================================
+    defines length needed to put color information.  5 chars are  needed  to
+    start coloring output, and 4 characters  are  neede  to  reset  terminal
+    color to default
+   ========================================================================== */
+
+
+#if ENABLE_COLORS
+    #define EL_COLORS_LEN (5 + 4)
+#else
+    #define EL_COLORS_LEN 0
+#endif
+
+
+/* ==========================================================================
     maximum buffer length excluding  new  line  and  null  character.   This
     defines length of final output not format.  So "%s" can  take  even  100
     bytes.    EL_LOG_MAX   is   defined   externally   during   compilation.
    ========================================================================== */
 
 
-#define EL_BUF_MAX (EL_PRE_LEN + (EL_LOG_MAX))
+#define EL_BUF_MAX (EL_PRE_LEN + (EL_LOG_MAX) + EL_COLORS_LEN)
 
 
 #endif

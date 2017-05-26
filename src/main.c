@@ -8,6 +8,7 @@ int main(void)
     el_option(EL_OPT_TS, EL_OPT_TS_OFF);
     el_option(EL_OPT_FINFO, 1);
     el_option(EL_OPT_TS_TM, EL_OPT_TS_TM_REALTIME);
+    el_option(EL_OPT_COLORS, 1);
 
     el_print(ELE, "err message");
     el_print(ELW, "wrn message");

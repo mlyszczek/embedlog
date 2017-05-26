@@ -103,12 +103,32 @@ AC_ARG_ENABLE([finfo],
 AS_IF([test "x$enable_finfo" = "xyes"],
 [
     AC_DEFINE([ENABLE_FINFO], [1], [Enable printing file info with log])
-    AC_CHECK_FUNCS([strncat],,
+    AC_CHECK_FUNCS([strncat strlen sprintf],,
         AC_MSG_ERROR(not found, needed by --enable-finfo))
 ],
 #else
 [
     enable_finfo="no"
+])
+
+
+#
+# --enable-colors
+#
+
+
+AC_ARG_ENABLE([colors],
+    AS_HELP_STRING([--enable-colors], [Enable output colorization]))
+
+AS_IF([test "x$enable_colors" = "xyes"],
+[
+    AC_DEFINE([ENABLE_COLORS], [1], [Enable output colorization])
+    AC_CHECK_FUNCS([strcpy strlen],,
+        AC_MSG_ERROR(not found, needed by --enable-colors))
+],
+#else
+[
+    enable_colors="no"
 ])
 
 
@@ -148,5 +168,6 @@ echo "print timestamp enabled..... : $enable_timestamp"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "print file info with log.... : $enable_finfo"
+echo "colorize output............. : $enable_colors"
 echo "maimum file length.......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
