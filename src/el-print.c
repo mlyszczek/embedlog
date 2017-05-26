@@ -236,11 +236,11 @@ static size_t el_timestamp
         struct tm  *tmp;  /* timestamp splitted pointer */
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    #if ENABLE_LOCALTIME_R
-        localtime_r((const time_t *)&s, &tm);
+    #if ENABLE_REENTRANT
+        gmtime_r((const time_t *)&s, &tm);
         tmp = &tm;
     #else
-        tmp = localtime((const time_t *)&s);
+        tmp = gmtime((const time_t *)&s);
     #endif
 
         tl = strftime(buf, 21, "[%Y-%m-%d %H:%M:%S", tmp);

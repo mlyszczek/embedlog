@@ -133,6 +133,26 @@ AS_IF([test "x$enable_colors" = "xyes"],
 
 
 #
+# --enable-reentrant
+#
+
+
+AC_ARG_ENABLE([reentrant],
+    AS_HELP_STRING([--enable-reentrant], [Enable reentrant functions]))
+
+AS_IF([test "x$enable_reentrant" = "xyes"],
+[
+    AC_DEFINE([ENABLE_REENTRANT], [1], [Enable reentrant functions])
+    AC_CHECK_FUNCS([gmtime_r],,
+        AC_MSG_ERROR(not found, needed by --enable-reentrant))
+],
+#else
+[
+    enable_reentrant="no"
+])
+
+
+#
 # VARIABLES=value options
 #
 
@@ -157,6 +177,7 @@ AS_IF([test "x$EL_FLEN_MAX" = x], [EL_FLEN_MAX="32"])
 AC_DEFINE_UNQUOTED([EL_FLEN_MAX], [$EL_FLEN_MAX], [Maximum size of file in message])
 
 
+
 AC_OUTPUT
 
 
@@ -169,5 +190,6 @@ echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "print file info with log.... : $enable_finfo"
 echo "colorize output............. : $enable_colors"
+echo "reentrant functions......... : $enable_reentrant"
 echo "maimum file length.......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
