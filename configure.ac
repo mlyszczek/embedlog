@@ -62,6 +62,11 @@ AC_ARG_ENABLE([realtime],
 
 AS_IF([test "x$enable_realtime" = "xyes"],
 [
+    AS_IF([test "x$enable_timestamp" != "xyes"],
+    [
+        AC_MSG_ERROR(--enable-realtime without --enable-timestamp has no effect)
+    ])
+
     AC_DEFINE([ENABLE_REALTIME], [1], [Enable using CLOCK_REALTIME in log])
     AC_CHECK_FUNCS([clock_gettime],,
         AC_MSG_ERROR(not found, needed by --enable-realtime))
@@ -82,6 +87,11 @@ AC_ARG_ENABLE([monotonic],
 
 AS_IF([test "x$enable_monotonic" = "xyes"],
 [
+    AS_IF([test "x$enable_timestamp" != "xyes"],
+    [
+        AC_MSG_ERROR(--enable-monotonic without --enable-timestamp has no effect)
+    ])
+
     AC_DEFINE([ENABLE_MONOTONIC], [1], [Enable using CLOCK_MONOTONIC in log])
     AC_CHECK_FUNCS([clock_gettime],,
         AC_MSG_ERROR(not found, needed by --enable-monotonic))
