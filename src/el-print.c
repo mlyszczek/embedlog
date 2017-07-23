@@ -17,9 +17,11 @@
 #include <time.h>
 #endif
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
 
 /* ==== private variables =================================================== */
 
@@ -381,14 +383,11 @@ static void el_puts
 }
 
 
-/* ==== public functions ==================================================== */
-
-
 /* ==========================================================================
-    Prints message formated by 'fmt' and '...' with timestamp, 'file' and
-    line number 'num' information, with specified 'level' into configured
-    outputs. Function allocates on callers heap EL_BUF_MAX of memory.  If
-    log message is longer than available buffer, it will be truncated and
+    Prints message formated by 'fmt' and 'ap'  with  timestamp,  'file'  and
+    line number 'num' information, with specified  'level'  into  configured
+    outputs.  Function allocates on callers heap EL_BUF_MAX of  memory.   If
+    log message is longer than available buffer, it will  be  truncated  and
     part of message will be lost.
 
     errno:
@@ -399,19 +398,18 @@ static void el_puts
    ========================================================================== */
 
 
-int el_print
+static int el_printv
 (
     enum el_level  level,                /* log level to print message with */
     const char    *file,                 /* file name where log is printed */
     size_t         num,                  /* line number where log is printed */
     const char    *fmt,                  /* message format (see printf (3)) */
-                   ...                   /* additional parameters for fmt */
+    va_list        ap                    /* additional parameters for fmt */
 )
 {
     char           buf[EL_BUF_MAX + 2];  /* buffer for message to print */
     size_t         w;                    /* bytes written to buf */
     size_t         flen;                 /* length of the parsed fmt output */
-    va_list        va;                   /* arguments '...' for fmt */
     int            e;                    /* error code */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -447,9 +445,7 @@ int el_print
      * add requested log from format, we add + 1 to include null termination
      */
 
-    va_start(va, fmt);
-    flen = vsnprintf(buf + w, EL_LOG_MAX + 1, fmt, va);
-    va_end(va);
+    flen = vsnprintf(buf + w, EL_LOG_MAX + 1, fmt, ap);
 
     if (flen > EL_LOG_MAX)
     {
@@ -488,3 +484,67 @@ int el_print
 
     return 0;
 }
+
+
+/* ==== public functions ==================================================== */
+
+
+/* ==========================================================================
+    calls el_print with 'fmt' and '...' parameters, but  additionaly  prints
+    information about errno.  Functionaly it is similar to  perror  function
+   ========================================================================== */
+
+
+int el_print_error
+(
+    enum el_level  level,                /* log level to print message with */
+    const char    *file,                 /* file name where log is printed */
+    size_t         num,                  /* line number where log is printed */
+    const char    *fmt,                  /* message format (see printf (3)) */
+                   ...                   /* additional parameters for fmt */
+)
+{
+    va_list        ap;                   /* arguments '...' for 'fmt' */
+    int            rc;                   /* return code from el_printfv() */
+    unsigned long  e;                    /* errno from upper layer */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    e = errno;
+
+    va_start(ap, fmt);
+    rc  = el_printv(level, file, num, fmt, ap);
+    rc |= el_print(level, file, num,
+        "errno num: %lu, strerror: %s", e, strerror(e));
+    va_end(ap);
+}
+
+
+/* ==========================================================================
+    simply calls el_printv with '...' converted to 'va_list'
+   ========================================================================== */
+
+
+int el_print
+(
+    enum el_level  level,                /* log level to print message with */
+    const char    *file,                 /* file name where log is printed */
+    size_t         num,                  /* line number where log is printed */
+    const char    *fmt,                  /* message format (see printf (3)) */
+                   ...                   /* additional parameters for fmt */
+)
+{
+    va_list        ap;                   /* arguments '...' for 'fmt' */
+    int            rc;                   /* return code from el_printfv() */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    va_start(ap, fmt);
+    rc = el_printv(level, file, num, fmt, ap);
+    va_end(ap);
+
+    return rc;
+}
+
+
+

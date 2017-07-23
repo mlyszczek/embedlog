@@ -63,6 +63,7 @@ int el_output_disable(enum el_output);
 int el_option(enum el_option, int);
 int el_print(enum el_level, const char *, size_t, const char *, ...);
 int el_print_mem(enum el_level, const char *, size_t, const void *, size_t);
+int el_print_error(enum el_level, const char *, size_t, const char *, ...);
 
 
 #endif
