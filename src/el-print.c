@@ -1,10 +1,45 @@
 /* ==========================================================================
-    Licensed under BSD 2clause license. See LICENSE file for more information
+    Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
+   ==========================================================================
+
+   ------------------------------------------------------------
+  / This module handles all el_print family functions, this is \
+  | the place where message log is constructed and being send  |
+  \ to apropriate output depending on the options              /
+   ------------------------------------------------------------
+    \                                ,+*^^*+___+++_
+     \                         ,*^^^^              )
+      \                     _+*                     ^**+_
+       \                  +^       _ _++*+_+++_,         )
+              _+^^*+_    (     ,+*^ ^          \+_        )
+             {       )  (    ,(    ,_+--+--,      ^)      ^\
+            { (@)    } f   ,(  ,+-^ __*_*_  ^^\_   ^\       )
+           {:;-/    (_+*-+^^^^^+*+*<_ _++_)_    )    )      /
+          ( /  (    (        ,___    ^*+_+* )   <    <      \
+           U _/     )    *--<  ) ^\-----++__)   )    )       )
+            (      )  _(^)^^))  )  )\^^^^^))^*+/    /       /
+          (      /  (_))_^)) )  )  ))^^^^^))^^^)__/     +^^
+         (     ,/    (^))^))  )  ) ))^^^^^^^))^^)       _)
+          *+__+*       (_))^)  ) ) ))^^^^^^))^^^^^)____*^
+          \             \_)^)_)) ))^^^^^^^^^^))^^^^)
+           (_             ^\__^^^^^^^^^^^^))^^^^^^^)
+             ^\___            ^\__^^^^^^))^^^^^^^^)\\
+                  ^^^^^\uuu/^^\uuu/^^^^\^\^\^\^\^\^\^\
+                     ___) >____) >___   ^\_\_\_\_\_\_\)
+                    ^^^//\\_^^//\\_^       ^(\_\_\_\)
+                      ^^^ ^^ ^^^ ^
    ========================================================================== */
 
 
-/* ==== include files ======================================================= */
+/* ==========================================================================
+          _               __            __         ____ _  __
+         (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
+        / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
+       / // / / // /__ / // /_/ // /_/ //  __/  / __// // //  __/(__  )
+      /_//_/ /_/ \___//_/ \__,_/ \__,_/ \___/  /_/  /_//_/ \___//____/
+
+   ========================================================================== */
 
 
 #include "embedlog.h"
@@ -23,7 +58,20 @@
 #include <string.h>
 
 
-/* ==== private variables =================================================== */
+/* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
 
 
 static const char char_level[4] = { 'e', 'w', 'i', 'd' };
@@ -56,7 +104,20 @@ static const char *color[] =
 #endif
 
 
-/* ==== private functions =================================================== */
+/* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+               ____                     __   _
+              / __/__  __ ____   _____ / /_ (_)____   ____   _____
+             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
+            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
+           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+
+   ========================================================================== */
 
 
 /* ==========================================================================
@@ -71,12 +132,13 @@ static const char *color[] =
 
 static size_t el_color
 (
-    char *buf,   /* buffer where to store color info */
-    int   level  /* log level or COLOR_RESET */
+    struct options  *options,  /* options defining printing style */
+    char            *buf,      /* buffer where to store color info */
+    int              level     /* log level or COLOR_RESET */
 )
 {
 #if ENABLE_COLORS
-    if (g_options.colors == 0)
+    if (options->colors == 0)
     {
         /*
          * no colors, you got it!
@@ -172,16 +234,17 @@ static void el_ts_clock_gettime
 
 static size_t el_timestamp
 (
-    char       *buf  /* buffer where timestamp will be stored */
+    struct options  *options,  /* options defining printing style */
+    char            *buf       /* buffer where timestamp will be stored */
 )
 {
 #if ENABLE_TIMESTAMP
-    long        s;   /* timestamp seconds */
-    long        us;  /* timestamp microseconds */
-    size_t      tl;  /* timestamp length */
+    long             s;        /* timestamp seconds */
+    long             us;       /* timestamp microseconds */
+    size_t           tl;       /* timestamp length */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (g_options.timestamp == EL_OPT_TS_OFF)
+    if (options->timestamp == EL_OPT_TS_OFF)
     {
         /*
          * user doesn't want us to print timestamp, that's fine
@@ -194,7 +257,7 @@ static size_t el_timestamp
      * first we get seconds and microseconds from proper timer
      */
 
-    switch (g_options.timestamp_timer)
+    switch (options->timestamp_timer)
     {
 #if ENABLE_REALTIME
 
@@ -232,7 +295,7 @@ static size_t el_timestamp
      * then convert retrieved time into string timestamp
      */
 
-    if (g_options.timestamp == EL_OPT_TS_LONG)
+    if (options->timestamp == EL_OPT_TS_LONG)
     {
         struct tm   tm;   /* timestamp splitted */
         struct tm  *tmp;  /* timestamp splitted pointer */
@@ -307,17 +370,18 @@ static const char *el_basename
 
 static size_t el_finfo
 (
-    char        *buf,   /* location whre to store file information */
-    const char  *file,  /* path to file - will be basenamed */
-    int          num    /* line number (max 99999) */
+    struct options  *options,  /* options defining printing style */
+    char            *buf,      /* location whre to store file information */
+    const char      *file,     /* path to file - will be basenamed */
+    int              num       /* line number (max 99999) */
 )
 {
 #if ENABLE_FINFO
-    const char  *base;  /* basenem of the 'file' */
-    size_t       fl;    /* number of bytes stored in 'buf' */
+    const char      *base;     /* basenem of the 'file' */
+    size_t           fl;       /* number of bytes stored in 'buf' */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (g_options.finfo == 0)
+    if (options->finfo == 0)
     {
         /*
          * no file info for this caller
@@ -349,33 +413,34 @@ static size_t el_finfo
 
 static void el_puts
 (
-    const char *s  /* string to put into output */
+    struct options  *options,  /* options defining printing style */
+    const char      *s         /* string to put into output */
 )
 {
 #if ENABLE_OUT_STDERR
-    if (g_options.outputs & EL_OUT_STDERR)
+    if (options->outputs & EL_OUT_STDERR)
     {
         fputs(s, stderr);
     }
 #endif
 
 #if 0 /* TODO */
-    if (g_options.outputs & EL_OUT_SYSLOG)
+    if (options->outputs & EL_OUT_SYSLOG)
     {
         el_puts_syslog(s);
     }
 
-    if (g_options.outputs & EL_OUT_FILE)
+    if (options->outputs & EL_OUT_FILE)
     {
         el_puts_file(s);
     }
 
-    if (g_options.outputs & EL_OUT_NET)
+    if (options->outputs & EL_OUT_NET)
     {
         el_puts_net(s);
     }
 
-    if (g_options.outputs & EL_OUT_TTY)
+    if (options->outputs & EL_OUT_TTY)
     {
         el_puts_tty(s);
     }
@@ -384,11 +449,163 @@ static void el_puts
 
 
 /* ==========================================================================
+                                        __     __ _
+                         ____   __  __ / /_   / /(_)_____
+                        / __ \ / / / // __ \ / // // ___/
+                       / /_/ // /_/ // /_/ // // // /__
+                      / .___/ \__,_//_.___//_//_/ \___/
+                     /_/
+               ____                     __   _
+              / __/__  __ ____   _____ / /_ (_)____   ____   _____
+             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
+            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
+           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+
+   ========================================================================== */
+
+
+/* ==========================================================================
+    calls el_print with 'fmt' and '...' parameters, but  additionaly  prints
+    information about errno.  Functionaly it is similar to  perror  function
+   ========================================================================== */
+
+
+int el_perror
+(
+    enum el_level  level,                /* log level to print message with */
+    const char    *file,                 /* file name where log is printed */
+    size_t         num,                  /* line number where log is printed */
+    const char    *fmt,                  /* message format (see printf (3)) */
+                   ...                   /* additional parameters for fmt */
+)
+{
+    va_list        ap;                   /* arguments '...' for 'fmt' */
+    int            rc;                   /* return code from el_print() */
+    unsigned long  e;                    /* errno from upper layer */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    e = errno;
+
+    va_start(ap, fmt);
+    rc  = el_voprint(level, file, num, &g_options, fmt, ap);
+    rc |= el_oprint(level, file, num, &g_options,
+        "errno num: %lu, strerror: %s", e, strerror(e));
+    va_end(ap);
+}
+
+
+/* ==========================================================================
+    el_perror function with custom options
+   ========================================================================== */
+
+
+int el_operror
+(
+    enum el_level    level,                /* log level to print message with */
+    const char      *file,                 /* file name where log is printed */
+    size_t           num,                  /* line number where log is printed*/
+    struct options  *options,              /* options defining printing style */
+    const char      *fmt,                  /* message format (see printf (3)) */
+                     ...                   /* additional parameters for fmt */
+)
+{
+    va_list          ap;                   /* arguments '...' for 'fmt' */
+    int              rc;                   /* return code from el_print() */
+    unsigned long    e;                    /* errno from upper layer */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    e = errno;
+
+    va_start(ap, fmt);
+    rc  = el_voprint(level, file, num, options, fmt, ap);
+    rc |= el_oprint(level, file, num, options,
+        "errno num: %lu, strerror: %s", e, strerror(e));
+    va_end(ap);
+}
+
+
+/* ==========================================================================
+    simply calls el_printv with '...' converted to 'va_list'
+   ========================================================================== */
+
+
+int el_print
+(
+    enum el_level  level,                /* log level to print message with */
+    const char    *file,                 /* file name where log is printed */
+    size_t         num,                  /* line number where log is printed */
+    const char    *fmt,                  /* message format (see printf (3)) */
+                   ...                   /* additional parameters for fmt */
+)
+{
+    va_list        ap;                   /* arguments '...' for 'fmt' */
+    int            rc;                   /* return code from el_printfv() */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    va_start(ap, fmt);
+    rc = el_voprint(level, file, num, &g_options, fmt, ap);
+    va_end(ap);
+
+    return rc;
+}
+
+
+/* ==========================================================================
+    el_print but with custom options
+   ========================================================================== */
+
+
+int el_oprint
+(
+    enum el_level    level,                /* log level to print message with */
+    const char      *file,                 /* file name where log is printed */
+    size_t           num,                  /* line number where log is printed */
+    struct options  *options,              /* options defining printing style */
+    const char      *fmt,                  /* message format (see printf (3)) */
+                     ...                   /* additional parameters for fmt */
+)
+{
+    va_list          ap;                   /* arguments '...' for 'fmt' */
+    int              rc;                   /* return code from el_printfv() */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    va_start(ap, fmt);
+    rc = el_voprint(level, file, num, options, fmt, ap);
+    va_end(ap);
+
+    return rc;
+}
+
+
+/* ==========================================================================
+    el_print but accepts variadic argument list object instead of '...'
+   ========================================================================== */
+
+
+int el_vprint
+(
+    enum el_level  level,  /* log level to print message with */
+    const char    *file,   /* file name where log is printed */
+    size_t         num,    /* line number where log is printed */
+    const char    *fmt,    /* message format (see printf (3)) */
+    va_list        ap      /* additional parameters for fmt */
+)
+{
+    return el_voprint(level, file, num, &g_options, fmt, ap);
+}
+
+
+/* ==========================================================================
     Prints message formated by 'fmt' and 'ap'  with  timestamp,  'file'  and
     line number 'num' information, with specified  'level'  into  configured
-    outputs.  Function allocates on callers heap EL_BUF_MAX of  memory.   If
-    log message is longer than available buffer, it will  be  truncated  and
-    part of message will be lost.
+    outputs.  Function allocates on  callers  stack  EL_BUF_MAX  of  memory.
+    If log message is longer than available buffer,  it  will  be  truncated
+    and part of message will be lost.  Additionally options may be passed to
+    tune printing style in runtime
 
     errno:
             EINVAL      level is invalid
@@ -398,25 +615,26 @@ static void el_puts
    ========================================================================== */
 
 
-static int el_printv
+int el_voprint
 (
-    enum el_level  level,                /* log level to print message with */
-    const char    *file,                 /* file name where log is printed */
-    size_t         num,                  /* line number where log is printed */
-    const char    *fmt,                  /* message format (see printf (3)) */
-    va_list        ap                    /* additional parameters for fmt */
+    enum el_level    level,                /* log level to print message with */
+    const char      *file,                 /* file name where log is printed */
+    size_t           num,                  /* line number where log is printed*/
+    struct options  *options,              /* options defining printing style */
+    const char      *fmt,                  /* message format (see printf (3)) */
+    va_list          ap                    /* additional parameters for fmt */
 )
 {
-    char           buf[EL_BUF_MAX + 2];  /* buffer for message to print */
-    size_t         w;                    /* bytes written to buf */
-    size_t         flen;                 /* length of the parsed fmt output */
-    int            e;                    /* error code */
+    char             buf[EL_BUF_MAX + 2];  /* buffer for message to print */
+    size_t           w;                    /* bytes written to buf */
+    size_t           flen;                 /* length of the parsed fmt output */
+    int              e;                    /* error code */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     VALID(EINVAL, 0 <= level && level <= EL_LEVEL_DBG);
     VALID(EINVAL, fmt);
-    VALID(ECHRNG, el_log_allowed(level));
+    VALID(ECHRNG, el_log_allowed(options, level));
 
     e = 0;
 
@@ -424,9 +642,9 @@ static int el_printv
      * add preamble and colors to log line buf
      */
 
-    w  = el_color(buf, level);
-    w += el_timestamp(buf + w);
-    w += el_finfo(buf + w, file, num);
+    w  = el_color(options, buf, level);
+    w += el_timestamp(options, buf + w);
+    w += el_finfo(options, buf + w, file, num);
 
     if (w != 0 && buf[w - 1] == ']')
     {
@@ -465,7 +683,7 @@ static int el_printv
      * add terminal formatting reset sequence
      */
 
-    w += el_color(buf + w, COLOR_RESET);
+    w += el_color(options, buf + w, COLOR_RESET);
 
     /*
      * make sure buf is always null terminated and contains new line character
@@ -474,7 +692,7 @@ static int el_printv
     buf[w++] = '\n';
     buf[w++] = '\0';
 
-    el_puts(buf);
+    el_puts(options, buf);
 
     if (e)
     {
@@ -484,67 +702,3 @@ static int el_printv
 
     return 0;
 }
-
-
-/* ==== public functions ==================================================== */
-
-
-/* ==========================================================================
-    calls el_print with 'fmt' and '...' parameters, but  additionaly  prints
-    information about errno.  Functionaly it is similar to  perror  function
-   ========================================================================== */
-
-
-int el_print_error
-(
-    enum el_level  level,                /* log level to print message with */
-    const char    *file,                 /* file name where log is printed */
-    size_t         num,                  /* line number where log is printed */
-    const char    *fmt,                  /* message format (see printf (3)) */
-                   ...                   /* additional parameters for fmt */
-)
-{
-    va_list        ap;                   /* arguments '...' for 'fmt' */
-    int            rc;                   /* return code from el_printfv() */
-    unsigned long  e;                    /* errno from upper layer */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-    e = errno;
-
-    va_start(ap, fmt);
-    rc  = el_printv(level, file, num, fmt, ap);
-    rc |= el_print(level, file, num,
-        "errno num: %lu, strerror: %s", e, strerror(e));
-    va_end(ap);
-}
-
-
-/* ==========================================================================
-    simply calls el_printv with '...' converted to 'va_list'
-   ========================================================================== */
-
-
-int el_print
-(
-    enum el_level  level,                /* log level to print message with */
-    const char    *file,                 /* file name where log is printed */
-    size_t         num,                  /* line number where log is printed */
-    const char    *fmt,                  /* message format (see printf (3)) */
-                   ...                   /* additional parameters for fmt */
-)
-{
-    va_list        ap;                   /* arguments '...' for 'fmt' */
-    int            rc;                   /* return code from el_printfv() */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-    va_start(ap, fmt);
-    rc = el_printv(level, file, num, fmt, ap);
-    va_end(ap);
-
-    return rc;
-}
-
-
-

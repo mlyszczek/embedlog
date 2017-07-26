@@ -8,6 +8,7 @@
 #define EMBEDLOG_H 1
 
 #include <stddef.h>
+#include <stdarg.h>
 
 #define ELE EL_LEVEL_ERR, __FILE__, __LINE__
 #define ELW EL_LEVEL_WRN, __FILE__, __LINE__
@@ -56,14 +57,35 @@ enum el_option_timestamp_timer
     EL_OPT_TS_TM_MONOTONIC
 };
 
+struct options
+{
+    int outputs;
+    int level;
+    int colors;
+    int timestamp;
+    int timestamp_timer;
+    int finfo;
+};
 
+int el_options_init(struct options *);
 int el_level_set(enum el_level);
+int el_olevel_set(struct options *, enum el_level);
 int el_output_enable(enum el_output);
+int el_ooutput_enable(struct options *, enum el_output);
 int el_output_disable(enum el_output);
+int el_ooutput_disable(struct options *, enum el_output);
 int el_option(enum el_option, int);
+int el_ooption(struct options *, enum el_option, int);
 int el_print(enum el_level, const char *, size_t, const char *, ...);
-int el_print_mem(enum el_level, const char *, size_t, const void *, size_t);
-int el_print_error(enum el_level, const char *, size_t, const char *, ...);
+int el_oprint(enum el_level, const char *, size_t, struct options *,
+        const char *, ...);
+int el_vprint(enum el_level, const char *, size_t, const char *, va_list);
+int el_voprint(enum el_level, const char *, size_t, struct options *,
+        const char *, va_list);
+int el_mprint(enum el_level, const char *, size_t, const void *, size_t);
+int el_perror(enum el_level, const char *, size_t, const char *, ...);
+int el_operror(enum el_level, const char *, size_t, struct options *,
+        const char *, ...);
 
 
 #endif

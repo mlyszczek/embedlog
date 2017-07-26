@@ -1,26 +1,82 @@
 /* ==========================================================================
     Licensed under BSD 2clause license. See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
+   ==========================================================================
+
+   -------------------------------------------------------------
+  / This is option module, here we parse and manage all options \
+  | regarding logging. Also this is home for global default     |
+  \ option object                                               /
+   -------------------------------------------------------------
+    \                         .       .
+     \                       / `.   .' "
+      \              .---.  <    > <    >  .---.
+       \             |    \  \ - ~ ~ - /  /    |
+         _____          ..-~             ~-..-~
+        |     |   \~~~\.'                    `./~~~/
+       ---------   \__/                        \__/
+      .'  O    \     /               /       \  "
+     (_____,    `._.'               |         }  \/~~~/
+      `----.          /       }     |        /    \__/
+            `-.      |       /      |       /      `. ,~~|
+                ~-.__|      /_ - ~ ^|      /- _      `..-'
+                     |     /        |     /     ~-.     `-. _  _  _
+                     |_____|        |_____|         ~ - . _ _ _ _ _>
    ========================================================================== */
 
 
-/* ==== include files ======================================================= */
+/* ==========================================================================
+          _               __            __         ____ _  __
+         (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
+        / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
+       / // / / // /__ / // /_/ // /_/ //  __/  / __// // //  __/(__  )
+      /_//_/ /_/ \___//_/ \__,_/ \__,_/ \___/  /_/  /_//_/ \___//____/
+
+   ========================================================================== */
 
 
-#include "embedlog.h"
 #include "config.h"
+#include "embedlog.h"
 #include "options.h"
 #include "valid.h"
 
 #include <errno.h>
+#include <string.h>
 
-/* ==== global variables ==================================================== */
+
+/* ==========================================================================
+                               __        __            __
+                       ____ _ / /____   / /_   ____ _ / /
+                      / __ `// // __ \ / __ \ / __ `// /
+                     / /_/ // // /_/ // /_/ // /_/ // /
+                     \__, //_/ \____//_.___/ \__,_//_/
+                    /____/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
 
 
 struct options g_options;
 
 
-/* ==== private variables =================================================== */
+/* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
 
 
 static const int VALID_OUTS = 0
@@ -47,61 +103,119 @@ static const int VALID_OUTS = 0
         ;
 
 
-/* ==== public functions ==================================================== */
+/* ==========================================================================
+                                        __     __ _
+                         ____   __  __ / /_   / /(_)_____
+                        / __ \ / / / // __ \ / // // ___/
+                       / /_/ // /_/ // /_/ // // // /__
+                      / .___/ \__,_//_.___//_//_/ \___/
+                     /_/
+               ____                     __   _
+              / __/__  __ ____   _____ / /_ (_)____   ____   _____
+             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
+            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
+           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+
+   ========================================================================== */
 
 
 /* ==========================================================================
-    Sets current log level
+    Sets options object to sane values
 
-    errno:
-            EINVAL      passed level is not a valid log level
+    errno
+            EINVAL      options is invalid (null)
+   ========================================================================== */
+
+
+int el_options_init
+(
+    struct options  *options  /* options object */
+)
+{
+    VALID(EINVAL, options);
+
+    memset(options, 0, sizeof(*options));
+    return 0;
+}
+
+
+/* ==========================================================================
+    Sets current log level for default options
    ========================================================================== */
 
 
 int el_level_set
 (
-    enum el_level level  /* log level to set */
+    enum el_level  level  /* log level to set */
+)
+{
+    return el_olevel_set(&g_options, level);
+}
+
+
+/* ==========================================================================
+    Sets current log level
+
+    errno
+            EINVAL      passed level is not a valid log level
+   ========================================================================== */
+
+
+int el_olevel_set
+(
+    struct options  *options,  /* options object to set option to */
+    enum el_level    level  /* log level to set */
 )
 {
     VALID(EINVAL, 0 <= level && level <= EL_LEVEL_DBG);
 
-    g_options.level = level;
+    options->level = level;
 
     return 0;
+}
+
+
+/* ==========================================================================
+    enables default output
+   ========================================================================== */
+
+
+int el_output_enable
+(
+    enum el_output  output  /* output to enable */
+)
+{
+    return el_ooutput_enable(&g_options, output);
 }
 
 
 /* ==========================================================================
     Enables specified output for prints
 
-    errno:
+    errno
             EINVAL      passwd output is invalid
             ENOSYS      specified output is not implemented, ie. was not
                         enabled during compilation
    ========================================================================== */
 
 
-int el_output_enable
+int el_ooutput_enable
 (
-    enum el_output output  /* output to enable */
+    struct options  *options,  /* options object to set option to */
+    enum el_output   output    /* output to enable */
 )
 {
     VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
     VALID(ENOSYS, (output & ~VALID_OUTS) == 0x00);
 
-    g_options.outputs |= output;
+    options->outputs |= output;
 
     return 0;
 }
 
 
 /* ==========================================================================
-    Disables specified output from prints
-
-    errno:
-            EINVAL      passed output is invalid
-            ENOSYS      specified output is not implemented, ie. was not
-                        enabled during compilation
+    disable default output
    ========================================================================== */
 
 
@@ -110,10 +224,30 @@ int el_output_disable
     enum el_output output  /* output to disable */
 )
 {
+    return el_ooutput_disable(&g_options, output);
+}
+
+
+/* ==========================================================================
+    Disables specified output from prints
+
+    errno
+            EINVAL      passed output is invalid
+            ENOSYS      specified output is not implemented, ie. was not
+                        enabled during compilation
+   ========================================================================== */
+
+
+int el_ooutput_disable
+(
+    struct options  *options,  /* options object to set option to */
+    enum el_output   output    /* output to disable */
+)
+{
     VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
     VALID(ENOSYS, (output & ~VALID_OUTS) == 0x00);
 
-    g_options.outputs &= ~output;
+    options->outputs &= ~output;
 
     return 0;
 }
@@ -127,27 +261,44 @@ int el_output_disable
 
 int el_log_allowed
 (
-    enum el_level level  /* log level to check */
+    struct options  *options,   /* options object */
+    enum el_level    level      /* log level to check */
 )
 {
-    return g_options.level >= level && g_options.outputs;
+    return options->level >= level && options->outputs;
 }
 
 
 /* ==========================================================================
-    sets 'option' with 'value'
+    el_ooptions but for default g_options object
+   ========================================================================== */
 
-    errno:
+
+int el_option
+(
+    enum el_option   option,   /* option to set */
+    int              value     /* option value */
+)
+{
+    return el_ooption(&g_options, option, value);
+}
+
+
+/* ==========================================================================
+    sets 'option' with 'value' in 'options' object.
+
+    errno
             EINVAL      option is invalid
             EINVAL      value for specific option is invalid
             ENOSYS      option was disabled during compilation
    ========================================================================== */
 
 
-int el_option
+int el_ooption
 (
-    enum el_option option,
-    int            value
+    struct options  *options,  /* options object to set option to */
+    enum el_option   option,   /* option to set */
+    int              value     /* option value */
 )
 {
     VALID(EINVAL, 0 <= option && option <= EL_OPT_FINFO);
@@ -163,7 +314,7 @@ int el_option
 
         VALID(EINVAL, (value & ~1) == 0);
 
-        g_options.colors = value;
+        options->colors = value;
         return 0;
 
     #endif /* ENABLE_COLORS */
@@ -173,13 +324,13 @@ int el_option
     case EL_OPT_TS:
         VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_OFF);
 
-        g_options.timestamp = value;
+        options->timestamp = value;
         return 0;
 
     case EL_OPT_TS_TM:
         VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_TM_MONOTONIC);
 
-        g_options.timestamp_timer = value;
+        options->timestamp_timer = value;
         return 0;
 
     #endif /* ENABLE_TIMESTAMP */
@@ -189,7 +340,7 @@ int el_option
     case EL_OPT_FINFO:
         VALID(EINVAL, (value & ~1) == 0);
 
-        g_options.finfo = value;
+        options->finfo = value;
         return 0;
 
     #endif /* ENABLE_FINFO */
