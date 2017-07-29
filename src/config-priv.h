@@ -30,16 +30,16 @@
 /* ==========================================================================
     single line of el_print_mem will be similar to this
 
-    0xNNNN: HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH  CCCCCCCCCCCCCCC
+    0xNNNN  HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH  CCCCCCCCCCCCCCC
    ========================================================================== */
 
 
 /* ==========================================================================
-    this defines length of "0xNNNN: " part.
+    this defines length of "0xNNNN  " part.
    ========================================================================== */
 
 
-#define EL_MEM_ADR_LEN 8
+#define EL_MEM_OFFSET_LEN 8
 
 
 /* ==========================================================================
@@ -65,14 +65,6 @@
 
 
 #define EL_MEM_CHAR_LEN (EL_MEM_LINE_SIZE)
-
-
-/* ==========================================================================
-    Length of the whole line that will be printed
-   ========================================================================== */
-
-
-#define EN_MEM_WHOLE_LINE_LEN (EL_MEM_ADR_LEN + EL_MEM_HEX_LEN + EL_MEM_CHAR_LEN)
 
 
 /* ==== defines for el_print function ======================================= */

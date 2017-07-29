@@ -84,7 +84,9 @@ int el_oprint(enum el_level, const char *, size_t, struct options *,
 int el_vprint(enum el_level, const char *, size_t, const char *, va_list);
 int el_voprint(enum el_level, const char *, size_t, struct options *,
         const char *, va_list);
-int el_mprint(enum el_level, const char *, size_t, const void *, size_t);
+int el_pmemory(enum el_level, const char *, size_t, const void *, size_t);
+int el_opmemory(enum el_level, const char *, size_t, struct options *,
+        const void *, size_t);
 int el_perror(enum el_level, const char *, size_t, const char *, ...);
 int el_operror(enum el_level, const char *, size_t, struct options *,
         const char *, ...);

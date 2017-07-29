@@ -64,6 +64,14 @@ int main(void)
     el_option(EL_OPT_TS, EL_OPT_TS_OFF);
     el_print(ELE, "and without ts");
 
+    unsigned char buf[256];
+
+    for (unsigned char i = 0; i != 255; ++i)
+    {
+        buf[i] = i;
+    }
+
+    el_pmemory(ELD, buf, 129);
 
     return 0;
 }

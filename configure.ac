@@ -186,6 +186,15 @@ AC_ARG_VAR([EL_FLEN_MAX], [Maximum size of file in message])
 AS_IF([test "x$EL_FLEN_MAX" = x], [EL_FLEN_MAX="32"])
 AC_DEFINE_UNQUOTED([EL_FLEN_MAX], [$EL_FLEN_MAX], [Maximum size of file in message])
 
+#
+# EL_MEM_LINE_SIZE
+#
+
+
+AC_ARG_VAR([EL_MEM_LINE_SIZE], [Maximum size of file in message])
+AS_IF([test "x$EL_MEM_LINE_SIZE" = x], [EL_MEM_LINE_SIZE="16"])
+AC_DEFINE_UNQUOTED([EL_MEM_LINE_SIZE], [$EL_MEM_LINE_SIZE],
+    [Number of bytes to print in one line in el_pmemory function])
 
 
 AC_OUTPUT
@@ -203,3 +212,4 @@ echo "colorize output............. : $enable_colors"
 echo "reentrant functions......... : $enable_reentrant"
 echo "maimum file length.......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
+echo "pmemory line size........... : $EL_MEM_LINE_SIZE"
