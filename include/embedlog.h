@@ -76,6 +76,8 @@ int el_output_disable(enum el_output);
 int el_ooutput_disable(struct options *, enum el_output);
 int el_option(enum el_option, int);
 int el_ooption(struct options *, enum el_option, int);
+int el_puts(const char *);
+int el_oputs(struct options *, const char *s);
 int el_print(enum el_level, const char *, size_t, const char *, ...);
 int el_oprint(enum el_level, const char *, size_t, struct options *,
         const char *, ...);

@@ -5,8 +5,10 @@
 
    ------------------------------------------------------------
   / This module handles all el_print family functions, this is \
-  | the place where message log is constructed and being send  |
-  \ to apropriate output depending on the options              /
+  | the place where message log is constructed, colors, file   |
+  | name and timstamp are added here if applicable. After      |
+  | processing ready string is sent to el_puts to send it to   |
+  \ apropriate output facility.                                /
    ------------------------------------------------------------
     \                                ,+*^^*+___+++_
      \                         ,*^^^^              )
@@ -407,48 +409,6 @@ static size_t el_finfo
 
 
 /* ==========================================================================
-    puts string 's' to all enabled output facilities
-   ========================================================================== */
-
-
-static void el_puts
-(
-    struct options  *options,  /* options defining printing style */
-    const char      *s         /* string to put into output */
-)
-{
-#if ENABLE_OUT_STDERR
-    if (options->outputs & EL_OUT_STDERR)
-    {
-        fputs(s, stderr);
-    }
-#endif
-
-#if 0 /* TODO */
-    if (options->outputs & EL_OUT_SYSLOG)
-    {
-        el_puts_syslog(s);
-    }
-
-    if (options->outputs & EL_OUT_FILE)
-    {
-        el_puts_file(s);
-    }
-
-    if (options->outputs & EL_OUT_NET)
-    {
-        el_puts_net(s);
-    }
-
-    if (options->outputs & EL_OUT_TTY)
-    {
-        el_puts_tty(s);
-    }
-#endif
-}
-
-
-/* ==========================================================================
                                         __     __ _
                          ____   __  __ / /_   / /(_)_____
                         / __ \ / / / // __ \ / // // ___/
@@ -462,68 +422,6 @@ static void el_puts
            /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
 
    ========================================================================== */
-
-
-/* ==========================================================================
-    calls el_print with 'fmt' and '...' parameters, but  additionaly  prints
-    information about errno.  Functionaly it is similar to  perror  function
-   ========================================================================== */
-
-
-int el_perror
-(
-    enum el_level  level,                /* log level to print message with */
-    const char    *file,                 /* file name where log is printed */
-    size_t         num,                  /* line number where log is printed */
-    const char    *fmt,                  /* message format (see printf (3)) */
-                   ...                   /* additional parameters for fmt */
-)
-{
-    va_list        ap;                   /* arguments '...' for 'fmt' */
-    int            rc;                   /* return code from el_print() */
-    unsigned long  e;                    /* errno from upper layer */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-    e = errno;
-
-    va_start(ap, fmt);
-    rc  = el_voprint(level, file, num, &g_options, fmt, ap);
-    rc |= el_oprint(level, file, num, &g_options,
-        "errno num: %lu, strerror: %s", e, strerror(e));
-    va_end(ap);
-}
-
-
-/* ==========================================================================
-    el_perror function with custom options
-   ========================================================================== */
-
-
-int el_operror
-(
-    enum el_level    level,                /* log level to print message with */
-    const char      *file,                 /* file name where log is printed */
-    size_t           num,                  /* line number where log is printed*/
-    struct options  *options,              /* options defining printing style */
-    const char      *fmt,                  /* message format (see printf (3)) */
-                     ...                   /* additional parameters for fmt */
-)
-{
-    va_list          ap;                   /* arguments '...' for 'fmt' */
-    int              rc;                   /* return code from el_print() */
-    unsigned long    e;                    /* errno from upper layer */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-    e = errno;
-
-    va_start(ap, fmt);
-    rc  = el_voprint(level, file, num, options, fmt, ap);
-    rc |= el_oprint(level, file, num, options,
-        "errno num: %lu, strerror: %s", e, strerror(e));
-    va_end(ap);
-}
 
 
 /* ==========================================================================
@@ -692,7 +590,7 @@ int el_voprint
     buf[w++] = '\n';
     buf[w++] = '\0';
 
-    el_puts(options, buf);
+    el_oputs(options, buf);
 
     if (e)
     {

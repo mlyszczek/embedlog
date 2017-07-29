@@ -36,12 +36,13 @@
 
 
 #include "config.h"
-#include "embedlog.h"
-#include "options.h"
-#include "valid.h"
 
 #include <errno.h>
 #include <string.h>
+
+#include "embedlog.h"
+#include "options.h"
+#include "valid.h"
 
 
 /* ==========================================================================
