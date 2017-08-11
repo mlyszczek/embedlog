@@ -57,7 +57,7 @@ enum el_option_timestamp_timer
     EL_OPT_TS_TM_MONOTONIC
 };
 
-struct options
+struct el_options
 {
     int outputs;
     int level;
@@ -67,28 +67,28 @@ struct options
     int finfo;
 };
 
-int el_options_init(struct options *);
+int el_options_init(struct el_options *);
 int el_level_set(enum el_level);
-int el_olevel_set(struct options *, enum el_level);
+int el_olevel_set(struct el_options *, enum el_level);
 int el_output_enable(enum el_output);
-int el_ooutput_enable(struct options *, enum el_output);
+int el_ooutput_enable(struct el_options *, enum el_output);
 int el_output_disable(enum el_output);
-int el_ooutput_disable(struct options *, enum el_output);
+int el_ooutput_disable(struct el_options *, enum el_output);
 int el_option(enum el_option, int);
-int el_ooption(struct options *, enum el_option, int);
+int el_ooption(struct el_options *, enum el_option, int);
 int el_puts(const char *);
-int el_oputs(struct options *, const char *s);
+int el_oputs(struct el_options *, const char *s);
 int el_print(enum el_level, const char *, size_t, const char *, ...);
-int el_oprint(enum el_level, const char *, size_t, struct options *,
+int el_oprint(enum el_level, const char *, size_t, struct el_options *,
         const char *, ...);
 int el_vprint(enum el_level, const char *, size_t, const char *, va_list);
-int el_voprint(enum el_level, const char *, size_t, struct options *,
+int el_voprint(enum el_level, const char *, size_t, struct el_options *,
         const char *, va_list);
 int el_pmemory(enum el_level, const char *, size_t, const void *, size_t);
-int el_opmemory(enum el_level, const char *, size_t, struct options *,
+int el_opmemory(enum el_level, const char *, size_t, struct el_options *,
         const void *, size_t);
 int el_perror(enum el_level, const char *, size_t, const char *, ...);
-int el_operror(enum el_level, const char *, size_t, struct options *,
+int el_operror(enum el_level, const char *, size_t, struct el_options *,
         const char *, ...);
 
 

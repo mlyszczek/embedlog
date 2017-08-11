@@ -61,7 +61,7 @@
    ========================================================================== */
 
 
-struct options g_options;
+struct el_options g_options;
 
 
 /* ==========================================================================
@@ -130,7 +130,7 @@ static const int VALID_OUTS = 0
 
 int el_options_init
 (
-    struct options  *options  /* options object */
+    struct el_options  *options  /* options object */
 )
 {
     VALID(EINVAL, options);
@@ -164,8 +164,8 @@ int el_level_set
 
 int el_olevel_set
 (
-    struct options  *options,  /* options object to set option to */
-    enum el_level    level  /* log level to set */
+    struct el_options  *options,  /* options object to set option to */
+    enum el_level       level  /* log level to set */
 )
 {
     VALID(EINVAL, 0 <= level && level <= EL_LEVEL_DBG);
@@ -202,8 +202,8 @@ int el_output_enable
 
 int el_ooutput_enable
 (
-    struct options  *options,  /* options object to set option to */
-    enum el_output   output    /* output to enable */
+    struct el_options  *options,  /* options object to set option to */
+    enum el_output      output    /* output to enable */
 )
 {
     VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
@@ -241,8 +241,8 @@ int el_output_disable
 
 int el_ooutput_disable
 (
-    struct options  *options,  /* options object to set option to */
-    enum el_output   output    /* output to disable */
+    struct el_options  *options,  /* options object to set option to */
+    enum el_output      output    /* output to disable */
 )
 {
     VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
@@ -262,8 +262,8 @@ int el_ooutput_disable
 
 int el_log_allowed
 (
-    struct options  *options,   /* options object */
-    enum el_level    level      /* log level to check */
+    struct el_options  *options,   /* options object */
+    enum el_level       level      /* log level to check */
 )
 {
     return options->level >= level && options->outputs;
@@ -297,9 +297,9 @@ int el_option
 
 int el_ooption
 (
-    struct options  *options,  /* options object to set option to */
-    enum el_option   option,   /* option to set */
-    int              value     /* option value */
+    struct el_options  *options,  /* options object to set option to */
+    enum el_option      option,   /* option to set */
+    int                 value     /* option value */
 )
 {
     VALID(EINVAL, 0 <= option && option <= EL_OPT_FINFO);

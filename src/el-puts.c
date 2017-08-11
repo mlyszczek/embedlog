@@ -75,8 +75,8 @@ int el_puts
 
 int el_oputs
 (
-    struct options  *options,  /* options defining printing style */
-    const char      *s         /* string to put into output */
+    struct el_options  *options,  /* options defining printing style */
+    const char         *s         /* string to put into output */
 )
 {
 #if ENABLE_OUT_STDERR

@@ -12,8 +12,8 @@
 #include "embedlog.h"
 
 
-extern struct options g_options;
+extern struct el_options g_options;
 
-int el_log_allowed(struct options *, enum el_level);
+int el_log_allowed(struct el_options *, enum el_level);
 
 #endif

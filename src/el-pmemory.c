@@ -72,13 +72,13 @@
 
 static void el_print_line
 (
-    enum el_level         level,       /* log level to print message with */
-    const char           *file,        /* file name where log is printed */
-    size_t                num,         /* line number where log is printed */
-    struct options       *options,     /* options defining printing style */
-    const unsigned char  *buf,         /* memory location to print */
-    size_t                line_size,   /* size of line in bytes */
-    size_t                line_number  /* line number beign processed */
+    enum el_level            level,       /* log level to print message with */
+    const char              *file,        /* file name where log is printed */
+    size_t                   num,         /* line number where log is printed */
+    struct el_options       *options,     /* options defining printing style */
+    const unsigned char     *buf,         /* memory location to print */
+    size_t                   line_size,   /* size of line in bytes */
+    size_t                   line_number  /* line number beign processed */
 )
 {
     /*
@@ -188,12 +188,12 @@ int el_pmemory
 
 int el_opmemory
 (
-    enum el_level    level,    /* log level to print message with */
-    const char      *file,     /* file name where log is printed */
-    size_t           num,      /* line number where log is printed */
-    struct options  *options,  /* options defining printing style */
-    const void      *mem,      /* memory location to print */
-    size_t           mlen      /* number of bytes to print */
+    enum el_level       level,    /* log level to print message with */
+    const char         *file,     /* file name where log is printed */
+    size_t              num,      /* line number where log is printed */
+    struct el_options  *options,  /* options defining printing style */
+    const void         *mem,      /* memory location to print */
+    size_t              mlen      /* number of bytes to print */
 )
 {
     /*

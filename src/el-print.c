@@ -134,9 +134,9 @@ static const char *color[] =
 
 static size_t el_color
 (
-    struct options  *options,  /* options defining printing style */
-    char            *buf,      /* buffer where to store color info */
-    int              level     /* log level or COLOR_RESET */
+    struct el_options  *options,  /* options defining printing style */
+    char               *buf,      /* buffer where to store color info */
+    int                 level     /* log level or COLOR_RESET */
 )
 {
 #if ENABLE_COLORS
@@ -236,8 +236,8 @@ static void el_ts_clock_gettime
 
 static size_t el_timestamp
 (
-    struct options  *options,  /* options defining printing style */
-    char            *buf       /* buffer where timestamp will be stored */
+    struct el_options  *options,  /* options defining printing style */
+    char               *buf       /* buffer where timestamp will be stored */
 )
 {
 #if ENABLE_TIMESTAMP
@@ -372,10 +372,10 @@ static const char *el_basename
 
 static size_t el_finfo
 (
-    struct options  *options,  /* options defining printing style */
-    char            *buf,      /* location whre to store file information */
-    const char      *file,     /* path to file - will be basenamed */
-    int              num       /* line number (max 99999) */
+    struct el_options  *options,  /* options defining printing style */
+    char               *buf,      /* location whre to store file information */
+    const char         *file,     /* path to file - will be basenamed */
+    int                 num       /* line number (max 99999) */
 )
 {
 #if ENABLE_FINFO
@@ -458,12 +458,12 @@ int el_print
 
 int el_oprint
 (
-    enum el_level    level,                /* log level to print message with */
-    const char      *file,                 /* file name where log is printed */
-    size_t           num,                  /* line number where log is printed */
-    struct options  *options,              /* options defining printing style */
-    const char      *fmt,                  /* message format (see printf (3)) */
-                     ...                   /* additional parameters for fmt */
+    enum el_level       level,                /* log level to print log with */
+    const char         *file,                 /* file name to print in log */
+    size_t              num,                  /* line number to print in log */
+    struct el_options  *options,              /* printing style options */
+    const char         *fmt,                  /* message format (man printf) */
+                        ...                   /* additional params for fmt */
 )
 {
     va_list          ap;                   /* arguments '...' for 'fmt' */
@@ -515,18 +515,18 @@ int el_vprint
 
 int el_voprint
 (
-    enum el_level    level,                /* log level to print message with */
-    const char      *file,                 /* file name where log is printed */
-    size_t           num,                  /* line number where log is printed*/
-    struct options  *options,              /* options defining printing style */
-    const char      *fmt,                  /* message format (see printf (3)) */
-    va_list          ap                    /* additional parameters for fmt */
+    enum el_level       level,                /* log level to print log with */
+    const char         *file,                 /* file name to print in log */
+    size_t              num,                  /* line number to print in log */
+    struct el_options  *options,              /* options defining print style */
+    const char         *fmt,                  /* message format (man printf) */
+    va_list             ap                    /* additional params for fmt */
 )
 {
-    char             buf[EL_BUF_MAX + 2];  /* buffer for message to print */
-    size_t           w;                    /* bytes written to buf */
-    size_t           flen;                 /* length of the parsed fmt output */
-    int              e;                    /* error code */
+    char                buf[EL_BUF_MAX + 2];  /* buffer for message to print */
+    size_t              w;                    /* bytes written to buf */
+    size_t              flen;                 /* length of the fmt output */
+    int                 e;                    /* error code */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 

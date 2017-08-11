@@ -86,17 +86,17 @@ int el_perror
 
 int el_operror
 (
-    enum el_level    level,                /* log level to print message with */
-    const char      *file,                 /* file name where log is printed */
-    size_t           num,                  /* line number where log is printed*/
-    struct options  *options,              /* options defining printing style */
-    const char      *fmt,                  /* message format (see printf (3)) */
-                     ...                   /* additional parameters for fmt */
+    enum el_level      level,     /* log level to print message with */
+    const char        *file,      /* file name where log is printed */
+    size_t             num,       /* line number where log is printed*/
+    struct el_options  *options,  /* options defining printing style */
+    const char        *fmt,       /* message format (see printf (3)) */
+                       ...        /* additional parameters for fmt */
 )
 {
-    va_list          ap;                   /* arguments '...' for 'fmt' */
-    int              rc;                   /* return code from el_print() */
-    unsigned long    e;                    /* errno from upper layer */
+    va_list            ap;        /* arguments '...' for 'fmt' */
+    int                rc;        /* return code from el_print() */
+    unsigned long      e;         /* errno from upper layer */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
