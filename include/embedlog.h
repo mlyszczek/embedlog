@@ -9,6 +9,7 @@
 
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #define ELE EL_LEVEL_ERR, __FILE__, __LINE__
 #define ELW EL_LEVEL_WRN, __FILE__, __LINE__
@@ -39,7 +40,13 @@ enum el_option
     EL_OPT_COLORS,
     EL_OPT_TS,
     EL_OPT_TS_TM,
+
     EL_OPT_FINFO,
+    EL_OPT_FNAME,
+    EL_OPT_FROTATE_NUMBER,
+    EL_OPT_FROTATE_SIZE,
+
+    EL_OPT_ERROR /* internal use only */
 };
 
 enum el_option_timestamp
@@ -59,12 +66,19 @@ enum el_option_timestamp_timer
 
 struct el_options
 {
-    int outputs;
-    int level;
-    int colors;
-    int timestamp;
-    int timestamp_timer;
-    int finfo;
+    int          outputs;
+    int          level;
+    int          colors;
+    int          timestamp;
+    int          timestamp_timer;
+
+    int          finfo;
+    int          frotate_number;
+    int          fcurrent_rotate;
+    long         frotate_size;
+    long         fpos;
+    FILE        *file;
+    const char  *fname;
 };
 
 int el_options_init(struct el_options *);
@@ -74,8 +88,8 @@ int el_output_enable(enum el_output);
 int el_ooutput_enable(struct el_options *, enum el_output);
 int el_output_disable(enum el_output);
 int el_ooutput_disable(struct el_options *, enum el_output);
-int el_option(enum el_option, int);
-int el_ooption(struct el_options *, enum el_option, int);
+int el_option(enum el_option, ...);
+int el_ooption(struct el_options *, enum el_option, ...);
 int el_puts(const char *);
 int el_oputs(struct el_options *, const char *s);
 int el_print(enum el_level, const char *, size_t, const char *, ...);

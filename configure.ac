@@ -8,11 +8,11 @@ AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
 
-#
+###
 # --enable-feature options
 #
 
-#
+###
 # --enable-out-stderr
 #
 
@@ -31,8 +31,28 @@ AS_IF([test "x$enable_out_stderr" = "xyes"],
     enable_out_stderr="no"
 ])
 
-
+###
+# --enable-out-file
 #
+
+
+AC_ARG_ENABLE([out-file],
+    AS_HELP_STRING([--enable-out-file], [Enable printing to file]))
+
+AM_CONDITIONAL([ENABLE_OUT_FILE], [test "x$enable_out_file" = "xyes"])
+AS_IF([test "x$enable_out_file" = "xyes"],
+[
+    AC_DEFINE([ENABLE_OUT_FILE], [1], [Enable printing to file])
+    AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
+        AC_MSG_ERROR(not found, needed by --enable-out-file))
+],
+# else
+[
+    enable_out_file="no"
+])
+
+
+###
 # --enable-timestamp
 #
 
@@ -52,7 +72,7 @@ AS_IF([test "x$enable_timestamp" = "xyes"],
 ])
 
 
-#
+###
 # --enable-realtime
 #
 
@@ -77,7 +97,7 @@ AS_IF([test "x$enable_realtime" = "xyes"],
 ])
 
 
-#
+###
 # --enable-monotonic
 #
 
@@ -102,7 +122,7 @@ AS_IF([test "x$enable_monotonic" = "xyes"],
 ])
 
 
-#
+###
 # --enable-finfo
 #
 
@@ -122,7 +142,7 @@ AS_IF([test "x$enable_finfo" = "xyes"],
 ])
 
 
-#
+###
 # --enable-colors
 #
 
@@ -142,7 +162,7 @@ AS_IF([test "x$enable_colors" = "xyes"],
 ])
 
 
-#
+###
 # --enable-reentrant
 #
 
@@ -162,12 +182,12 @@ AS_IF([test "x$enable_reentrant" = "xyes"],
 ])
 
 
-#
+###
 # VARIABLES=value options
 #
 
 
-#
+###
 # EL_LOG_MAX
 #
 
@@ -177,7 +197,7 @@ AS_IF([test "x$EL_LOG_MAX" = x], [EL_LOG_MAX="2 * 1024"])
 AC_DEFINE_UNQUOTED([EL_LOG_MAX], [$EL_LOG_MAX], [Maximum size of log message])
 
 
-#
+###
 # EL_FLEN_MAX
 #
 
@@ -186,7 +206,7 @@ AC_ARG_VAR([EL_FLEN_MAX], [Maximum size of file in message])
 AS_IF([test "x$EL_FLEN_MAX" = x], [EL_FLEN_MAX="32"])
 AC_DEFINE_UNQUOTED([EL_FLEN_MAX], [$EL_FLEN_MAX], [Maximum size of file in message])
 
-#
+###
 # EL_MEM_LINE_SIZE
 #
 
@@ -204,6 +224,7 @@ echo
 echo "embedlog compilation configuration summary"
 echo
 echo "print to stderr............. : $enable_out_stderr"
+echo "print to file............... : $enable_out_file"
 echo "print timestamp enabled..... : $enable_timestamp"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"

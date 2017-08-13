@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 
+#include "el-file.h"
 #include "embedlog.h"
 #include "options.h"
 
@@ -82,7 +83,7 @@ int el_oputs
 #if ENABLE_OUT_STDERR
     if (options->outputs & EL_OUT_STDERR)
     {
-        fputs(s, stderr);
+        return fputs(s, stderr) == EOF ? -1 : 0;
     }
 #endif
 
@@ -91,12 +92,16 @@ int el_oputs
     {
         el_puts_syslog(s);
     }
+#endif
 
+#if ENABLE_OUT_FILE
     if (options->outputs & EL_OUT_FILE)
     {
-        el_puts_file(s);
+        return el_file_puts(options, s);
     }
+#endif
 
+#if 0
     if (options->outputs & EL_OUT_NET)
     {
         el_puts_net(s);

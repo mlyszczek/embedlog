@@ -43,6 +43,7 @@
 #include "embedlog.h"
 #include "options.h"
 #include "valid.h"
+#include "el-file.h"
 
 
 /* ==========================================================================
@@ -82,26 +83,146 @@ struct el_options g_options;
 
 static const int VALID_OUTS = 0
 
-    #if ENABLE_OUT_STDERR
-        | EL_OUT_STDERR
-    #endif
+#if ENABLE_OUT_STDERR
+    | EL_OUT_STDERR
+#endif
 
-    #if ENABLE_OUT_SYSLOG
-        | EL_OUT_SYSLOG
-    #endif
+#if ENABLE_OUT_SYSLOG
+    | EL_OUT_SYSLOG
+#endif
+
+#if ENABLE_OUT_FILE
+    | EL_OUT_FILE
+#endif
+
+#if ENABLE_OUT_NET
+    | EL_OUT_NET
+#endif
+
+#if ENABLE_OUT_TTY
+    | EL_OUT_TTY
+#endif
+    ;
+
+
+/* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+               ____                     __   _
+              / __/__  __ ____   _____ / /_ (_)____   ____   _____
+             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
+            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
+           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+
+   ========================================================================== */
+
+
+/* ==========================================================================
+    sets 'option' with 'ap' values in 'options' object.
+
+    errno
+            EINVAL      option is invalid
+            EINVAL      value for specific option is invalid
+            ENOSYS      option was disabled during compilation
+   ========================================================================== */
+
+
+static int el_vooption
+(
+    struct el_options  *options,  /* options object to set option to */
+    enum el_option      option,   /* option to set */
+    va_list             ap        /* option value(s) */
+)
+{
+    int          value_int;   /* ap value treated as integer */
+    long         value_long;  /* ap value treated as long */
+    const char  *value_str;   /* ap value treated as string */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    VALID(EINVAL, 0 <= option && option <= EL_OPT_ERROR);
+
+    switch (option)
+    {
+    #if ENABLE_COLORS
+
+    case EL_OPT_COLORS:
+        /*
+         * only 1 or 0 is allowed, if any other bit is set return EINVAL
+         */
+
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
+        options->colors = value_int;
+        return 0;
+
+    #endif /* ENABLE_COLORS */
+
+    #if ENABLE_TIMESTAMP
+
+    case EL_OPT_TS:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, 0 <= value_int && value_int <= EL_OPT_TS_OFF);
+
+        options->timestamp = value_int;
+        return 0;
+
+    case EL_OPT_TS_TM:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, 0 <= value_int && value_int <= EL_OPT_TS_TM_MONOTONIC);
+
+        options->timestamp_timer = value_int;
+        return 0;
+
+    #endif /* ENABLE_TIMESTAMP */
+
+    #if ENABLE_FINFO
+
+    case EL_OPT_FINFO:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
+        options->finfo = value_int;
+        return 0;
+
+    #endif /* ENABLE_FINFO */
 
     #if ENABLE_OUT_FILE
-        | EL_OUT_FILE
-    #endif
 
-    #if ENABLE_OUT_NET
-        | EL_OUT_NET
-    #endif
+    case EL_OPT_FNAME:
+        value_str = va_arg(ap, const char *);
+        options->fname = value_str;
+        return el_file_open(options);
 
-    #if ENABLE_OUT_TTY
-        | EL_OUT_TTY
-    #endif
-        ;
+    case EL_OPT_FROTATE_NUMBER:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, value_int >= 0);
+        options->frotate_number = value_int;
+        return 0;
+
+    case EL_OPT_FROTATE_SIZE:
+        value_long = va_arg(ap, long);
+        VALID(EINVAL, value_long >= 1);
+        options->frotate_size = value_long;
+        return 0;
+
+    #endif  /* ENABLE_OUT_FILE */
+
+    default:
+        /*
+         * if we get here, user used option that was disabled during compilation
+         * time and is not implemented
+         */
+
+        errno = ENOSYS;
+        return -1;
+    }
+}
 
 
 /* ==========================================================================
@@ -278,20 +399,23 @@ int el_log_allowed
 int el_option
 (
     enum el_option   option,   /* option to set */
-    int              value     /* option value */
+                     ...       /* option value */
 )
 {
-    return el_ooption(&g_options, option, value);
+    va_list ap;  /* variadic arguments */
+    int     rc;  /* return code from el_voooption */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    va_start(ap, option);
+    rc = el_vooption(&g_options, option, ap);
+    va_end(ap);
+
+    return rc;
 }
 
 
 /* ==========================================================================
-    sets 'option' with 'value' in 'options' object.
-
-    errno
-            EINVAL      option is invalid
-            EINVAL      value for specific option is invalid
-            ENOSYS      option was disabled during compilation
+    same as el_vooptions but accepts variadic arguments
    ========================================================================== */
 
 
@@ -299,61 +423,17 @@ int el_ooption
 (
     struct el_options  *options,  /* options object to set option to */
     enum el_option      option,   /* option to set */
-    int                 value     /* option value */
+                        ...       /* option value(s) */
 )
 {
-    VALID(EINVAL, 0 <= option && option <= EL_OPT_FINFO);
+    va_list ap;  /* variadic arguments */
+    int     rc;  /* return code from el_voooption */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    switch (option)
-    {
-    #if ENABLE_COLORS
 
-    case EL_OPT_COLORS:
-        /*
-         * only 1 or 0 is allowed, if any other bit is set return EINVAL
-         */
+    va_start(ap, option);
+    rc = el_vooption(options, option, ap);
+    va_end(ap);
 
-        VALID(EINVAL, (value & ~1) == 0);
-
-        options->colors = value;
-        return 0;
-
-    #endif /* ENABLE_COLORS */
-
-    #if ENABLE_TIMESTAMP
-
-    case EL_OPT_TS:
-        VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_OFF);
-
-        options->timestamp = value;
-        return 0;
-
-    case EL_OPT_TS_TM:
-        VALID(EINVAL, 0 <= value && value <= EL_OPT_TS_TM_MONOTONIC);
-
-        options->timestamp_timer = value;
-        return 0;
-
-    #endif /* ENABLE_TIMESTAMP */
-
-    #if ENABLE_FINFO
-
-    case EL_OPT_FINFO:
-        VALID(EINVAL, (value & ~1) == 0);
-
-        options->finfo = value;
-        return 0;
-
-    #endif /* ENABLE_FINFO */
-
-    default:
-        /*
-         * if we get here, user used option that was disabled during compilation
-         * time and is not implemented
-         */
-
-        errno = ENOSYS;
-        return -1;
-    }
+    return rc;
 }
-
