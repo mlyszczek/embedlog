@@ -276,10 +276,6 @@ int el_options_init
 
     memset(options, 0, sizeof(*options));
     options->print_log_level = 1;
-#if ENABLE_OUT_STDERR
-    options->outputs = EL_OUT_STDERR;
-#endif
-
     return 0;
 }
 
