@@ -351,6 +351,12 @@ int el_ooutput_enable
 )
 {
     VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
+
+    if (output == EL_OUT_ALL)
+    {
+        options->outputs = VALID_OUTS;
+    }
+
     VALID(ENOSYS, (output & ~VALID_OUTS) == 0x00);
 
     options->outputs |= output;
@@ -390,6 +396,13 @@ int el_ooutput_disable
 )
 {
     VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
+
+    if (output == EL_OUT_ALL)
+    {
+        options->outputs = 0;
+        return 0;
+    }
+
     VALID(ENOSYS, (output & ~VALID_OUTS) == 0x00);
 
     options->outputs &= ~output;
