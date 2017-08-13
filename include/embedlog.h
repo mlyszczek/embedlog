@@ -40,8 +40,9 @@ enum el_option
     EL_OPT_COLORS,
     EL_OPT_TS,
     EL_OPT_TS_TM,
-
+    EL_OPT_PRINT_LEVEL,
     EL_OPT_FINFO,
+
     EL_OPT_FNAME,
     EL_OPT_FROTATE_NUMBER,
     EL_OPT_FROTATE_SIZE,
@@ -51,9 +52,9 @@ enum el_option
 
 enum el_option_timestamp
 {
+    EL_OPT_TS_OFF,
     EL_OPT_TS_LONG,
-    EL_OPT_TS_SHORT,
-    EL_OPT_TS_OFF
+    EL_OPT_TS_SHORT
 };
 
 enum el_option_timestamp_timer
@@ -71,6 +72,7 @@ struct el_options
     int          colors;
     int          timestamp;
     int          timestamp_timer;
+    int          print_log_level;
 
     int          finfo;
     int          frotate_number;
@@ -81,6 +83,7 @@ struct el_options
     const char  *fname;
 };
 
+int el_init(void);
 int el_options_init(struct el_options *);
 int el_level_set(enum el_level);
 int el_olevel_set(struct el_options *, enum el_level);

@@ -555,7 +555,10 @@ int el_voprint
         ++w;
     }
 
-    w += sprintf(buf + w, "%c/", char_level[level]);
+    if (options->print_log_level)
+    {
+        w += sprintf(buf + w, "%c/", char_level[level]);
+    }
 
     /*
      * add requested log from format, we add + 1 to include null termination

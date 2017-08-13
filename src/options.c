@@ -148,6 +148,13 @@ static int el_vooption
 
     switch (option)
     {
+    case EL_OPT_PRINT_LEVEL:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
+        options->print_log_level = value_int;
+        return 0;
+
     #if ENABLE_COLORS
 
     case EL_OPT_COLORS:
@@ -242,6 +249,17 @@ static int el_vooption
 
 
 /* ==========================================================================
+    initializes global options to default state
+   ========================================================================== */
+
+
+int el_init(void)
+{
+    return el_options_init(&g_options);
+}
+
+
+/* ==========================================================================
     Sets options object to sane values
 
     errno
@@ -257,6 +275,11 @@ int el_options_init
     VALID(EINVAL, options);
 
     memset(options, 0, sizeof(*options));
+    options->print_log_level = 1;
+#if ENABLE_OUT_STDERR
+    options->outputs = EL_OUT_STDERR;
+#endif
+
     return 0;
 }
 
