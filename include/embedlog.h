@@ -53,8 +53,10 @@ enum el_option
 enum el_option_timestamp
 {
     EL_OPT_TS_OFF,
+    EL_OPT_TS_SHORT,
     EL_OPT_TS_LONG,
-    EL_OPT_TS_SHORT
+
+    EL_OPT_TS_ERROR /* internal use only */
 };
 
 enum el_option_timestamp_timer
@@ -62,7 +64,9 @@ enum el_option_timestamp_timer
     EL_OPT_TS_TM_CLOCK,
     EL_OPT_TS_TM_TIME,
     EL_OPT_TS_TM_REALTIME,
-    EL_OPT_TS_TM_MONOTONIC
+    EL_OPT_TS_TM_MONOTONIC,
+
+    EL_OPT_TS_TM_ERROR /* internal use only */
 };
 
 struct el_options

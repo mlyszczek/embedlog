@@ -144,7 +144,7 @@ static int el_vooption
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    VALID(EINVAL, 0 <= option && option <= EL_OPT_ERROR);
+    VALID(EINVAL, 0 <= option && option < EL_OPT_ERROR);
 
     switch (option)
     {
@@ -174,14 +174,14 @@ static int el_vooption
 
     case EL_OPT_TS:
         value_int = va_arg(ap, int);
-        VALID(EINVAL, 0 <= value_int && value_int <= EL_OPT_TS_OFF);
+        VALID(EINVAL, 0 <= value_int && value_int < EL_OPT_TS_ERROR);
 
         options->timestamp = value_int;
         return 0;
 
     case EL_OPT_TS_TM:
         value_int = va_arg(ap, int);
-        VALID(EINVAL, 0 <= value_int && value_int <= EL_OPT_TS_TM_MONOTONIC);
+        VALID(EINVAL, 0 <= value_int && value_int < EL_OPT_TS_TM_ERROR);
 
         options->timestamp_timer = value_int;
         return 0;
