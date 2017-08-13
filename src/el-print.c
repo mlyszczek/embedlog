@@ -47,7 +47,7 @@
 #include "embedlog.h"
 #include "config.h"
 #include "config-priv.h"
-#include "options.h"
+#include "el-options.h"
 #include "valid.h"
 
 #if ENABLE_TIMESTAMP

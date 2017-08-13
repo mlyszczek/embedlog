@@ -43,7 +43,7 @@
 
 #include "config-priv.h"
 #include "embedlog.h"
-#include "options.h"
+#include "el-options.h"
 #include "valid.h"
 
 

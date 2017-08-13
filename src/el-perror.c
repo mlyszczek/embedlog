@@ -29,7 +29,7 @@
 #include <string.h>
 
 #include "embedlog.h"
-#include "options.h"
+#include "el-options.h"
 
 
 /* ==========================================================================

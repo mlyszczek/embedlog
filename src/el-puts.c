@@ -35,7 +35,7 @@
 
 #include "el-file.h"
 #include "embedlog.h"
-#include "options.h"
+#include "el-options.h"
 
 
 /* ==========================================================================

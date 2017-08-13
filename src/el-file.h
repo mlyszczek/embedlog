@@ -6,7 +6,7 @@
 #ifndef EL_FILE_H
 #define EL_FILE_H
 
-#include "options.h"
+#include "el-options.h"
 
 int el_file_open(struct el_options *);
 int el_file_puts(struct el_options *, const char *);
