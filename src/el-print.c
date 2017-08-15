@@ -584,7 +584,7 @@ int el_voprint
      * add terminal formatting reset sequence
      */
 
-    w += el_color(options, buf + w, COLOR_RESET);
+    w += el_color(options, buf + w, 4 /* COLOR_RESET */);
 
     /*
      * make sure buf is always null terminated and contains new line character
