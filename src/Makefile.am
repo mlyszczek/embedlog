@@ -15,7 +15,7 @@ if ENABLE_OUT_FILE
 test_SOURCES += el-file.c
 endif
 
-test_CFLAGS = -I$(top_srcdir)/include -O0 -g3 -ggdb
+test_CFLAGS = -I$(top_srcdir)/include -O0 -g3 -ggdb -DNDEBUG
 
 TESTS = $(check_PROGRAMS)
 LOG_DRIVER = $(top_srcdir)/tap-driver

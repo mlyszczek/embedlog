@@ -72,7 +72,7 @@ int el_perror
     e = errno;
 
     va_start(ap, fmt);
-    rc  = el_voprint(level, file, num, &g_options, fmt, ap);
+    rc  = el_ovprint(level, file, num, &g_options, fmt, ap);
     rc |= el_oprint(level, file, num, &g_options,
         "errno num: %lu, strerror: %s", e, strerror(e));
     va_end(ap);
@@ -103,7 +103,7 @@ int el_operror
     e = errno;
 
     va_start(ap, fmt);
-    rc  = el_voprint(level, file, num, options, fmt, ap);
+    rc  = el_ovprint(level, file, num, options, fmt, ap);
     rc |= el_oprint(level, file, num, options,
         "errno num: %lu, strerror: %s", e, strerror(e));
     va_end(ap);

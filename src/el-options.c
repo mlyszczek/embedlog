@@ -255,7 +255,7 @@ static int el_vooption
 
 int el_init(void)
 {
-    return el_options_init(&g_options);
+    return el_oinit(&g_options);
 }
 
 
@@ -267,7 +267,7 @@ int el_init(void)
    ========================================================================== */
 
 
-int el_options_init
+int el_oinit
 (
     struct el_options  *options  /* options object */
 )

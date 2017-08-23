@@ -444,7 +444,7 @@ int el_print
 
 
     va_start(ap, fmt);
-    rc = el_voprint(level, file, num, &g_options, fmt, ap);
+    rc = el_ovprint(level, file, num, &g_options, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -472,7 +472,7 @@ int el_oprint
 
 
     va_start(ap, fmt);
-    rc = el_voprint(level, file, num, options, fmt, ap);
+    rc = el_ovprint(level, file, num, options, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -493,7 +493,7 @@ int el_vprint
     va_list        ap      /* additional parameters for fmt */
 )
 {
-    return el_voprint(level, file, num, &g_options, fmt, ap);
+    return el_ovprint(level, file, num, &g_options, fmt, ap);
 }
 
 
@@ -513,7 +513,7 @@ int el_vprint
    ========================================================================== */
 
 
-int el_voprint
+int el_ovprint
 (
     enum el_level       level,                /* log level to print log with */
     const char         *file,                 /* file name to print in log */
