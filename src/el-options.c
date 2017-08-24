@@ -253,7 +253,10 @@ static int el_vooption
    ========================================================================== */
 
 
-int el_init(void)
+int el_init
+(
+    void
+)
 {
     return el_oinit(&g_options);
 }
@@ -276,9 +279,49 @@ int el_oinit
 
     memset(options, 0, sizeof(*options));
     options->print_log_level = 1;
+    options->level = EL_LEVEL_INF;
     return 0;
 }
 
+
+/* ==========================================================================
+    cleans up whatever has been initialized/reserved by el_init
+   ========================================================================== */
+
+
+int el_cleanup
+(
+    void
+)
+{
+    return el_ocleanup(&g_options);
+}
+
+
+/* ==========================================================================
+    cleans up whatever has been initialized/reserver by el_cleanup
+
+    errno
+            EINVAL      options is invlaid (null)
+   ========================================================================== */
+
+
+int el_ocleanup
+(
+    struct el_options  *options  /* options object */
+)
+{
+    VALID(EINVAL, options);
+
+#if ENABLE_OUT_FILE
+    if (options->file)
+    {
+        fclose(options->file);
+    }
+#endif
+
+    return 0;
+}
 
 /* ==========================================================================
     Sets current log level for default options

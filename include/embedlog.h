@@ -103,6 +103,7 @@ struct el_options
 
 
 int el_init(void);
+int el_cleanup(void);
 int el_level_set(enum el_level level);
 int el_output_enable(enum el_output output);
 int el_output_disable(enum el_output output);
@@ -119,6 +120,7 @@ int el_perror(enum el_level level, const char *file, size_t line,
 
 
 int el_oinit(struct el_options *options);
+int el_ocleanup(struct el_options *options);
 int el_olevel_set(struct el_options *options, enum el_level level);
 int el_ooutput_enable(struct el_options *options, enum el_output output);
 int el_ooutput_disable(struct el_options *options, enum el_output output);
