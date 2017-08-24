@@ -530,11 +530,22 @@ int el_ovprint
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    VALID(EINVAL, 0 <= level && level <= EL_LEVEL_DBG);
     VALID(EINVAL, fmt);
     VALID(ECHRNG, el_log_allowed(options, level));
 
     e = 0;
+
+    if (level > EL_LEVEL_DBG)
+    {
+        /*
+         * level is larger than predefined and  we  don't  have  colors  for
+         * those log levels, so we force colors to be of EL_LEVEL_DBG, since
+         * every level larger than EL_LEVEL_DBG is threaded as more  verbose
+         * debug anyway.
+         */
+
+        level = EL_LEVEL_DBG;
+    }
 
     /*
      * add preamble and colors to log line buf

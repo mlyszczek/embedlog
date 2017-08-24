@@ -323,6 +323,7 @@ int el_ocleanup
     return 0;
 }
 
+
 /* ==========================================================================
     Sets current log level for default options
    ========================================================================== */
@@ -341,7 +342,7 @@ int el_level_set
     Sets current log level
 
     errno
-            EINVAL      passed level is not a valid log level
+            EINVAL      passed options is invalid (null)
    ========================================================================== */
 
 
@@ -351,7 +352,7 @@ int el_olevel_set
     enum el_level       level  /* log level to set */
 )
 {
-    VALID(EINVAL, 0 <= level && level <= EL_LEVEL_DBG);
+    VALID(EINVAL, options);
 
     options->level = level;
 
