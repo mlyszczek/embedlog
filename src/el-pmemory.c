@@ -72,9 +72,9 @@
 
 static void el_print_line
 (
-    enum el_level            level,       /* log level to print message with */
     const char              *file,        /* file name where log is printed */
     size_t                   num,         /* line number where log is printed */
+    enum el_level            level,       /* log level to print message with */
     struct el_options       *options,     /* options defining printing style */
     const unsigned char     *buf,         /* memory location to print */
     size_t                   line_size,   /* size of line in bytes */
@@ -126,7 +126,7 @@ static void el_print_line
      * print constructed line
      */
 
-    el_oprint(level, file, num, options, "0x%04x  %-*s %s",
+    el_oprint(file, num, level, options, "0x%04x  %-*s %s",
         offset, EL_MEM_HEX_LEN, hex_data, char_data);
 }
 
@@ -154,14 +154,14 @@ static void el_print_line
 
 int el_pmemory
 (
-    enum el_level    level,    /* log level to print message with */
     const char      *file,     /* file name where log is printed */
     size_t           num,      /* line number where log is printed */
+    enum el_level    level,    /* log level to print message with */
     const void      *mem,      /* memory location to print */
     size_t           mlen      /* number of bytes to print */
 )
 {
-    return el_opmemory(level, file, num, &g_options, mem, mlen);
+    return el_opmemory(file, num, level, &g_options, mem, mlen);
 }
 
 
@@ -188,9 +188,9 @@ int el_pmemory
 
 int el_opmemory
 (
-    enum el_level       level,    /* log level to print message with */
     const char         *file,     /* file name where log is printed */
     size_t              num,      /* line number where log is printed */
+    enum el_level       level,    /* log level to print message with */
     struct el_options  *options,  /* options defining printing style */
     const void         *mem,      /* memory location to print */
     size_t              mlen      /* number of bytes to print */
@@ -230,16 +230,16 @@ int el_opmemory
      * ------  -----------------------------------------------  ----------------
      */
 
-    el_oprint(level, file, num, options, "%.*s  %.*s  %.*s",
+    el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
         EL_MEM_OFFSET_LEN - 2, separator,
         EL_MEM_HEX_LEN - 1, separator,
         EL_MEM_CHAR_LEN, separator);
 
-    el_oprint(level, file, num, options, "%-*s%-*s%s",
+    el_oprint(file, num, level, options, "%-*s%-*s%s",
         EL_MEM_OFFSET_LEN, "offset",
         EL_MEM_HEX_LEN + 1, "hex", "ascii");
 
-    el_oprint(level, file, num, options, "%.*s  %.*s  %.*s",
+    el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
         EL_MEM_OFFSET_LEN - 2, separator,
         EL_MEM_HEX_LEN - 1, separator,
         EL_MEM_CHAR_LEN, separator);
@@ -252,7 +252,7 @@ int el_opmemory
 
     for (line_number = 0; line_number < lines_count; ++line_number)
     {
-        el_print_line(level, file, num, options,
+        el_print_line(file, num, level, options,
             mem, EL_MEM_LINE_SIZE, line_number);
 
         /*
@@ -269,7 +269,7 @@ int el_opmemory
 
     if (last_line_size)
     {
-        el_print_line(level, file, num, options,
+        el_print_line(file, num, level, options,
             mem, last_line_size, line_number);
     }
 
@@ -279,7 +279,7 @@ int el_opmemory
      * ------  -----------------------------------------------  ----------------
      */
 
-    el_oprint(level, file, num, options, "%.*s  %.*s  %.*s",
+    el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
         EL_MEM_OFFSET_LEN - 2, separator,
         EL_MEM_HEX_LEN - 1, separator,
         EL_MEM_CHAR_LEN, separator);

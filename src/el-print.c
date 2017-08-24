@@ -431,9 +431,9 @@ static size_t el_finfo
 
 int el_print
 (
-    enum el_level  level,                /* log level to print message with */
     const char    *file,                 /* file name where log is printed */
     size_t         num,                  /* line number where log is printed */
+    enum el_level  level,                /* log level to print message with */
     const char    *fmt,                  /* message format (see printf (3)) */
                    ...                   /* additional parameters for fmt */
 )
@@ -444,7 +444,7 @@ int el_print
 
 
     va_start(ap, fmt);
-    rc = el_ovprint(level, file, num, &g_options, fmt, ap);
+    rc = el_ovprint(file, num, level, &g_options, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -458,9 +458,9 @@ int el_print
 
 int el_oprint
 (
-    enum el_level       level,                /* log level to print log with */
     const char         *file,                 /* file name to print in log */
     size_t              num,                  /* line number to print in log */
+    enum el_level       level,                /* log level to print log with */
     struct el_options  *options,              /* printing style options */
     const char         *fmt,                  /* message format (man printf) */
                         ...                   /* additional params for fmt */
@@ -472,7 +472,7 @@ int el_oprint
 
 
     va_start(ap, fmt);
-    rc = el_ovprint(level, file, num, options, fmt, ap);
+    rc = el_ovprint(file, num, level, options, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -486,14 +486,14 @@ int el_oprint
 
 int el_vprint
 (
-    enum el_level  level,  /* log level to print message with */
     const char    *file,   /* file name where log is printed */
     size_t         num,    /* line number where log is printed */
+    enum el_level  level,  /* log level to print message with */
     const char    *fmt,    /* message format (see printf (3)) */
     va_list        ap      /* additional parameters for fmt */
 )
 {
-    return el_ovprint(level, file, num, &g_options, fmt, ap);
+    return el_ovprint(file, num, level, &g_options, fmt, ap);
 }
 
 
@@ -515,9 +515,9 @@ int el_vprint
 
 int el_ovprint
 (
-    enum el_level       level,                /* log level to print log with */
     const char         *file,                 /* file name to print in log */
     size_t              num,                  /* line number to print in log */
+    enum el_level       level,                /* log level to print log with */
     struct el_options  *options,              /* options defining print style */
     const char         *fmt,                  /* message format (man printf) */
     va_list             ap                    /* additional params for fmt */

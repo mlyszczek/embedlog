@@ -12,15 +12,15 @@
 #include <stdio.h>
 
 #if NOFINFO
-#   define ELE EL_LEVEL_ERR, NULL, 0
-#   define ELW EL_LEVEL_WRN, NULL, 0
-#   define ELI EL_LEVEL_INF, NULL, 0
-#   define ELD EL_LEVEL_DBG, NULL, 0
+#   define ELE NULL, 0, EL_LEVEL_ERR
+#   define ELW NULL, 0, EL_LEVEL_WRN
+#   define ELI NULL, 0, EL_LEVEL_INF
+#   define ELD NULL, 0, EL_LEVEL_DBG
 #else
-#   define ELE EL_LEVEL_ERR, __FILE__, __LINE__
-#   define ELW EL_LEVEL_WRN, __FILE__, __LINE__
-#   define ELI EL_LEVEL_INF, __FILE__, __LINE__
-#   define ELD EL_LEVEL_DBG, __FILE__, __LINE__
+#   define ELE __FILE__, __LINE__, EL_LEVEL_ERR
+#   define ELW __FILE__, __LINE__, EL_LEVEL_WRN
+#   define ELI __FILE__, __LINE__, EL_LEVEL_INF
+#   define ELD __FILE__, __LINE__, EL_LEVEL_DBG
 #endif
 
 #if (__STDC_VERSION__ >= 199901L)
@@ -109,13 +109,13 @@ int el_output_enable(enum el_output output);
 int el_output_disable(enum el_output output);
 int el_option(enum el_option option, ...);
 int el_puts(const char *string);
-int el_print(enum el_level level, const char *file, size_t line,
+int el_print(const char *file, size_t line, enum el_level level,
         const char *fmt, ...);
-int el_vprint(enum el_level level, const char *file, size_t line,
+int el_vprint(const char *file, size_t line, enum el_level level,
         const char *fmt, va_list ap);
-int el_pmemory(enum el_level level, const char *file, size_t line,
+int el_pmemory(const char *file, size_t line, enum el_level level,
         const void *memory, size_t mlen);
-int el_perror(enum el_level level, const char *file, size_t line,
+int el_perror(const char *file, size_t line, enum el_level level,
         const char *fmt, ...);
 
 
@@ -126,13 +126,13 @@ int el_ooutput_enable(struct el_options *options, enum el_output output);
 int el_ooutput_disable(struct el_options *options, enum el_output output);
 int el_ooption(struct el_options *options, enum el_option option, ...);
 int el_oputs(struct el_options *options, const char *string);
-int el_oprint(enum el_level level, const char *file, size_t line,
+int el_oprint(const char *file, size_t line, enum el_level level,
         struct el_options *options, const char *fnt, ...);
-int el_ovprint(enum el_level level, const char *file, size_t line,
+int el_ovprint(const char *file, size_t line, enum el_level level,
         struct el_options *options, const char *fmt, va_list ap);
-int el_opmemory(enum el_level level, const char *file, size_t line,
+int el_opmemory(const char *file, size_t line, enum el_level level,
         struct el_options *options, const void *memory, size_t mlen);
-int el_operror(enum el_level level, const char *file, size_t line,
+int el_operror(const char *file, size_t line, enum el_level level,
         struct el_options *options, const char *fmt, ...);
 
 
