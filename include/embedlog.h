@@ -12,15 +12,23 @@
 #include <stdio.h>
 
 #if NOFINFO
-#   define ELE NULL, 0, EL_LEVEL_ERR
-#   define ELW NULL, 0, EL_LEVEL_WRN
-#   define ELI NULL, 0, EL_LEVEL_INF
-#   define ELD NULL, 0, EL_LEVEL_DBG
+#   define ELF NULL, 0, EL_FATAL
+#   define ELA NULL, 0, EL_ALERT
+#   define ELC NULL, 0, EL_CRIT
+#   define ELE NULL, 0, EL_ERROR
+#   define ELW NULL, 0, EL_WARN
+#   define ELN NULL, 0, EL_NOTICE
+#   define ELI NULL, 0, EL_INFO
+#   define ELD NULL, 0, EL_DBG
 #else
-#   define ELE __FILE__, __LINE__, EL_LEVEL_ERR
-#   define ELW __FILE__, __LINE__, EL_LEVEL_WRN
-#   define ELI __FILE__, __LINE__, EL_LEVEL_INF
-#   define ELD __FILE__, __LINE__, EL_LEVEL_DBG
+#   define ELF __FILE__, __LINE__, EL_FATAL
+#   define ELA __FILE__, __LINE__, EL_ALERT
+#   define ELC __FILE__, __LINE__, EL_CRIT
+#   define ELE __FILE__, __LINE__, EL_ERROR
+#   define ELW __FILE__, __LINE__, EL_WARN
+#   define ELN __FILE__, __LINE__, EL_NOTICE
+#   define ELI __FILE__, __LINE__, EL_INFO
+#   define ELD __FILE__, __LINE__, EL_DBG
 #endif
 
 #if (__STDC_VERSION__ >= 199901L)
@@ -33,20 +41,24 @@
 
 enum el_output
 {
-    EL_OUT_STDERR = 0x01,
-    EL_OUT_SYSLOG = 0x02,
-    EL_OUT_FILE   = 0x04,
-    EL_OUT_NET    = 0x08,
-    EL_OUT_TTY    = 0x10,
-    EL_OUT_ALL    = 0x1f
+    EL_OUT_STDERR = 0x0001,
+    EL_OUT_SYSLOG = 0x0002,
+    EL_OUT_FILE   = 0x0004,
+    EL_OUT_NET    = 0x0008,
+    EL_OUT_TTY    = 0x0010,
+    EL_OUT_ALL    = 0xffff,
 };
 
 enum el_level
 {
-    EL_LEVEL_ERR,
-    EL_LEVEL_WRN,
-    EL_LEVEL_INF,
-    EL_LEVEL_DBG
+    EL_FATAL,
+    EL_ALERT,
+    EL_CRIT,
+    EL_ERROR,
+    EL_WARN,
+    EL_NOTICE,
+    EL_INFO,
+    EL_DBG
 };
 
 enum el_option

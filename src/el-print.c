@@ -76,18 +76,10 @@
    ========================================================================== */
 
 
-static const char char_level[4] = { 'e', 'w', 'i', 'd' };
+static const char char_level[8] = { 'f', 'a', 'c', 'e', 'w', 'n', 'i', 'd' };
 
 
 #if ENABLE_COLORS
-
-/*
- * index to remove all formatting
- */
-
-
-#define COLOR_RESET 4
-
 
 /*
  * colors indexes are synced with log level
@@ -96,10 +88,14 @@ static const char char_level[4] = { 'e', 'w', 'i', 'd' };
 
 static const char *color[] =
 {
-    "\e[31m",  /* red */
-    "\e[33m",  /* yellow */
-    "\e[32m",  /* green */
-    "\e[34m",  /* blue */
+    "\e[91m",  /* fatal - light red */
+    "\e[31m",  /* alert - red */
+    "\e[95m",  /* critical - light magenta */
+    "\e[35m",  /* error - magenta */
+    "\e[93m",  /* warning - light yellow */
+    "\e[92m",  /* notice - light green */
+    "\e[32m",  /* information - green */
+    "\e[34m",  /* debug - blue */
     "\e[0m"    /* remove all formats */
 };
 
@@ -127,7 +123,7 @@ static const char *color[] =
     bytes stored in buf.  If colors are disabled, function will return 0 and
     nothing will be stored int 'buf'.
 
-    color can be one of log levels passed directly, or COLOR_RESET macro, which
+    color can be one of log levels passed directly, or int  value  8,  which
     will reset colors.
    ========================================================================== */
 
@@ -136,7 +132,7 @@ static size_t el_color
 (
     struct el_options  *options,  /* options defining printing style */
     char               *buf,      /* buffer where to store color info */
-    int                 level     /* log level or COLOR_RESET */
+    int                 level     /* log level or 8 for reset */
 )
 {
 #if ENABLE_COLORS
@@ -535,16 +531,16 @@ int el_ovprint
 
     e = 0;
 
-    if (level > EL_LEVEL_DBG)
+    if (level > EL_DBG)
     {
         /*
          * level is larger than predefined and  we  don't  have  colors  for
-         * those log levels, so we force colors to be of EL_LEVEL_DBG, since
-         * every level larger than EL_LEVEL_DBG is threaded as more  verbose
-         * debug anyway.
+         * those log levels, so we force colors to be of EL_DBG level, since
+         * every level larger than EL_DBG is threaded as more verbose  debug
+         * anyway.
          */
 
-        level = EL_LEVEL_DBG;
+        level = EL_DBG;
     }
 
     /*
@@ -595,7 +591,7 @@ int el_ovprint
      * add terminal formatting reset sequence
      */
 
-    w += el_color(options, buf + w, 4 /* COLOR_RESET */);
+    w += el_color(options, buf + w, 8 /* reset colors */);
 
     /*
      * make sure buf is always null terminated and contains new line character

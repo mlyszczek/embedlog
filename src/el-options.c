@@ -279,7 +279,7 @@ int el_oinit
 
     memset(options, 0, sizeof(*options));
     options->print_log_level = 1;
-    options->level = EL_LEVEL_INF;
+    options->level = EL_INFO;
     return 0;
 }
 
