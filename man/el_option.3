@@ -1,0 +1,266 @@
+.TH "el_option" "3" "22 Sep 2017 (v1.0.0)" "bofc.pl"
+
+.SH NAME
+\fBel_option\fR - sets optional configuration of the logger
+
+.SH SYNOPSIS
+
+.sh
+.B #include <embedlog.h>
+
+.sh
+.BI "int el_option(enum el_option " option ", " ... ")"
+.br
+.BI "int el_ooption(struct el_options *" options ","
+.BI "enum el_option " option ", " ... ")"
+
+.SH DESCRIPTION
+\fBel_option\fR allows user to configure logger's internal options, to tune
+logging to users needs.
+
+.SH OPTIONS
+\fIoption\fR can be (value inside parenthesis determines argument types of
+variadic arguments \fI...\fR)
+
+.BI "EL_OPT_COLORS (" int ")"
+.RS 4
+If this is set to 1, output will be enriched with ANSI colors depending on the
+message severity. This option needs terminal supporting colors. You can store
+messages with colors to file, and then read them with colors on color-enabled
+terminal. If this is set to 0, no colors will be added.
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Input argument is different than 1 or 0
+.       RE
+.   RE
+.RE
+
+.BI "EL_OPT_TS (" enum " " el_option_timestamp ")"
+.RS 4
+Allows timestamp to be added to each log message. Possible values are:
+
+.   B EL_OPT_TS_OFF
+.   RS 4
+Timestamp will not be added to messages
+.   RE
+
+.   B EL_OPT_TS_SHORT
+.   RS 4
+Short timestamp will be added to log in format \fB[1503661223.537631]\fR
+.   RE
+
+.   B EL_OPT_TS_LONG
+.   RS 4
+Long timestamp will be added to log in format \fB[2017-08-25 11:40:23.537651]\fR
+.   RE
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Input argument is invalid
+.       RE
+.   RE
+.RE
+
+.BI "EL_OPT_TS_TM (" enum " " el_option_timestamp_timer ")"
+.RS 4
+Sets the clock source for the timestamp print.
+
+.   B EL_OPT_TS_TM_CLOCK
+.   RS 4
+Library will use value from \fBclock\fR() function. With this clock precission
+varies from 10^-3[s] to 10^-9[s]. On POSIX systems, this clock has precision
+of 10^-6[s]. This timer has a lot drawbacks, time value is unspecified at the
+beggining of the program, timer is not incremented when thread is sleeping,
+timer will overlap eventually (on 32bit systems with POSIX it takes around 72
+minutes for the clock to overlap). On the other hand this is the most precise
+clock for pure c89 systems without POSIX.
+.   RE
+
+.   B EL_OPT_TS_TM_TIME
+.   RS 4
+Time is taken from \fBtime\fR() function. This returns current wall clock of
+the system, it's precision is very low (1[s]), but it's pure c89 and it is
+good for logging low frequent messages. This clock is susceptible to unexpected
+time change (from NTP or by root itself).
+.   RE
+
+.   B EL_OPT_TS_TM_REALTIME
+.   RS 4
+Time is taken from \fBclock_gettime\fR() using \fBCLOCK_REALTIME\fR clock.
+This required system with POSIX.1-2001. This time returns current system
+wall clock, but it's precision is much higher that \fBEL_OPT_TS_TM_TIME\fR
+clock (depending on system it can vary from 10^-3[s] up to even 10^-9[s]).
+Just like it is with \fBEL_OPT_TS_TM_TIME\fR this timestamp can jump forward of
+backward if it is changed in the system.
+.   RE
+
+.   B EL_OPT_TS_TM_MONOTONIC
+.   RS 4
+This clock is similar to \fBEL_OPT_TS_TM_REALTIME\fR but it shows time from
+unspecified time and is not affected by time change (it can still be altered
+with \fBadjtime\fR(3) or NTP)
+.   RE
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Input argument is invalid
+.       RE
+.   RE
+.RE
+
+
+.BI "EL_OPT_PRINT_LEVEL (" int ")"
+.RS 4
+If this is set to 1, each log will have log level information prefix in format
+"l/" where 'l' is first character of level message is printed with, for example:
+
+.   RS 4
+c/this is critical message
+.br
+n/this is just a notice
+.br
+d/debug print
+.   RE
+
+If value is set to 0, level information will not be added, and above messages
+would like like this
+
+.   RS 4
+this is critical message
+.br
+this is just an notice
+.br
+debug print
+.   RE
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Input argument is different than 1 or 0
+.       RE
+.   RE
+.RE
+
+.BI "EL_OPT_FINFO (" int ")"
+.RS 4
+If set to 1, adds information about log location to each message in format
+[some_file.c:123]. Setting this to 0, will result in no file information at all
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Input argument is different than 1 or 0
+.       RE
+.   RE
+.RE
+
+.BI "EL_OPT_FNAME (" const " " char " " * ")"
+.RS 4
+Sets the file name for the logs. Logs will be stored in this file. If file
+rotation is enabled, a numer will be postfixed to each file. See
+\fBEL_OPT_FROTATE_NUMBER\fR in this page for more details.
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Input parameter is NULL
+.       RE
+
+.       B ENAMETOOLONG
+.       RS 4
+File name is too long
+.       RE
+
+Function can also fail and set \fIerrno\fR for any of the errors specified for
+the routing \fBfopen(3)\fR
+
+.   RE
+
+If function fails, file is not opened and any calls that logs to file will
+result in failure.
+.RE
+
+.BI "EL_OPT_FROTATE_NUMBER (" long ")"
+.RS 4
+If set to 0, file rotation will be disabled and logs will be printed into
+specified file without size limit. The only size limit is the one presented
+by the filesystem and architecture.
+
+If this value is bigger than 0, file rotation will be enabled. All files will
+have suffixes added to name set in EL_OPT_FNAME. For example,
+\fIprogram.log.0\fR. Files are enumareted from \fI.0\fR to \fI.n\fR, where
+\fIn\fR is set rotate number. File with suffix \fI.0\fR is the oldest one,
+and the higher the number, the newer the file is. If logger reaches maximum
+number of files, oldest one with suffix \fI.0\fR will be deleted and suffixes
+of the files will be decremented by 1 (ie. \fIlog.1\fR will be renamed to
+\fIlog.0\fR, \fIlog.2\fR will be renamed to \fIlog.1\fR and so on.
+
+User can also pass 1 here, but if file reaches its size limit, it will be
+deleted and printing will continue from the empty file
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Input parameter is less than 0
+.       RE
+.   RE
+.RE
+
+.BI "EL_OPT_FROTATE_SIZE (" long ")"
+.RS 4
+This defines size at which files will be rotated. If message being printed
+would overflow rotate size, current file will be closed and new one will be
+created, and current message will be stored in that new file. It is guaranteed
+that file will not be bigger than value set in this option. If log printed
+into file is bigger than configure rotate size, message will be truncated, to
+prevent file bigger than configure rotate size. It's very rare situation as
+it doesn't make a lot of sense to set rotate size to such small value.
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Value is less than 1
+.       RE
+.   RE
+.RE
+
+
+.SH RETURN VALUE
+On success 0 is returned. -1 is returned when some error occured
+
+.SH ERRORS
+Check for error description of specific option that failed for more informations
+
+.SH SEE ALSO
+.BR el_init (3),
+.BR el_cleanup (3),
+.BR el_overview (7),
+.BR el_level_set (3),
+.BR el_output_enable (3),
+.BR el_output_disable (3),
+.BR el_puts (3),
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3),
+.BR el_pmemory (3),
+.BR el_ocleanup (3),
+.BR el_olevel_set (3),
+.BR el_ooutput_enable (3),
+.BR el_ooutput_disable (3),
+.BR el_oputs (3),
+.BR el_oprint (3),
+.BR el_ovprint (3),
+.BR el_operror (3),
+.BR el_opmemory (3),

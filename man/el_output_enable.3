@@ -1,0 +1,106 @@
+.TH "el_output_enable" "3" "22 Sep 2017 (v1.0.0)" "bofc.pl"
+
+.SH NAME
+\fBel_output_enable\fR, \fBel_output_disable\fR - enable or disable specific
+output.
+
+.SH SYNOPSIS
+
+.sh
+.BI "#include <embedlog.h>
+
+.sh
+.BI "el_output_enable(enum el_output " output ")"
+.br
+.BI "el_output_disable(enum el_output " output ")"
+.br
+.BI "el_ooutput_enable(struct el_options *" options ","
+.BI "enum el_output " output ")"
+.br
+.BI "el_ooutput_disable(struct el_options *" options ","
+.BI "enum el_output " output ")"
+
+.SH DESCRIPTION
+\fBel_output_enable\fR will enable given \fIoutput\fR, when log is printed
+with any of the printing function. User can enable as many outputs as he
+desires - it can be all inputs of even none (if one wants to surpress logging
+for some time). Enabling or disabling \fIoutput\fR when it alread has been
+enabled/disabled has no effect.
+
+Currently following \fIoutputs\fB can be enabled.
+
+.TP
+.B EL_OUT_STDERR
+Messages will be printed to standard error output
+
+.TP
+.B EL_OUT_SYSLOG
+Messages will be sent to syslog facility. This requires system with implementing
+POSIX.1-2001 and any syslog daemon
+
+.TP
+.B EL_OUT_FILE
+Messages will be printed to file
+.TP
+.B EL_OUT_NET
+Messages shall be printed to external server. This requires BSD Sockets to be
+enabled on the clients system, and listening server. (TODO Not implemented yet)
+
+.TP
+.B EL_OUT_TTY
+Prints messages directly to configured serial console
+
+.TP
+.B EL_OUT_ALL
+Enables all supported outputs at once
+
+.P
+Many of the outputs can be configured for special needs, and some of them need
+mandatory configuration. For information about output configuration see
+\fBel_option\fR(3)
+
+
+\fBel_output_disable\fR simply disables specified \fIoutput\fR. If no output
+is enabled, logging will be disabled (no cpu cycles will be wasted constructing
+message).
+
+\fBel_ooutput_enable\fR and \fBel_ooutput_disable\fR work same way but also
+accept \fIoptions\fR
+
+.SH RETURN VALUE
+0 is returned on success and -1 on errors
+
+.SH ERRORS
+.TP
+.B EINVAL
+Specified \fIoutput\fR is invalid
+
+.TP
+.B EINVAL
+\fIoptions\fR object is invalid (null)
+
+.TP
+.B ENOSYS
+Specified \fIoutput\fR is not implemented on current system (support was not
+compiled into library)
+
+.SH SEE ALSO
+.BR el_overview (7),
+.BR el_init (3),
+.BR el_cleanup (3),
+.BR el_level_set (3),
+.BR el_option (3),
+.BR el_puts (3),
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3),
+.BR el_pmemory (3),
+.BR el_oinit (3),
+.BR el_ocleanup (3),
+.BR el_olevel_set (3),
+.BR el_ooption (3),
+.BR el_oputs (3),
+.BR el_oprint (3),
+.BR el_ovprint (3),
+.BR el_operror (3),
+.BR el_opmemory (3),

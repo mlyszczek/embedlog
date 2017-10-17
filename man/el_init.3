@@ -1,0 +1,87 @@
+.TH "el_init" "3" "22 Sep 2017 (v1.0.0)" "bofc.pl"
+
+.SH NAME
+\fBel_init\fR - initializes library and options for printing.
+
+.SH SYNOPSIS
+
+.sh
+.BI "#include <embedlog.h>
+
+.sh
+.BI "int el_init(void)"
+.br
+.BI "int el_oinit(struct options *" options ")"
+
+.SH DESCRIPTION
+\fBel_init()\fR initializes library and default options structure. This function
+must be called once before using any other function.
+
+\fBel_oinit()\fR initializes only \fIoptions\fR structure passed to it. Only after
+that functions that accepts \fIoptions\fR may be used.
+
+.SH RETURN VALUE
+
+Both functions will return 0 upon success and -1 on errors
+
+.SH ERRORS
+
+.TP
+.B EINVAL
+\fIoptions\fR is invalid (null)
+
+.SH EXAMPLE
+Error handling has been ommited for clarity sake
+
+.nf
+#include <embedlog.h>
+
+int main(void)
+{
+    struct el_options opts;
+
+    /* initialize both default and opts */
+    el_init();
+    el_oinit(&opts);
+
+    /* default logger will print to stderr */
+    el_output_enable(EL_OUT_STDERR);
+
+    /* and opts will print to file */
+    el_ooutput_enable(&opts, EL_OUT_FILE);
+    el_ooption(&opts, EL_OPT_FNAME, "/tmp/test.log");
+
+    /* print messages */
+    el_print(ELI, "will print to stderr");
+    el_oprint(ELI, &opts, "will print to file /tmp/test.log");
+
+    /* cleanup after any initialization code (like fopen) */
+    el_ocleanup(&opts);
+    el_cleanup();
+
+    return 0;
+}
+
+.SH SEE ALSO
+.BR el_init (3),
+.BR el_cleanup (3),
+.BR el_overview (7),
+.BR el_level_set (3),
+.BR el_output_enable (3),
+.BR el_output_disable (3),
+.BR el_option (3),
+.BR el_puts (3),
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3),
+.BR el_pmemory (3),
+.BR el_ocleanup (3),
+.BR el_olevel_set (3),
+.BR el_ooutput_enable (3),
+.BR el_ooutput_disable (3),
+.BR el_ooption (3),
+.BR el_oputs (3),
+.BR el_oprint (3),
+.BR el_ovprint (3),
+.BR el_operror (3),
+.BR el_opmemory (3),

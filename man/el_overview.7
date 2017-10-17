@@ -1,0 +1,199 @@
+.TH "el_overview" "7" "22 Sep 2017 (v1.0.0)" "bofc.pl"
+
+.SH NAME
+\fBel_overview\fR - quick overview of \fIembedlog\fR logging library
+
+.SH SYNOPSIS
+\fBembedlog\fR - is a highly portable \fBc89\fR complaint logger (with
+additional features for users with \fBc99\fR compilers and/or \fBPOSIX\fR
+systems). This library is designed mainly for embedded devices, but can also be
+used in high level OSes like \fBLinux\fR.
+
+.SH DESCRIPTION
+Logger incorporates features like:
+
+.RS 4
+- printing to different outputs (simultaneously) like:
+.RS 4
+- stderr
+.br
+- syslog
+.br
+- file (with optional rotating)
+.br
+- net (TODO: not implemented yet)
+.br
+- tty - directly to chosen serial console (TODO: not implemented yet)
+.RE
+- timestamping using following clocks:
+.RS 4
+- clock_t
+.br
+- time_t
+.br
+- CLOCK_REALTIME (requires POSIX)
+.br
+- CLOCK_MONOTONIC (requires POSIX)
+.RE
+- printing file and line information
+.br
+- 8 predefined log levels (and [sizeof(int) - 8] custom levels ;-))
+.br
+- colorful output (for easy error spotting)
+.RE
+
+.RE
+Library implements following functions:
+
+.sh
+.BI "int el_init(void)"
+.br
+.BI "int el_cleanup(void)"
+.br
+.BI "int el_level_set(enum el_level " level ")"
+.br
+.BI "int el_output_enable(enum el_output " output ")"
+.br
+.BI "int el_output_disable(enum el_output " output ")"
+.br
+.BI "int el_option(enum el_option " option ", ...)"
+.br
+.BI "int el_puts(const char *" string ")"
+.br
+.BI "int el_print(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", const char *" fmt ", " ... ")"
+.br
+.BI "int el_vprint(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", const char *" fmt ", va_list " ap ")"
+.br
+.BI "int el_pmemory(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", const void *" memory ", size_t " mlen ")"
+.br
+.BI "int el_perror(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", const char *" fmt ", " ... ")"
+
+Each functions has its equivalent function but accepting \fBoptions\fR as
+argument. This is helpful if we want to have more than one, separated loggers
+in a single program. Please see \fBel_option\fR(3) for more information.
+
+.sh
+.BI "int el_oinit(struct el_options *" options ")"
+.br
+.BI "int el_ocleanup(struct el_options *" options ")"
+.br
+.BI "int el_olevel_set(struct el_options *" options ", enum el_level " level ")"
+.br
+.BI "int el_ooutput_enable(struct el_options *" options ","
+.BI "enum el_output " output ")"
+.br
+.BI "int el_ooutput_disable(struct el_options *" options ","
+.BI "enum el_output " output ")"
+.br
+.BI "int el_ooption(struct el_options *" options ", enum el_option " option ","
+.BI "...)"
+.br
+.BI "int el_oputs(struct el_options *" options ", const char *" string ")"
+.br
+.BI "int el_oprint(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", struct el_options *" options ","
+.BI "const char * "fnt ", " ... ")"
+.br
+.BI "int el_ovprint(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", struct el_options *" options ","
+.BI "const char *" fmt ", va_list " ap ")"
+.br
+.BI "int el_opmemory(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", struct el_options *" options ","
+.BI "const void *" memory ", size_t " mlen ")"
+.br
+.BI "int el_operror(const char *" file ", size_t " line ","
+.BI "enum el_level " level ", struct el_options *" options ","
+.BI "const char *" fmt ", " ... ")"
+
+For more information about a function open manual page with functions name from
+section 3 (ie. for el_oputs, you'd open \fBel_oputs\fR(3))
+
+Every function that accepts 3 parameters \fIlevel\fR, \fIfile\fR and \fIline\fR
+as its first arguments, can accept short macro that injects proper values into
+function. Awailable macros are:
+
+.RS 4
+\fBELF\fR  Fatal errors, usually precedes application crash
+.br
+\fBELA\fR  Alert, vey major error that should be fixed as soon as possible
+.br
+\fBELC\fR  Critical
+.br
+\fBELE\fR  Error
+.br
+\fBELW\fR  Warning
+.br
+\fBELN\fR  Normal log, but of high importance
+.br
+\fBELI\fR  Information message, shouldn't spam too much here
+.br
+\fBELD\fR  Debug messages, can spam as much as you'd like
+.RE
+
+So instead of calling
+
+.RS 4
+\fBel_print(__FILE__, __LINE__, EL_NOTICE, "Notice message");\fR
+.RE
+
+You can simply call it like
+
+.RS 4
+\fBel_print(ELN, "Notice message");\fR
+.RE
+
+.SH EXAMPLE
+Initial setup is very trivial. One should call init function and set at least
+one output. Output can also be customized with proper options, see
+\fBel_option\fR(3) for more details.
+
+.nf
+#include <embedlog.h>
+
+int main(void)
+{
+    /* initialize library */
+    el_init();
+
+
+    /* tell logger to print onto stderr */
+    el_output_enable(EL_OUT_STDERR);
+
+    /* print message with info severity */
+    el_print(ELI, "answer is %d", 42);
+
+    /* clean after ourselfs */
+    el_cleanup();
+
+    return 0;
+}
+
+.SH SEE ALSO
+.BR el_overview (7),
+.BR el_init (3),
+.BR el_cleanup (3),
+.BR el_level_set (3),
+.BR el_output_enable (3),
+.BR el_output_disable (3),
+.BR el_option (3),
+.BR el_puts (3),
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3),
+.BR el_pmemory (3),
+.BR el_oinit (3),
+.BR el_ocleanup (3),
+.BR el_olevel_set (3),
+.BR el_ooutput_enable (3),
+.BR el_ooutput_disable (3),
+.BR el_ooption (3),
+.BR el_oputs (3),
+.BR el_oprint (3),
+.BR el_ovprint (3),
+.BR el_operror (3),
+.BR el_opmemory (3),

@@ -1,0 +1,56 @@
+.TH "el_cleanup" "3" "22 Sep 2017 (v1.0.0)" "bofc.pl"
+
+.SH NAME
+\fBel_cleanup\fR - cleans all resources allocated by \fBel_init()\fR and
+\fBel_option\fR() calls.
+
+.SH SYNOPSIS
+
+.sh
+.BI "#include <embedlog.h>"
+
+.sh
+.BI "int el_cleanup(void)"
+.br
+.BI "int el_ocleanup(struct el_options *" options ")"
+
+.SH DESCRIPTION
+\fBel_cleanup\fR() flushes all remaining buffers and frees any resources
+allocated through the life of the library. After clean up, library calls
+cannot be used without initialization.
+
+\fBel_ocleanup\fR() works just the same, but accepts custom \fIoptions\fR
+as argument
+
+.SH RETURN VALUE
+0 upon successful cleanup or -1 on errors. When -1 was returned no resources
+were freed, and library functions still can be used.
+
+.SH ERRORS
+\fBel_cleanup\fR() function cannot fail. \fBel_ocleanup\fR() may return:
+
+.TP
+.B EINVAL
+Passed options object is not valid
+
+.SH SEE ALSO
+.BR el_init (3),
+.BR el_overview (7),
+.BR el_level_set (3),
+.BR el_output_enable (3),
+.BR el_output_disable (3),
+.BR el_option (3),
+.BR el_puts (3),
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3),
+.BR el_pmemory (3),
+.BR el_olevel_set (3),
+.BR el_ooutput_enable (3),
+.BR el_ooutput_disable (3),
+.BR el_ooption (3),
+.BR el_oputs (3),
+.BR el_oprint (3),
+.BR el_ovprint (3),
+.BR el_operror (3),
+.BR el_opmemory (3),

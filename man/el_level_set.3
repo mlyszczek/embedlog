@@ -1,0 +1,85 @@
+.TH "el_level_set" "3" "22 Sep 2017 (v1.0.0)" "bofc.pl"
+
+.SH NAME
+\fBel_level_set\fR - sets current logging level
+
+.SH SYNOPSIS
+
+.sh
+.BI "#include <embedlog.h>
+
+.sh
+.BI "int el_level_set(enum el_level " level ")"
+.br
+.BI "int el_olevel_set(struct el_options *" options ", enum el_level " level ")"
+
+.SH DESCRIPTION
+\fBel_level_set\fR sets what the current logging level shall be. Altough it
+accepts \fBenum el_level\fR this can be whatever number from range <0, INT_MAX>.
+The higher the level, the lower priority of the message. All messages that have
+lower priority (higher number) then currently set \fIlevel\fR will not be
+printed. There are 8 predefined levels, sorted by priority (highest first):
+
+.RS 4
+.B EL_FATAL,
+.br
+.B EL_ALERT,
+.br
+.B EL_CRIT,
+.br
+.B EL_ERROR,
+.br
+.B EL_WARN,
+.br
+.B EL_NOTICE,
+.br
+.B EL_INFO,
+.br
+.B EL_DBG
+.RE
+
+If 8 print levels are not enough, one can define new levels, knowing that
+\fBEL_FATAL\fR has int value of 0, and \fBEL_DBG\fR has int value of
+7. User can also use debug level and add an integer like: \fBEL_DBG\fR +
+\fIn\fR - where \fIn\fR can be any number from range <0, INT_MAX - 8>.
+
+If messages are printed with lower priority than \fBEL_DBG\fR they all
+will be treated as messages printed with level \fBEL_DBG\fR, that means
+message printed with level \fBEL_DBG\fR and \fBEL_DBG + 3\fR, will
+be printed exactly the same, so same color (if colors are enabled) and if log
+level printig is enabled, such messages will have same 'd/' prefix no matter
+the level.
+
+\fBel_olevel_set\fR works the same way but it accepts external \fIoptions\fR
+instead of static one in library.
+
+.SH RETURN VALUE
+0 is returned on success or -1 on error
+
+.SH ERRORS
+.TP
+.B EINVAL
+\fIoptions\fR is invalid (null)
+
+.SH SEE ALSO
+.BR el_overview (7),
+.BR el_init (3),
+.BR el_cleanup (3),
+.BR el_output_enable (3),
+.BR el_output_disable (3),
+.BR el_option (3),
+.BR el_puts (3),
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3),
+.BR el_pmemory (3),
+.BR el_oinit (3),
+.BR el_ocleanup (3),
+.BR el_ooutput_enable (3),
+.BR el_ooutput_disable (3),
+.BR el_ooption (3),
+.BR el_oputs (3),
+.BR el_oprint (3),
+.BR el_ovprint (3),
+.BR el_operror (3),
+.BR el_opmemory (3),
