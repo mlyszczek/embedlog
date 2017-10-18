@@ -65,44 +65,11 @@
 
 
 /* ==========================================================================
-    checks if we can (or should) write to a file
-   ========================================================================== */
-
-
-static int el_file_is_writeable
-(
-    struct el_options  *options,  /* file options */
-    size_t              slen      /* length of string caller wants to print */
-)
-{
-    if (options->file == NULL)
-    {
-        /*
-         * well, it's hard to write to a file if it is not opened
-         */
-
-        return 0;
-    }
-
-    if (options->fpos + slen > options->frotate_size)
-    {
-        /*
-         * writing to file, would overflow it (according to frotate_size
-         * set by user), so write should no be allowed.
-         */
-
-        return 0;
-    }
-
-    return 1;
-}
-
-
-/* ==========================================================================
     function rotates file, meaning if currently opened file has  suffix  .3,
     function will close that file and will open file  with  suffix  .4.   If
     creating  new  suffix  is  impossible  (we  reached  frotate_number   of
-    suffixed) function will rename files, and create new file with suffix .0
+    suffixed) function will remove oldest log file  and  new  file  will  be
+    created
    ========================================================================== */
 
 
@@ -230,6 +197,12 @@ int el_file_open
 {
     if (options->file)
     {
+        off_t fsize;  /* size of the opened file we close */
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+        fsize = ftell(options->file);
+
         /*
          * to prevent any memory leak in  case  of  double  open,  we  first
          * close already opened file Such situation may happen when  library
@@ -237,6 +210,17 @@ int el_file_open
          */
 
         fclose(options->file);
+
+        if (fsize == 0)
+        {
+            /*
+             * file is empty, so we get rid of it, as it was probably opened
+             * by mistake
+             */
+
+            remove(options->fname);
+        }
+
         options->file = NULL;
     }
 
@@ -356,24 +340,48 @@ int el_file_puts
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    sl = strlen(s);
-
-    if (options->frotate_number && el_file_is_writeable(options, sl) == 0)
+    if (options->file == NULL)
     {
         /*
-         * we get here only when frotate is enabled, and writing to  current
-         * file would result in exceding frotate_size of file. In suche case
-         * we rotate the file by closing the old one and opening  new  file,
-         * and if we already filled  frotate_number  files,  we  remove  the
-         * oldest one, unless frotate_number is -1, then we  rotate  without
-         * deleting anything.
+         * file has not been opened, prevent segfault
          */
 
-        if (el_file_rotate(options) != 0)
+        errno = EBADF;
+        return -1;
+    }
+
+    sl = strlen(s);
+
+    if (options->frotate_number)
+    {
+        if (options->fpos + sl > options->frotate_size)
         {
-            return -1;
+            /*
+             * we get here only when frotate  is  enabled,  and  writing  to
+             * current file would result in exceding frotate_size  of  file.
+             * In such case we rotate the file by closing the  old  one  and
+             * opening new file, and if  we  already  filled  frotate_number
+             * files,  we  remove  the oldest one.
+             */
+
+            if (el_file_rotate(options) != 0)
+            {
+                return -1;
+            }
+        }
+
+        if (sl > options->frotate_size)
+        {
+            /*
+             * we can't fit message even in an empty file, in such  case  we
+             * need to truncate log, so we don't  create  file  bigger  than
+             * configured frotate_size
+             */
+
+            sl = options->frotate_size;
         }
     }
+
 
     if (fwrite(s, sl, 1, options->file) != 1)
     {

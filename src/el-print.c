@@ -600,7 +600,10 @@ int el_ovprint
     buf[w++] = '\n';
     buf[w++] = '\0';
 
-    el_oputs(options, buf);
+    if (el_oputs(options, buf) != 0)
+    {
+        return -1;
+    }
 
     if (e)
     {

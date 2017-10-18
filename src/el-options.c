@@ -203,14 +203,36 @@ static int el_vooption
 
     case EL_OPT_FNAME:
         value_str = va_arg(ap, const char *);
+        VALID(EINVAL, value_str);
         options->fname = value_str;
         return el_file_open(options);
 
     case EL_OPT_FROTATE_NUMBER:
+    {
+        int previous_frotate; /* previous value of frotate number */
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int >= 0);
+        previous_frotate = options->frotate_number;
         options->frotate_number = value_int;
+
+        if (previous_frotate == 0 && options->file)
+        {
+            /*
+             * user turned on file rotation  when  file  is  already  opened
+             * without rotation.  To prevent weird situations and even  data
+             * loss, we reopen file as opening with log rotation  is  a  bit
+             * different.  el_file_open  function  will  close  file  before
+             * reopening
+             */
+
+            return el_file_open(options);
+        }
+
         return 0;
+    }
 
     case EL_OPT_FROTATE_SIZE:
         value_long = va_arg(ap, long);
@@ -299,10 +321,11 @@ int el_cleanup
 
 
 /* ==========================================================================
-    cleans up whatever has been initialized/reserver by el_cleanup
+    cleans up  whatever  has  been  initialized/reserved  by  el_option  and
+    el_init calls
 
     errno
-            EINVAL      options is invlaid (null)
+            EINVAL      options is invalid (null)
    ========================================================================== */
 
 
