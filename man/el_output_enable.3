@@ -54,6 +54,11 @@ Prints messages directly to configured serial console
 .B EL_OUT_ALL
 Enables all supported outputs at once
 
+.TP
+.B EL_OUT_CUSTOM
+Enables custom function to be called on log print. Pointer to custom function
+needs to be set with \fBel_option\fR(3)
+
 .P
 Many of the outputs can be configured for special needs, and some of them need
 mandatory configuration. For information about output configuration see

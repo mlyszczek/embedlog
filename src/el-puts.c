@@ -80,10 +80,15 @@ int el_oputs
     const char         *s         /* string to put into output */
 )
 {
+    int                 rv;       /* return value from function */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    rv = 0;
 #if ENABLE_OUT_STDERR
     if (options->outputs & EL_OUT_STDERR)
     {
-        return fputs(s, stderr) == EOF ? -1 : 0;
+        rv |= fputs(s, stderr) == EOF ? -1 : 0;
     }
 #endif
 
@@ -97,7 +102,7 @@ int el_oputs
 #if ENABLE_OUT_FILE
     if (options->outputs & EL_OUT_FILE)
     {
-        return el_file_puts(options, s);
+        rv |= el_file_puts(options, s);
     }
 #endif
 
@@ -113,5 +118,12 @@ int el_oputs
     }
 #endif
 
-    return 0;
+#if ENABLE_OUT_CUSTOM
+    if (options->outputs & EL_OUT_CUSTOM && options->custom_puts)
+    {
+        rv |= options->custom_puts(s);
+    }
+#endif
+
+    return rv;
 }

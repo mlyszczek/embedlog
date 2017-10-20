@@ -102,6 +102,10 @@ static const int VALID_OUTS = 0
 #if ENABLE_OUT_TTY
     | EL_OUT_TTY
 #endif
+
+#if ENABLE_OUT_CUSTOM
+    | EL_OUT_CUSTOM
+#endif
     ;
 
 
@@ -138,9 +142,10 @@ static int el_vooption
     va_list             ap        /* option value(s) */
 )
 {
-    int          value_int;   /* ap value treated as integer */
-    long         value_long;  /* ap value treated as long */
-    const char  *value_str;   /* ap value treated as string */
+    int          value_int;       /* ap value treated as integer */
+    long         value_long;      /* ap value treated as long */
+    const char  *value_str;       /* ap value treated as string */
+    void       (*value_ptr)();    /* ap value threated as function pointer */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -241,6 +246,15 @@ static int el_vooption
         return 0;
 
     #endif  /* ENABLE_OUT_FILE */
+
+    #if ENABLE_OUT_CUSTOM
+
+    case EL_OPT_CUSTOM_PUTS:
+        value_ptr = va_arg(ap, void (*)());
+        options->custom_puts = (el_custom_puts)value_ptr;
+        return 0;
+
+    #endif /* ENABLE_OUT_CUSTOM */
 
     default:
         /*

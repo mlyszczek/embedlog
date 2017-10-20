@@ -1,9 +1,9 @@
 AC_INIT([embedlog], [0.0.1], [michal.lyszczek@bofc.pl])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIRS([m4])
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
@@ -49,6 +49,27 @@ AS_IF([test "x$enable_out_file" = "xyes"],
 # else
 [
     enable_out_file="no"
+])
+
+
+###
+# --enable-out-custom
+#
+
+
+AC_ARG_ENABLE([out-custom],
+    AS_HELP_STRING([--enable-out-custom], [Enable printing to custom]))
+
+AM_CONDITIONAL([ENABLE_OUT_CUSTOM], [test "x$enable_out_custom" = "xyes"])
+AS_IF([test "x$enable_out_custom" = "xyes"],
+[
+    AC_DEFINE([ENABLE_OUT_CUSTOM], [1], [Enable printing to custom])
+    AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
+        AC_MSG_ERROR(not found, needed by --enable-out-custom))
+],
+# else
+[
+    enable_out_custom="no"
 ])
 
 
@@ -225,6 +246,7 @@ echo "embedlog compilation configuration summary"
 echo
 echo "print to stderr............. : $enable_out_stderr"
 echo "print to file............... : $enable_out_file"
+echo "print to custom routine..... : $enable_out_custom"
 echo "print timestamp enabled..... : $enable_timestamp"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"

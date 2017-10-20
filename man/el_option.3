@@ -163,6 +163,15 @@ Input argument is different than 1 or 0
 .   RE
 .RE
 
+.BI "EL_CUSTOM_PUTS (" int " "(*el_custom_puts)(const " " char " " *s) ")
+.RS 4
+Sets function pointer for custom message print. Function will receive complete
+messsage to print, just as it would be printed to ie. stderr or another
+facility. Function cannot fail, if NULL is passed, custom function won't be
+called. It is still mandatory to enable custom printing with
+\fBel_enable_output\fR()
+.RE
+
 .BI "EL_OPT_FNAME (" const " " char " " * ")"
 .RS 4
 Sets the file name for the logs. Logs will be stored in this file. If file
@@ -241,7 +250,17 @@ Value is less than 1
 On success 0 is returned. -1 is returned when some error occured
 
 .SH ERRORS
-Check for error description of specific option that failed for more informations
+.TP
+.B EINVAL
+Passed \fIoption\fR is invalid
+
+.TP
+.B ENOSYS
+Passed \fIoption\fR is not supported on this system (support was not compiled)
+
+.RE
+Also check for error description of specific option that failed for more
+informations
 
 .SH SEE ALSO
 .BR el_init (3),

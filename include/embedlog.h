@@ -46,7 +46,8 @@ enum el_output
     EL_OUT_FILE   = 0x0004,
     EL_OUT_NET    = 0x0008,
     EL_OUT_TTY    = 0x0010,
-    EL_OUT_ALL    = 0xffff,
+    EL_OUT_CUSTOM = 0x0020,
+    EL_OUT_ALL    = 0x003f,
 };
 
 enum el_level
@@ -68,6 +69,7 @@ enum el_option
     EL_OPT_TS_TM,
     EL_OPT_PRINT_LEVEL,
     EL_OPT_FINFO,
+    EL_OPT_CUSTOM_PUTS,
 
     EL_OPT_FNAME,
     EL_OPT_FROTATE_NUMBER,
@@ -95,24 +97,26 @@ enum el_option_timestamp_timer
     EL_OPT_TS_TM_ERROR /* internal use only */
 };
 
+typedef int (*el_custom_puts)(const char *s);
+
 struct el_options
 {
-    int          outputs;
-    int          level;
-    int          colors;
-    int          timestamp;
-    int          timestamp_timer;
-    int          print_log_level;
+    int             outputs;
+    int             level;
+    int             colors;
+    int             timestamp;
+    int             timestamp_timer;
+    int             print_log_level;
 
-    int          finfo;
-    int          frotate_number;
-    int          fcurrent_rotate;
-    long         frotate_size;
-    long         fpos;
-    FILE        *file;
-    const char  *fname;
+    int             finfo;
+    int             frotate_number;
+    int             fcurrent_rotate;
+    long            frotate_size;
+    long            fpos;
+    FILE           *file;
+    const char     *fname;
+    el_custom_puts  custom_puts;
 };
-
 
 int el_init(void);
 int el_cleanup(void);
