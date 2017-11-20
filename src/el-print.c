@@ -88,14 +88,14 @@ static const char char_level[8] = { 'f', 'a', 'c', 'e', 'w', 'n', 'i', 'd' };
 
 static const char *color[] =
 {
-    "\e[91m",  /* fatal - light red */
-    "\e[31m",  /* alert - red */
-    "\e[95m",  /* critical - light magenta */
-    "\e[35m",  /* error - magenta */
-    "\e[93m",  /* warning - light yellow */
-    "\e[92m",  /* notice - light green */
-    "\e[32m",  /* information - green */
-    "\e[34m",  /* debug - blue */
+    "\e[91m",  /* fatal             light red */
+    "\e[31m",  /* alert             red */
+    "\e[95m",  /* critical          light magenta */
+    "\e[35m",  /* error             magenta */
+    "\e[93m",  /* warning           light yellow */
+    "\e[92m",  /* notice            light green */
+    "\e[32m",  /* information       green */
+    "\e[34m",  /* debug             blue */
     "\e[0m"    /* remove all formats */
 };
 

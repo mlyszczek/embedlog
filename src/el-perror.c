@@ -121,6 +121,7 @@ int el_perror
 )
 {
     int            rc;     /* return code from el_operror() */
+    va_list        ap;     /* argument pointer for variadic variables */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -148,6 +149,7 @@ int el_operror
 )
 {
     int                rc;        /* return code from el_operror() */
+    va_list            ap;     /* argument pointer for variadic variables */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 

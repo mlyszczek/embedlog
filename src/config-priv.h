@@ -100,6 +100,15 @@
 
 
 /* ==========================================================================
+    Maximum length of line number.  ie, if set to 1, range 0-9  is  allowed,
+    rendering  [source-file.c:5]  valid  while  [source-file.c:13]  invalid.
+   ========================================================================== */
+
+
+#define EL_PRE_FINFO_LINE_MAX_LEN 7
+
+
+/* ==========================================================================
     maximum file info length. File info is a part with file name and line
     number, it looks like this
 
@@ -107,14 +116,13 @@
 
     EL_FLEN_MAX is a maximum length of a  file  and  is  defined  externally
     during  compilation  to  suite   users   needs,   3   is   for   special
-    characters    "[:]"    and    5    is    maximum    length    of    line
-    number.    It   is   assumed   that   nobody    will    compile    files
-    longer   than    99999    number    of lines.
+    characters "[:]".  EL_PRE_FINFO_LINE_MAX_LEN can  be  redefined  to  any
+    value.
    ========================================================================== */
 
 
 #if ENABLE_FINFO
-    #define EL_PRE_FINFO_LEN ((EL_FLEN_MAX) + 3 + 5)
+    #define EL_PRE_FINFO_LEN ((EL_FLEN_MAX) + 3 + EL_PRE_FINFO_LINE_MAX_LEN)
 #else
     #define EL_PRE_FINFO_LEN 0
 #endif

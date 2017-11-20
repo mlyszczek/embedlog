@@ -1,5 +1,7 @@
 *.o
 .*
+*.gch
+config.cache
 *libembedlog*
 Makefile
 Makefile.in
@@ -23,6 +25,6 @@ missing
 stamp-h1
 test-driver
 test-suite.log
-tests
-tests.log
-tests.trs
+test
+test.log
+test.trs

@@ -313,7 +313,7 @@ int el_oinit
 {
     VALID(EINVAL, options);
 
-    memset(options, 0, sizeof(*options));
+    memset(options, 0, sizeof(struct el_options));
     options->print_log_level = 1;
     options->level = EL_INFO;
     return 0;

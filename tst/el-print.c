@@ -1,0 +1,647 @@
+/* ==========================================================================
+    Licensed under BSD 2clause license See LICENSE file for more information
+    Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
+   ========================================================================== */
+
+
+/* ==========================================================================
+          _               __            __         ____ _  __
+         (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
+        / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
+       / // / / // /__ / // /_/ // /_/ //  __/  / __// // //  __/(__  )
+      /_//_/ /_/ \___//_/ \__,_/ \__,_/ \___/  /_/  /_//_/ \___//____/
+
+   ========================================================================== */
+
+#include <rb.h>
+#include <string.h>
+#include <ctype.h>
+
+#include "mtest.h"
+#include "stdlib.h"
+#include "embedlog.h"
+
+#include "config-priv.h"
+#include "el-options.h"
+
+
+/* ==========================================================================
+                  _                __           __
+    ____   _____ (_)_   __ ____ _ / /_ ___     / /_ __  __ ____   ___   _____
+   / __ \ / ___// /| | / // __ `// __// _ \   / __// / / // __ \ / _ \ / ___/
+  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / /_ / /_/ // /_/ //  __/(__  )
+ / .___//_/   /_/  |___/ \__,_/ \__/ \___/   \__/ \__, // .___/ \___//____/
+/_/                                              /____//_/
+
+   ========================================================================== */
+
+
+struct log_message
+{
+    const char          *file;
+    size_t               line;
+    enum el_level        level;
+    const char          *msg;
+};
+
+
+/* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
+
+
+mt_defs_ext();
+static char        logbuf[1024 * 1024];  /* output simulation */
+static struct rb  *expected_logs;        /* array of expected logs */
+
+
+/* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+               ____                     __   _
+              / __/__  __ ____   _____ / /_ (_)____   ____   _____
+             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
+            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
+           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+
+   ========================================================================== */
+
+
+/* ==========================================================================
+    this is custom function that will be called instead of for example puts,
+    after el_print constructs message.  We capture that message  and  simply
+    append to logbuf, so we can analyze it later if everything is in  order.
+   ========================================================================== */
+
+
+static int print_to_buffer
+(
+    const char *s
+)
+{
+    strcat(logbuf, s);
+}
+
+
+/* ==========================================================================
+    Checks if el_print function prints everything  in  well-defined  format.
+    This function cross-checks logbuf buffer where el_print function  prints
+    message into, and expected_logs with raw information about  what  should
+    be printed.
+   ========================================================================== */
+
+
+static int print_check(void)
+{
+#define IS_DIGIT() if (!isdigit(*msg++)) return -1
+#define IS_CHAR(c) if (*msg++ != c) return -1
+
+    static const char  *levelstr = "facewnid";
+    struct log_message  expected;
+    char               *msg;
+    char                tmp[1024];
+    int                 i;
+    int                 slevel;
+    size_t              msglen;
+    static const char  *color[] =
+    {
+        "\e[91m",  /* fatal             light red */
+        "\e[31m",  /* alert             red */
+        "\e[95m",  /* critical          light magenta */
+        "\e[35m",  /* error             magenta */
+        "\e[93m",  /* warning           light yellow */
+        "\e[92m",  /* notice            light green */
+        "\e[32m",  /* information       green */
+        "\e[34m",  /* debug             blue */
+        "\e[0m"    /* remove all formats */
+    };
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    msg = logbuf;
+    while (rb_read(expected_logs, &expected, 1) == 1)
+    {
+        slevel = expected.level > EL_DBG ? EL_DBG : expected.level;
+
+        if (expected.level > g_options.level)
+        {
+            /*
+             * log should not have been printed due to current log level
+             * restriction. We just continue here, because if log was indeed
+             * printed, next checks will fail anyway.
+             */
+
+            continue;
+        }
+
+        if (g_options.colors)
+        {
+            if (strncmp(msg, color[slevel], 5) != 0)
+            {
+                /*
+                 * no color information or el_print generated wrong color
+                 */
+
+                return -1;
+            }
+
+            /*
+             * move msg by 5 bytes - begging of color is always 5char long
+             */
+
+            msg += 5;
+        }
+
+        /*
+         * check printing timestamp
+         */
+
+        if (g_options.timestamp == EL_OPT_TS_LONG)
+        {
+            IS_CHAR('[');
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_CHAR('-');
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_CHAR('-');
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_CHAR(' ');
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_CHAR(':');
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_CHAR(':');
+            IS_DIGIT();
+            IS_DIGIT();
+            IS_CHAR('.');
+
+            for (i = 0; i != 6; ++i)
+            {
+                IS_DIGIT();
+            }
+            IS_CHAR(']');
+
+        }
+        else if (g_options.timestamp == EL_OPT_TS_SHORT)
+        {
+            IS_CHAR('[');
+            while (*msg != '.' )
+            {
+                IS_DIGIT();
+            }
+
+            ++msg; /* skip the '.' character */
+
+            for (i = 0; i != 6; ++i)
+            {
+                IS_DIGIT();
+            }
+            IS_CHAR(']');
+        }
+        else if (g_options.timestamp == EL_OPT_TS_OFF)
+        {
+            /*
+             * we check for nothing here
+             */
+        }
+        else
+        {
+            /*
+             * wrong timestamp option value
+             */
+
+           return -1;
+        }
+
+        /*
+         * check printing file information
+         */
+
+        if (g_options.finfo)
+        {
+            IS_CHAR('[');
+            i = 0;
+
+            while (*msg != ':')
+            {
+                tmp[i] = *msg++;
+                if (i++ == EL_FLEN_MAX)
+                {
+                    /*
+                     * we didn't find ':' character withing maximum lenght
+                     * of file - file is too long
+                     */
+
+                    return -1;
+                }
+            }
+
+            msg++;  /* skip ':' character */
+            tmp[i] = '\0';
+
+            if (strcmp(tmp, expected.file) != 0)
+            {
+                /*
+                 * file name in printed log is different than what we set
+                 */
+
+                return -1;
+            }
+
+            i = 0;
+
+            while (*msg != ']')
+            {
+                tmp[i] = *msg;
+                if (i++ == EL_PRE_FINFO_LINE_MAX_LEN)
+                {
+                    /*
+                     * file line lenght is too large, or ending ']' is missing
+                     */
+
+                    return -1;
+                }
+
+                /*
+                 * file line should be a number ;-)
+                 */
+
+                IS_DIGIT();
+
+            }
+
+            msg++;  /* skip ']' character */
+            tmp[i] = '\0';
+
+            if (atoi(tmp) != expected.line)
+            {
+                /*
+                 * line number in printed log is different than what was set
+                 */
+
+                return -1;
+            }
+        }
+
+        if (g_options.finfo || g_options.timestamp != EL_OPT_TS_OFF)
+        {
+            /*
+             * file info or timestamp information is enabled, in that case
+             * we check for additional space between info and log message
+             */
+
+            if (*msg++ != ' ')
+            {
+                return -1;
+            }
+        }
+
+        /*
+         * check printing log level
+         */
+
+        if (g_options.print_log_level)
+        {
+            if (*msg++ != levelstr[slevel])
+            {
+                return -1;
+            }
+
+            if (*msg++ != '/')
+            {
+                return -1;
+            }
+        }
+
+        msglen = strlen(expected.msg);
+
+        if (strncmp(msg, expected.msg, msglen) != 0)
+        {
+            return -1;
+        }
+
+        msg += msglen;
+
+        if (g_options.colors)
+        {
+            if (strncmp(msg, color[8], 4) != 0)
+            {
+                /*
+                 * expected end of color, got some shit
+                 */
+
+                return -1;
+            }
+
+            /*
+             * end of color is always 4 bytes long
+             */
+
+            msg += 4;
+        }
+
+        if (*msg != '\n')
+        {
+            /*
+             * all logs should be ended with new line
+             */
+
+            return -1;
+        }
+
+        /*
+         * set msg to point to next message
+         */
+
+        ++msg;
+    }
+
+    return 0;
+
+#undef IS_CHAR
+#undef IS_DIGIT
+}
+
+
+/* ==========================================================================
+    adds log to array of expected logs and then  sends  passed  log  message
+    into el_print
+   ========================================================================== */
+
+
+static void add_log
+(
+    const char    *file,
+    size_t         line,
+    enum el_level  level,
+    const char    *msg
+)
+{
+    struct log_message  expected;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    expected.file = file;
+    expected.line = line;
+    expected.level = level;
+    expected.msg = msg;
+    rb_write(expected_logs, &expected, 1);
+    el_print(file, line, level, msg);
+}
+
+
+/* ==========================================================================
+    Called before every test,  initializes  embedlog  to  known  state,  and
+    allocates memory for expected_logs buffer
+   ========================================================================== */
+
+
+static void test_prepare(void)
+{
+    el_init();
+    el_option(EL_OPT_CUSTOM_PUTS, print_to_buffer);
+    el_option(EL_OPT_PRINT_LEVEL, 0);
+    el_output_enable(EL_OUT_CUSTOM);
+    memset(logbuf, 0, sizeof(logbuf));
+    expected_logs = rb_new(1024, sizeof(struct log_message),
+        O_NONTHREAD | O_NONBLOCK);
+}
+
+
+/* ==========================================================================
+    Called after every test. Frees all memory allocated by test_prepare
+   ========================================================================== */
+
+
+static void test_cleanup(void)
+{
+    el_cleanup();
+    rb_destroy(expected_logs);
+}
+
+
+/* ==========================================================================
+                           __               __
+                          / /_ ___   _____ / /_ _____
+                         / __// _ \ / ___// __// ___/
+                        / /_ /  __/(__  )/ /_ (__  )
+                        \__/ \___//____/ \__//____/
+
+   ========================================================================== */
+
+
+static void print_simple_message(void)
+{
+    add_log(ELF, "print_simple_message");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_simple_multiple_message(void)
+{
+    add_log(ELF, "print_simple_multiple_message first");
+    add_log(ELF, "print_simple_multiple_message second");
+    add_log(ELF, "print_simple_multiple_message third");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_log_level(void)
+{
+    el_option(EL_OPT_PRINT_LEVEL, 1);
+    el_level_set(EL_DBG);
+    add_log(ELF, "print_log_level fatal message");
+    add_log(ELA, "print_log_level alert message");
+    add_log(ELC, "print_log_level critical message");
+    add_log(ELE, "print_log_level error message");
+    add_log(ELW, "print_log_level warning message");
+    add_log(ELN, "print_log_level notice message");
+    add_log(ELI, "print_log_level info message");
+    add_log(ELD, "print_log_level debug message");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_colorful_output(void)
+{
+    el_option(EL_OPT_COLORS, 1);
+    el_level_set(EL_DBG + 2);
+    add_log(ELF, "print_colorful_output fatal message");
+    add_log(ELA, "print_colorful_output alert message");
+    add_log(ELC, "print_colorful_output critical message");
+    add_log(ELE, "print_colorful_output error message");
+    add_log(ELW, "print_colorful_output warning message");
+    add_log(ELN, "print_colorful_output notice message");
+    add_log(ELI, "print_colorful_output info message");
+    add_log(ELD, "print_colorful_output debug message");
+    add_log(ELD + 1, "print_colorful_output debug + 1 message");
+    add_log(ELD + 2, "print_colorful_output debug + 2 message");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_custom_log_level(void)
+{
+    el_option(EL_OPT_PRINT_LEVEL, 1);
+    el_level_set(EL_DBG + 5);
+    add_log(ELD + 4, "print_custom_log_level custom debug 4");
+    add_log(ELD + 5, "print_custom_log_level custom debug 5");
+    add_log(ELD + 6, "print_custom_log_level custom debug 6");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_short(void)
+{
+    el_option(EL_OPT_TS, EL_OPT_TS_SHORT);
+    add_log(ELF, "print_timestamp_short first");
+    add_log(ELF, "print_timestamp_short second");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_long(void)
+{
+    el_option(EL_OPT_TS, EL_OPT_TS_LONG);
+    add_log(ELF, "print_timestamp_long first");
+    add_log(ELF, "print_timestamp_long second");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_finfo(void)
+{
+    el_option(EL_OPT_FINFO, 1);
+    add_log(ELF, "print_finfo first");
+    add_log(ELF, "print_finfo second");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_mix_of_everything(void)
+{
+    int level;
+    int timestamp;
+    int printlevel;
+    int finfo;
+    int colors;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    /*
+     * clean test, as we will init and cleanup this manually for every
+     * option set
+     */
+
+    test_cleanup();
+
+    for (level = EL_FATAL;          level <= EL_DBG;              ++level)
+    for (timestamp = EL_OPT_TS_OFF; timestamp != EL_OPT_TS_ERROR; ++timestamp)
+    for (printlevel = 0;            printlevel <= 1;              ++printlevel)
+    for (finfo = 0;                 finfo <= 1;                   ++finfo)
+    for (colors = 0;                colors <= 1;                  ++colors)
+    {
+        test_prepare();
+        el_level_set(level);
+        el_option(EL_OPT_TS, timestamp);
+        el_option(EL_OPT_PRINT_LEVEL, printlevel);
+        el_option(EL_OPT_FINFO, finfo);
+        el_option(EL_OPT_COLORS, colors);
+
+        add_log(ELF, "fatal message");
+        add_log(ELA, "alert message");
+        add_log(ELC, "critical message");
+        add_log(ELE, "error message");
+        add_log(ELW, "warning message");
+        add_log(ELN, "notice message");
+        add_log(ELI, "info message");
+        add_log(ELD, "debug message");
+        mt_fok(print_check());
+
+        test_cleanup();
+    }
+
+    /*
+     * to avoid double free, we init test here, so mtest can free it
+     * without crash. Yup, this is cheap.
+     */
+
+    test_prepare();
+}
+
+
+/* ==========================================================================
+             __               __
+            / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
+           / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
+          / /_ /  __/(__  )/ /_   / /_/ // /   / /_/ // /_/ // /_/ /
+          \__/ \___//____/ \__/   \__, //_/    \____/ \__,_// .___/
+                                 /____/                    /_/
+   ========================================================================== */
+
+
+void el_print_test_group(void)
+{
+    mt_prepare_test = &test_prepare;
+    mt_cleanup_test = &test_cleanup;
+
+    mt_run(print_simple_message);
+    mt_run(print_simple_multiple_message);
+    mt_run(print_log_level);
+    mt_run(print_colorful_output);
+    mt_run(print_custom_log_level);
+    mt_run(print_timestamp_short);
+    mt_run(print_timestamp_long);
+    mt_run(print_finfo);
+    mt_run(print_mix_of_everything);
+}
