@@ -1,7 +1,8 @@
 check_PROGRAMS = test
 test_SOURCES  = main.c \
 				el-options.c \
-				el-print.c
+				el-print.c \
+				el-file.c
 
 test_SOURCES += ../src/el-print.c \
 				../src/el-puts.c \

@@ -16,8 +16,9 @@
 #include <errno.h>
 
 #include "embedlog.h"
+#include "el-options.h"
 #include "mtest.h"
-#include "test_group_list.h"
+#include "test-group-list.h"
 #include "config.h"
 
 /* ==========================================================================

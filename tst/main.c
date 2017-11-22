@@ -5,7 +5,7 @@
 
 #include "embedlog.h"
 #include "mtest.h"
-#include "test_group_list.h"
+#include "test-group-list.h"
 
 mt_defs();  /* definitions for mtest */
 
@@ -13,5 +13,6 @@ int main(void)
 {
     el_options_test_group();
     el_print_test_group();
+    el_file_test_group();
     mt_return();
 }

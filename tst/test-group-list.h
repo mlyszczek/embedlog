@@ -7,5 +7,7 @@
 #define TEST_GROUP_LIST 1
 
 void el_options_test_group(void);
+void el_print_test_group(void);
+void el_file_test_group(void);
 
 #endif

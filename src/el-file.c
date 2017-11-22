@@ -46,6 +46,30 @@
 #include <string.h>
 
 #include "el-options.h"
+#include "config.h"
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+
+/* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
+
+
+static char  current_log[PATH_MAX + 1];  /* full path to current log file */
 
 
 /* ==========================================================================
@@ -64,6 +88,27 @@
    ========================================================================== */
 
 
+static int el_file_exists
+(
+    struct el_options  *options
+)
+{
+#if HAVE_ACCESS
+    return access(current_log, F_OK) == 0;
+#else
+    FILE *f;
+
+    if ((f = fopen(current_log, "r")) == NULL)
+    {
+        return 0;
+    }
+
+    fclose(f);
+    return 1;
+#endif
+}
+
+
 /* ==========================================================================
     function rotates file, meaning if currently opened file has  suffix  .3,
     function will close that file and will open file  with  suffix  .4.   If
@@ -78,8 +123,7 @@ static int el_file_rotate
     struct el_options  *options
 )
 {
-    char  path[PATH_MAX + 1];  /* path to log file we will open */
-    int   i;                   /* simple iterator for loop */
+    int                 i;       /* simple iterator for loop */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -150,21 +194,22 @@ static int el_file_rotate
 
 skip_rotate:
     /*
-     * now we can safely open file with  suffix  .0,  we're  sure  we  won't
+     * now we can safely open file with  suffix  .n,  we're  sure  we  won't
      * overwrite anything (well except if someone sets frotate_number to  1,
      * then current .0 file will be truncated).  We don't need to check  for
      * length of created file, as it is checked in el_file_open  and  if  it
      * passes there, it will pass here as well
      */
 
-    sprintf(path, "%s.%d", options->fname, options->fcurrent_rotate);
+    sprintf(current_log, "%s.%d", options->fname, options->fcurrent_rotate);
 
-    if ((options->file = fopen(path, "w")) == NULL)
+    if ((options->file = fopen(current_log, "w")) == NULL)
     {
         return -1;
     }
 
-    options->fpos = ftell(options->file);
+    options->fpos = 0;
+
     return 0;
 }
 
@@ -226,14 +271,11 @@ int el_file_open
 
     if (options->frotate_number)
     {
-        FILE   *f;                   /* opened file */
-        int     i;                   /* simple interator for loop */
-        char    path[PATH_MAX + 1];  /* file path + suffix = file to open */
-        size_t  pathl;               /* length of path after snprintf */
-        long    fsize;               /* size of the opened file */
+        FILE   *f;      /* opened file */
+        int     i;      /* simple interator for loop */
+        size_t  pathl;  /* length of path after snprintf */
+        long    fsize;  /* size of the opened file */
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        path[0] = '\0';
 
         /*
          * file rotation is enabled, in such case we need  to  find,  oldest
@@ -245,7 +287,8 @@ int el_file_open
 
         for (i = options->frotate_number - 1; i >= 0; --i)
         {
-            pathl = snprintf(path, PATH_MAX + 1, "%s.%d", options->fname, i);
+            pathl = snprintf(current_log, PATH_MAX + 1, "%s.%d",
+                options->fname, i);
 
             if (pathl > PATH_MAX)
             {
@@ -255,11 +298,12 @@ int el_file_open
                  * could result in some data lose on the disk.
                  */
 
+                current_log[0] = '\0';
                 errno = ENAMETOOLONG;
                 return -1;
             }
 
-            if ((f = fopen(path, "a")) == NULL)
+            if ((f = fopen(current_log, "a")) == NULL)
             {
                 /*
                  * if we cannot open file, that means there is some kind  of
@@ -267,6 +311,7 @@ int el_file_open
                  * it's pointless to continue
                  */
 
+                current_log[0] = '\0';
                 return -1;
             }
 
@@ -295,7 +340,7 @@ int el_file_open
                  */
 
                 fclose(f);
-                remove(path);
+                remove(current_log);
                 continue;
             }
 
@@ -315,8 +360,18 @@ int el_file_open
      * rotation is disabled, simply open file with append flag
      */
 
-    if ((options->file = fopen(options->fname, "a")) == NULL)
+    if (strlen(options->fname) > PATH_MAX)
     {
+        current_log[0] = '\0';
+        errno = ENAMETOOLONG;
+        return -1;
+    }
+
+    strcpy(current_log, options->fname);
+
+    if ((options->file = fopen(current_log, "a")) == NULL)
+    {
+        current_log[0] = '\0';
         return -1;
     }
 
@@ -340,7 +395,7 @@ int el_file_puts
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    if (options->file == NULL)
+    if (current_log[0] == '\0')
     {
         /*
          * file has not been opened, prevent segfault
@@ -354,7 +409,7 @@ int el_file_puts
 
     if (options->frotate_number)
     {
-        if (options->fpos + sl > options->frotate_size)
+        if (options->fpos != 0 &&  options->fpos + sl > options->frotate_size)
         {
             /*
              * we get here only when frotate  is  enabled,  and  writing  to
@@ -382,6 +437,30 @@ int el_file_puts
         }
     }
 
+    if (el_file_exists(options) == 0)
+    {
+        /*
+         * file doesn't exist, it may happen when someone unlinks  currently
+         * opened file. Even tough user unlinked our log file, we still have
+         * file opened, so this file exists in the system, but  not  in  the
+         * file system tree and  as  such,  every  write  to  such  file  is
+         * effectively writing to /dev/null.  To prevent that, we close  and
+         * reopen our current log file
+         */
+
+        if (options->file)
+        {
+            fclose(options->file);
+        }
+
+        if ((options->file = fopen(current_log, "a")) == NULL)
+        {
+            errno = EBADF;
+            return -1;
+        }
+
+        options->fpos = 0;
+    }
 
     if (fwrite(s, sl, 1, options->file) != 1)
     {
@@ -408,4 +487,7 @@ void el_file_cleanup
     {
         fclose(options->file);
     }
+
+    options->file = NULL;
+    current_log[0] = '\0';
 }

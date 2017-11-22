@@ -578,6 +578,7 @@ static void print_mix_of_everything(void)
     int colors;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+
     /*
      * clean test, as we will init and cleanup this manually for every
      * option set

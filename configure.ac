@@ -6,7 +6,9 @@ AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
+AC_CHECK_LIB
 
+AC_CHECK_FUNCS(access)
 
 ###
 # --enable-feature options
