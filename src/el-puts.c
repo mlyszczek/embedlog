@@ -31,6 +31,7 @@
    ========================================================================== */
 
 
+#include <errno.h>
 #include <stdio.h>
 
 #include "el-file.h"
@@ -76,15 +77,26 @@ int el_puts
 
 int el_oputs
 (
-    struct el_options  *options,  /* options defining printing style */
-    const char         *s         /* string to put into output */
+    struct el_options  *options,   /* options defining printing style */
+    const char         *s          /* string to put into output */
 )
 {
-    int                 rv;       /* return value from function */
+    int                 rv;        /* return value from function */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     rv = 0;
+
+    if (options->outputs == 0)
+    {
+        /*
+         * all outputs are disabled, no place to print
+         */
+
+        errno = ENOMEDIUM;
+        return -1;
+    }
+
 #if ENABLE_OUT_STDERR
     if (options->outputs & EL_OUT_STDERR)
     {

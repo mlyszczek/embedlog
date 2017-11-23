@@ -248,6 +248,47 @@ static void file_filename_too_long(void)
    ========================================================================== */
 
 
+static void file_print_without_init(void)
+{
+    mt_ferr(el_puts("whatev..."), ENOMEDIUM);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static int file_print_after_cleanup(void)
+{
+    el_init();
+    el_output_enable(EL_OUT_FILE);
+    el_option(EL_OPT_FROTATE_SIZE, 16);
+    el_option(EL_OPT_FROTATE_NUMBER, 0);
+    el_option(EL_OPT_FNAME, WORKDIR"/log");
+    el_cleanup();
+    mt_ferr(el_puts("whatev"), ENOMEDIUM);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static int file_print_without_setting_file(void)
+{
+    el_init();
+    el_output_enable(EL_OUT_FILE);
+    el_option(EL_OPT_FROTATE_SIZE, 16);
+    el_option(EL_OPT_FROTATE_NUMBER, 0);
+    mt_ferr(el_puts("no file set"), EBADF);
+    el_cleanup();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void file_rotate_1_no_rotate(void)
 {
     el_option(EL_OPT_FROTATE_NUMBER, 1);
@@ -942,10 +983,14 @@ static void file_rotate_filename_too_long(void)
 
 void el_file_test_group(void)
 {
+    mkdir(WORKDIR, 0755);
+
+    mt_run(file_print_without_init);
+    mt_run(file_print_after_cleanup);
+    mt_run(file_print_without_setting_file);
+
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
-
-    mkdir(WORKDIR, 0755);
 
     mt_run(file_single_message);
     mt_run(file_multi_message);
@@ -989,4 +1034,6 @@ void el_file_test_group(void)
     mt_run(file_rotate_dir_no_access);
     mt_run(file_rotate_no_access_to_file);
     mt_run(file_rotate_filename_too_long);
+
+    rmdir(WORKDIR);
 }
