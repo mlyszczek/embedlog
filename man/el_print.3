@@ -197,6 +197,18 @@ Any of the input parameters is invalid.
 Loggig to file is enabled and filename was not set with \fBEL_OPT_FNAME\fR
 option
 
+.TP
+.B EBADF
+Logging to file is enabled, file was opened sucessfuly, but log cannot be stored
+into file. This usually happen that file was unlinked from the file system and
+\fBembedlog\fR couldn't create new file again (no access to directory or
+directory doesn't exist at all). Log is lost, but \fBembedlog\fR will try to
+recreate log file everytime \fIel_print\fR is called.
+
+.TP
+.B ENOMEDIUM
+All possible outputs are disabled
+
 .RE
 \fBel_print\fR(), \fBel_vprint\fR(), \fBel_perror\fR() \fBel_pmemory\fR
 may also return

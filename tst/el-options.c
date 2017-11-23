@@ -346,17 +346,6 @@ static void options_log_allowed(void)
     mt_fail(el_log_allowed(&g_options, EL_INFO)   == 0);
     mt_fail(el_log_allowed(&g_options, EL_DBG)    == 0);
 
-    g_options.outputs = 0;
-
-    mt_fail(el_log_allowed(&g_options, EL_FATAL)  == 0);
-    mt_fail(el_log_allowed(&g_options, EL_ALERT)  == 0);
-    mt_fail(el_log_allowed(&g_options, EL_CRIT)   == 0);
-    mt_fail(el_log_allowed(&g_options, EL_ERROR)  == 0);
-    mt_fail(el_log_allowed(&g_options, EL_WARN)   == 0);
-    mt_fail(el_log_allowed(&g_options, EL_NOTICE) == 0);
-    mt_fail(el_log_allowed(&g_options, EL_INFO)   == 0);
-    mt_fail(el_log_allowed(&g_options, EL_DBG)    == 0);
-
     mt_fail(el_cleanup() == 0);
 }
 

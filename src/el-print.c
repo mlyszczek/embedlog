@@ -528,6 +528,7 @@ int el_ovprint
 
     VALID(EINVAL, fmt);
     VALID(ECHRNG, el_log_allowed(options, level));
+    VALID(ENOMEDIUM, options->outputs);
 
     e = 0;
 

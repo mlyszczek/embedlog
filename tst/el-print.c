@@ -16,6 +16,7 @@
 #include <rb.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include "mtest.h"
 #include "stdlib.h"
@@ -622,6 +623,106 @@ static void print_mix_of_everything(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+static void print_too_long_print_truncate(void)
+{
+    char  msg[EL_LOG_MAX + 3];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    memset(msg, 'a', sizeof(msg));
+    msg[sizeof(msg) - 1] = '\0';
+    msg[sizeof(msg) - 2] = '3';
+    msg[sizeof(msg) - 3] = '2';
+    msg[sizeof(msg) - 4] = '1';
+    msg[sizeof(msg) - 4] = '0';
+
+    add_log(ELI, "not truncated");
+    add_log(ELI, msg);
+
+    /*
+     * while el_print will make copy of msg, our test  print_check  function
+     * will just use pointer to our msg here, and since we expect message to
+     * be truncated, we truncate it here  and  print_check  will  take  this
+     * truncated message as expected one.
+     */
+
+    msg[sizeof(msg) - 3] = '\0';
+
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_truncate_with_date(void)
+{
+    char  msg[EL_LOG_MAX + 3];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_option(EL_OPT_TS, EL_OPT_TS_LONG);
+    memset(msg, 'a', sizeof(msg));
+    msg[sizeof(msg) - 1] = '\0';
+    msg[sizeof(msg) - 2] = '3';
+    msg[sizeof(msg) - 3] = '2';
+    msg[sizeof(msg) - 4] = '1';
+    msg[sizeof(msg) - 4] = '0';
+
+    add_log(ELI, "not truncated");
+    add_log(ELI, msg);
+
+    msg[sizeof(msg) - 3] = '\0';
+
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_truncate_with_all_options(void)
+{
+    char  msg[EL_LOG_MAX + 3];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_option(EL_OPT_TS, EL_OPT_TS_LONG);
+    el_option(EL_OPT_FINFO, 1);
+    el_option(EL_OPT_PRINT_LEVEL, 1);
+    memset(msg, 'a', sizeof(msg));
+    msg[sizeof(msg) - 1] = '\0';
+    msg[sizeof(msg) - 2] = '3';
+    msg[sizeof(msg) - 3] = '2';
+    msg[sizeof(msg) - 4] = '1';
+    msg[sizeof(msg) - 4] = '0';
+
+    add_log(ELI, "not truncated");
+    add_log(ELI, msg);
+
+    msg[sizeof(msg) - 3] = '\0';
+
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_with_no_output_available(void)
+{
+    el_output_disable(EL_OUT_ALL);
+    mt_ferr(el_print(ELI, "i'll be back"), ENOMEDIUM);
+}
+
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -645,4 +746,8 @@ void el_print_test_group(void)
     mt_run(print_timestamp_long);
     mt_run(print_finfo);
     mt_run(print_mix_of_everything);
+    mt_run(print_too_long_print_truncate);
+    mt_run(print_truncate_with_date);
+    mt_run(print_truncate_with_all_options);
+    mt_run(print_with_no_output_available);
 }

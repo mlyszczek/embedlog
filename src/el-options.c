@@ -498,7 +498,7 @@ int el_log_allowed
     enum el_level       level      /* log level to check */
 )
 {
-    return options->level >= level && options->outputs;
+    return options->level >= level;
 }
 
 
