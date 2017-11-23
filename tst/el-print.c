@@ -421,7 +421,7 @@ static void test_prepare(void)
     el_init();
     el_option(EL_OPT_CUSTOM_PUTS, print_to_buffer);
     el_option(EL_OPT_PRINT_LEVEL, 0);
-    el_output_enable(EL_OUT_CUSTOM);
+    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_CUSTOM);
     memset(logbuf, 0, sizeof(logbuf));
     expected_logs = rb_new(1024, sizeof(struct log_message),
         O_NONTHREAD | O_NONBLOCK);
@@ -477,7 +477,7 @@ static void print_simple_multiple_message(void)
 static void print_log_level(void)
 {
     el_option(EL_OPT_PRINT_LEVEL, 1);
-    el_level_set(EL_DBG);
+    el_option(EL_OPT_LEVEL, EL_DBG);
     add_log(ELF, "print_log_level fatal message");
     add_log(ELA, "print_log_level alert message");
     add_log(ELC, "print_log_level critical message");
@@ -497,7 +497,7 @@ static void print_log_level(void)
 static void print_colorful_output(void)
 {
     el_option(EL_OPT_COLORS, 1);
-    el_level_set(EL_DBG + 2);
+    el_option(EL_OPT_LEVEL, EL_DBG + 2);
     add_log(ELF, "print_colorful_output fatal message");
     add_log(ELA, "print_colorful_output alert message");
     add_log(ELC, "print_colorful_output critical message");
@@ -519,7 +519,7 @@ static void print_colorful_output(void)
 static void print_custom_log_level(void)
 {
     el_option(EL_OPT_PRINT_LEVEL, 1);
-    el_level_set(EL_DBG + 5);
+    el_option(EL_OPT_LEVEL, EL_DBG + 5);
     add_log(ELD + 4, "print_custom_log_level custom debug 4");
     add_log(ELD + 5, "print_custom_log_level custom debug 5");
     add_log(ELD + 6, "print_custom_log_level custom debug 6");
@@ -594,7 +594,7 @@ static void print_mix_of_everything(void)
     for (colors = 0;                colors <= 1;                  ++colors)
     {
         test_prepare();
-        el_level_set(level);
+        el_option(EL_OPT_LEVEL, level);
         el_option(EL_OPT_TS, timestamp);
         el_option(EL_OPT_PRINT_LEVEL, printlevel);
         el_option(EL_OPT_FINFO, finfo);
@@ -717,7 +717,7 @@ static void print_truncate_with_all_options(void)
 
 static void print_with_no_output_available(void)
 {
-    el_output_disable(EL_OUT_ALL);
+    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_NONE);
     mt_ferr(el_print(ELI, "i'll be back"), ENOMEDIUM);
 }
 

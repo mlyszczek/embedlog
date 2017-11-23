@@ -41,13 +41,14 @@
 
 enum el_output
 {
-    EL_OUT_STDERR = 0x0001,
-    EL_OUT_SYSLOG = 0x0002,
-    EL_OUT_FILE   = 0x0004,
-    EL_OUT_NET    = 0x0008,
-    EL_OUT_TTY    = 0x0010,
-    EL_OUT_CUSTOM = 0x0020,
-    EL_OUT_ALL    = 0x003f,
+    EL_OPT_OUT_NONE   = 0x0000,
+    EL_OPT_OUT_STDERR = 0x0001,
+    EL_OPT_OUT_SYSLOG = 0x0002,
+    EL_OPT_OUT_FILE   = 0x0004,
+    EL_OPT_OUT_NET    = 0x0008,
+    EL_OPT_OUT_TTY    = 0x0010,
+    EL_OPT_OUT_CUSTOM = 0x0020,
+    EL_OPT_OUT_ALL    = 0x003f,
 };
 
 enum el_level
@@ -64,6 +65,8 @@ enum el_level
 
 enum el_option
 {
+    EL_OPT_LEVEL,
+    EL_OPT_OUTPUT,
     EL_OPT_COLORS,
     EL_OPT_TS,
     EL_OPT_TS_TM,
@@ -120,9 +123,6 @@ struct el_options
 
 int el_init(void);
 int el_cleanup(void);
-int el_level_set(enum el_level level);
-int el_output_enable(enum el_output output);
-int el_output_disable(enum el_output output);
 int el_option(enum el_option option, ...);
 int el_puts(const char *string);
 int el_print(const char *file, size_t line, enum el_level level,
@@ -137,9 +137,6 @@ int el_perror(const char *file, size_t line, enum el_level level,
 
 int el_oinit(struct el_options *options);
 int el_ocleanup(struct el_options *options);
-int el_olevel_set(struct el_options *options, enum el_level level);
-int el_ooutput_enable(struct el_options *options, enum el_output output);
-int el_ooutput_disable(struct el_options *options, enum el_output output);
 int el_ooption(struct el_options *options, enum el_option option, ...);
 int el_oputs(struct el_options *options, const char *string);
 int el_oprint(const char *file, size_t line, enum el_level level,

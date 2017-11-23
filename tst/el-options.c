@@ -110,7 +110,7 @@ static void options_level_set(void)
 
     for (i = 0; i != 32; ++i)
     {
-        mt_fail(el_level_set(i) == 0);
+        mt_fail(el_option(EL_OPT_LEVEL, i) == 0);
         mt_fail(g_options.level == i);
     }
 
@@ -122,208 +122,23 @@ static void options_level_set(void)
    ========================================================================== */
 
 
-static void options_level_einval(void)
-{
-    mt_assert(el_init() == 0);
-    errno = 0;
-    mt_fail(el_olevel_set(NULL, EL_NOTICE) == -1);
-    mt_fail(errno == EINVAL);
-    mt_fail(el_cleanup() == 0);
-}
-
-
-/* ==========================================================================
-   ========================================================================== */
-
-
-static void options_output_enable(void)
+static void options_output(void)
 {
     int current_outputs;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     current_outputs = 0;
     mt_assert(el_init() == 0);
+    mt_fok(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR));
+    mt_fail(g_options.outputs == EL_OPT_OUT_STDERR);
 
-#if ENABLE_OUT_STDERR
-    mt_fail(el_output_enable(EL_OUT_STDERR) == 0);
-    current_outputs |= EL_OUT_STDERR;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
+    mt_fok(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE));
+    mt_fail(g_options.outputs == EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE);
 
-#if ENABLE_OUT_SYSLOG
-    mt_fail(el_output_enable(EL_OUT_SYSLOG) == 0);
-    current_outputs |= EL_OUT_STDERR;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-#if ENABLE_OUT_FILE
-    mt_fail(el_output_enable(EL_OUT_FILE) == 0);
-    current_outputs |= EL_OUT_FILE;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-#if ENABLE_OUT_NET
-    mt_fail(el_output_enable(EL_OUT_NET) == 0);
-    current_outputs |= EL_OUT_NET;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-#if ENABLE_OUT_TTY
-    mt_fail(el_output_enable(EL_OUT_TTY) == 0);
-    current_outputs |= EL_OUT_TTY;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
+    mt_ferr(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_ALL + 7), EINVAL);
+    mt_fail(g_options.outputs == EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE);
 
     mt_fail(el_cleanup() == 0);
-}
-
-
-/* ==========================================================================
-   ========================================================================== */
-
-
-static void options_output_disable(void)
-{
-    int current_outputs;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    current_outputs = 0
-#if ENABLE_OUT_STDERR
-    | EL_OUT_STDERR
-#endif
-
-#if ENABLE_OUT_SYSLOG
-    | EL_OUT_SYSLOG
-#endif
-
-#if ENABLE_OUT_FILE
-    | EL_OUT_FILE
-#endif
-
-#if ENABLE_OUT_NET
-    | EL_OUT_NET
-#endif
-
-#if ENABLE_OUT_TTY
-    | EL_OUT_TTY
-#endif
-    ;
-
-    mt_assert(el_init() == 0);
-    g_options.outputs = current_outputs;
-
-#if ENABLE_OUT_STDERR
-    mt_fail(el_output_disable(EL_OUT_STDERR) == 0);
-    current_outputs &= ~EL_OUT_STDERR;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-#if ENABLE_OUT_SYSLOG
-    mt_fail(el_output_disable(EL_OUT_SYSLOG) == 0);
-    current_outputs &= ~EL_OUT_SYSLOG;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-#if ENABLE_OUT_FILE
-    mt_fail(el_output_disable(EL_OUT_FILE) == 0);
-    current_outputs &= ~EL_OUT_FILE;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-#if ENABLE_OUT_NET
-    mt_fail(el_output_disable(EL_OUT_NET) == 0);
-    current_outputs &= ~EL_OUT_NET;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-#if ENABLE_OUT_TTY
-    mt_fail(el_output_disable(EL_OUT_TTY) == 0);
-    current_outputs &= ~EL_OUT_TTY;
-    mt_fail(current_outputs == g_options.outputs);
-#endif
-
-    mt_fail(el_cleanup() == 0);
-}
-
-
-/* ==========================================================================
-   ========================================================================== */
-
-
-static void options_output_enable_einval(void)
-{
-    mt_assert(el_init() == 0);
-
-    errno = 0;
-    mt_fail(el_output_enable(0x1fff) == -1);
-    mt_fail(errno == EINVAL);
-
-    errno = 0;
-    mt_fail(el_output_disable(0x10ff) == -1);
-    mt_fail(errno == EINVAL);
-
-    mt_fail(el_cleanup() == 0);
-}
-
-
-/* ==========================================================================
-   ========================================================================== */
-
-
-static void options_output_enable_enosys(void)
-{
-    mt_assert(el_init() == 0);
-
-#if !ENABLE_OUT_STDERR
-    errno = 0;
-    mt_fail(el_output_enable(EL_OUT_STDERR) == -1);
-    mt_fail(errno == ENOSYS);
-
-    errno = 0;
-    mt_fail(el_output_disable(EL_OUT_STDERR) == -1);
-    mt_fail(errno = ENOSYS);
-#endif
-
-#if !ENABLE_OUT_SYSLOG
-    errno = 0;
-    mt_fail(el_output_enable(EL_OUT_SYSLOG) == -1);
-    mt_fail(errno == ENOSYS);
-
-    errno = 0;
-    mt_fail(el_output_disable(EL_OUT_SYSLOG) == -1);
-    mt_fail(errno = ENOSYS);
-#endif
-
-#if !ENABLE_OUT_FILE
-    errno = 0;
-    mt_fail(el_output_enable(EL_OUT_FILE) == -1);
-    mt_fail(errno == ENOSYS);
-
-    errno = 0;
-    mt_fail(el_output_disable(EL_OUT_FILE) == -1);
-    mt_fail(errno = ENOSYS);
-#endif
-
-#if !ENABLE_OUT_NET
-    errno = 0;
-    mt_fail(el_output_enable(EL_OUT_NET) == -1);
-    mt_fail(errno == ENOSYS);
-
-    errno = 0;
-    mt_fail(el_output_disable(EL_OUT_NET) == -1);
-    mt_fail(errno = ENOSYS);
-#endif
-
-#if !ENABLE_OUT_TTY
-    errno = 0;
-    mt_fail(el_output_enable(EL_OUT_TTY) == -1);
-    mt_fail(errno == ENOSYS);
-
-    errno = 0;
-    mt_fail(el_output_disable(EL_OUT_TTY) == -1);
-    mt_fail(errno = ENOSYS);
-#endif
-
 }
 
 
@@ -335,7 +150,7 @@ static void options_log_allowed(void)
 {
     mt_assert(el_init() == 0);
     g_options.level = EL_ERROR;
-    g_options.outputs = EL_OUT_STDERR;
+    g_options.outputs = EL_OPT_OUT_STDERR;
 
     mt_fail(el_log_allowed(&g_options, EL_FATAL)  == 1);
     mt_fail(el_log_allowed(&g_options, EL_ALERT)  == 1);
@@ -431,11 +246,7 @@ void el_options_test_group(void)
     mt_run(options_init);
     mt_run(options_init_einval);
     mt_run(options_level_set);
-    mt_run(options_level_einval);
-    mt_run(options_output_enable);
-    mt_run(options_output_disable);
-    mt_run(options_output_enable_einval);
-    mt_run(options_output_enable_enosys);
+    mt_run(options_output);
     mt_run(options_log_allowed);
     mt_run(options_opt_print_level);
     mt_run(options_opt_colors);

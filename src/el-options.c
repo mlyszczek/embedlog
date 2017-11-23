@@ -84,27 +84,27 @@ struct el_options g_options;
 static const int VALID_OUTS = 0
 
 #if ENABLE_OUT_STDERR
-    | EL_OUT_STDERR
+    | EL_OPT_OUT_STDERR
 #endif
 
 #if ENABLE_OUT_SYSLOG
-    | EL_OUT_SYSLOG
+    | EL_OPT_OUT_SYSLOG
 #endif
 
 #if ENABLE_OUT_FILE
-    | EL_OUT_FILE
+    | EL_OPT_OUT_FILE
 #endif
 
 #if ENABLE_OUT_NET
-    | EL_OUT_NET
+    | EL_OPT_OUT_NET
 #endif
 
 #if ENABLE_OUT_TTY
-    | EL_OUT_TTY
+    | EL_OPT_OUT_TTY
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    | EL_OUT_CUSTOM
+    | EL_OPT_OUT_CUSTOM
 #endif
     ;
 
@@ -153,6 +153,18 @@ static int el_vooption
 
     switch (option)
     {
+    case EL_OPT_LEVEL:
+        value_int = va_arg(ap, int);
+        options->level = value_int;
+        return 0;
+
+    case EL_OPT_OUTPUT:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~EL_OPT_OUT_ALL) == 0x00);
+        VALID(ENOMEDIUM, (value_int & ~VALID_OUTS) == 0x00);
+        options->outputs = value_int;
+        return 0;
+
     case EL_OPT_PRINT_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
@@ -354,133 +366,6 @@ int el_ocleanup
 #if ENABLE_OUT_FILE
     el_file_cleanup(options);
 #endif
-
-    return 0;
-}
-
-
-/* ==========================================================================
-    Sets current log level for default options
-   ========================================================================== */
-
-
-int el_level_set
-(
-    enum el_level  level  /* log level to set */
-)
-{
-    return el_olevel_set(&g_options, level);
-}
-
-
-/* ==========================================================================
-    Sets current log level
-
-    errno
-            EINVAL      passed options is invalid (null)
-   ========================================================================== */
-
-
-int el_olevel_set
-(
-    struct el_options  *options,  /* options object to set option to */
-    enum el_level       level  /* log level to set */
-)
-{
-    VALID(EINVAL, options);
-
-    options->level = level;
-
-    return 0;
-}
-
-
-/* ==========================================================================
-    enables default output
-   ========================================================================== */
-
-
-int el_output_enable
-(
-    enum el_output  output  /* output to enable */
-)
-{
-    return el_ooutput_enable(&g_options, output);
-}
-
-
-/* ==========================================================================
-    Enables specified output for prints
-
-    errno
-            EINVAL      passwd output is invalid
-            ENOSYS      specified output is not implemented, ie. was not
-                        enabled during compilation
-   ========================================================================== */
-
-
-int el_ooutput_enable
-(
-    struct el_options  *options,  /* options object to set option to */
-    enum el_output      output    /* output to enable */
-)
-{
-    VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
-
-    if (output == EL_OUT_ALL)
-    {
-        options->outputs = VALID_OUTS;
-    }
-
-    VALID(ENOSYS, (output & ~VALID_OUTS) == 0x00);
-
-    options->outputs |= output;
-
-    return 0;
-}
-
-
-/* ==========================================================================
-    disable default output
-   ========================================================================== */
-
-
-int el_output_disable
-(
-    enum el_output output  /* output to disable */
-)
-{
-    return el_ooutput_disable(&g_options, output);
-}
-
-
-/* ==========================================================================
-    Disables specified output from prints
-
-    errno
-            EINVAL      passed output is invalid
-            ENOSYS      specified output is not implemented, ie. was not
-                        enabled during compilation
-   ========================================================================== */
-
-
-int el_ooutput_disable
-(
-    struct el_options  *options,  /* options object to set option to */
-    enum el_output      output    /* output to disable */
-)
-{
-    VALID(EINVAL, (output & ~EL_OUT_ALL) == 0x00);
-
-    if (output == EL_OUT_ALL)
-    {
-        options->outputs = 0;
-        return 0;
-    }
-
-    VALID(ENOSYS, (output & ~VALID_OUTS) == 0x00);
-
-    options->outputs &= ~output;
 
     return 0;
 }

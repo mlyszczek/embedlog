@@ -22,6 +22,127 @@ logging to users needs.
 \fIoption\fR can be (value inside parenthesis determines argument types of
 variadic arguments \fI...\fR)
 
+.BI "EL_OPT_LEVEL (" enum " " el_level ")"
+.RS 4
+\fBEL_OPT_LEVEL\fR sets what the current logging level shall be. Altough it
+accepts \fBenum el_level\fR this can be whatever number from range <0, INT_MAX>.
+The higher the level, the lower priority of the message. All messages that have
+lower priority (higher number) then currently set \fIel_level\fR will not be
+printed. There are 8 predefined levels, sorted by priority (highest first):
+
+.   RS 4
+.       B EL_FATAL,
+.       br
+.       B EL_ALERT,
+.       br
+.       B EL_CRIT,
+.       br
+.       B EL_ERROR,
+.       br
+.       B EL_WARN,
+.       br
+.       B EL_NOTICE,
+.       br
+.       B EL_INFO,
+.       br
+.       B EL_DBG
+.   RE
+
+If 8 print levels are not enough, one can define new levels, knowing that
+\fBEL_FATAL\fR has int value of 0, and \fBEL_DBG\fR has int value of
+7. User can also use debug level and add an integer like: \fBEL_DBG\fR +
+\fIn\fR - where \fIn\fR can be any number from range <0, INT_MAX - 8>.
+
+If messages are printed with lower priority than \fBEL_DBG\fR they all
+will be treated as messages printed with level \fBEL_DBG\fR, that means
+message printed with level \fBEL_DBG\fR and \fBEL_DBG + 3\fR, will
+be printed exactly the same, so same color (if colors are enabled) and if log
+level printig is enabled, such messages will have same 'd/' prefix no matter
+the level.
+
+.   B ERRORS
+.   RS 4
+Setting log level cannot fail
+.   RE
+.RE
+
+.BI "EL_OPT_OUTPUT (" enum " " el_output ")"
+.RS 4
+\fBEL_OPT_OUTPUT\fR simply sets to what output(s) logs will be printed to
+with any of the printing function. User can enable as many outputs as he
+desires - it can be all inputs or even none (if one wants to surpress logging
+for some time). To enable multiple outputs join values with \fBor\fR operator
+(\fB|\fR).
+
+Currently following \fIoutputs\fR can be enabled.
+
+.   B EL_OUT_STDERR
+.   RS 4
+Messages will be printed to standard error output
+.   RE
+
+.   B EL_OUT_SYSLOG
+.   RS 4
+Messages will be sent to syslog facility. This requires system with implemented
+POSIX.1-2001 and any syslog daemon
+.   RE
+
+.   B EL_OUT_FILE
+.   RS 4
+Messages will be printed to file. To work user should set output file with
+\fBEL_OPT_FNAME\fR. Log rotation can be configured with
+\fBEL_OPT_FROTATE_NUMBER\fR and \fREL_OPT_FROTATE_SIZE\fB options.
+.   RE
+
+.   B EL_OUT_NET
+.   RS 4
+Messages shall be printed to external server. This requires BSD Sockets to be
+enabled on the clients system, and listening server. (TODO Not implemented yet)
+.   RE
+
+.   B EL_OUT_TTY
+.   RS 4
+Prints messages directly to configured serial console
+.   RE
+
+.   B EL_OUT_ALL
+.   RS 4
+Enables all supported outputs at once
+.   RE
+
+.   B EL_OUT_NONE
+.   RS 4
+Disables every output - logs won't be printed at all
+.   RE
+
+.   B EL_OUT_CUSTOM
+.   RS 4
+Enables custom function to be called on log print. Pointer to custom function
+needs to be set with \fBEL_CUSTOM_PUTS\fR option.
+.   RE
+
+Many of the outputs can be configured for special needs, and some of them need
+mandatory configuration. For information about output configuration see proper
+option description
+
+
+.   B ERRORS
+.   RS 4
+.       B EINVAL
+.       RS 4
+Specified \fIoutput\fR is invalid
+.       RE
+.   RE
+
+.   RS 4
+.       B ENOMEDIUM
+.       RS 4
+Specified \fIoutput\fR is not implemented on current system (support was not
+compiled into library)
+.       RE
+.   RE
+.RE
+
 .BI "EL_OPT_COLORS (" int ")"
 .RS 4
 If this is set to 1, output will be enriched with ANSI colors depending on the
