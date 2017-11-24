@@ -15,5 +15,6 @@ int main(void)
     el_print_test_group();
     el_file_test_group();
     el_perror_test_group();
+    el_pmemory_test_group();
     mt_return();
 }

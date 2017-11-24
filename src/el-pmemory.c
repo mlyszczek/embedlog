@@ -221,6 +221,8 @@ int el_opmemory
      */
 
     VALID(ECHRNG, el_log_allowed(options, level));
+    VALID(EINVAL, mem);
+    VALID(EINVAL, mlen);
 
     /*
      * print log table preamble that is:

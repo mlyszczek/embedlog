@@ -3,7 +3,8 @@ test_SOURCES  = main.c \
 				el-options.c \
 				el-print.c \
 				el-file.c \
-				el-perror.c
+				el-perror.c \
+				el-pmemory.c
 
 test_SOURCES += ../src/el-print.c \
 				../src/el-puts.c \
