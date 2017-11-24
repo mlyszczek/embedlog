@@ -14,5 +14,6 @@ int main(void)
     el_options_test_group();
     el_print_test_group();
     el_file_test_group();
+    el_perror_test_group();
     mt_return();
 }
