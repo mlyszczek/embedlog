@@ -1,3 +1,5 @@
+include Makefile.am.coverage
+
 check_PROGRAMS = test
 test_SOURCES  = main.c \
 				el-options.c \
@@ -16,7 +18,9 @@ if ENABLE_OUT_FILE
 test_SOURCES += ../src/el-file.c
 endif
 
-test_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -O0 -g3 -ggdb -DNDEBUG
+test_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -O0 -g3 -ggdb \
+			  -DNDEBUG $(COVERAGE_CFLAGS)
+test_LDFLAGS = $(COVERAGE_LDFLAGS)
 test_LDADD = -lrb
 
 TESTS = $(check_PROGRAMS)

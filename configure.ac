@@ -6,9 +6,22 @@ AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
-AC_CHECK_LIB
+#AC_CHECK_LIB
 
 AC_CHECK_FUNCS(access)
+
+
+###
+# gcov coverage reporting
+#
+
+
+m4_include([m4/gcov.m4])
+AC_TDD_GCOV
+AC_SUBST(COVERAGE_CFLAGS)
+AC_SUBST(COVERAGE_CXXFLAGS)
+AC_SUBST(COVERAGE_LDFLAGS)
+
 
 ###
 # --enable-feature options

@@ -3,6 +3,10 @@
 *.gch
 config.cache
 *libembedlog*
+*.gcno
+*.gcda
+tst/coverage.info
+tst/coveragereport/
 Makefile
 Makefile.in
 aclocal.m4
