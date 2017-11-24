@@ -242,12 +242,6 @@ int el_file_open
 {
     if (options->file)
     {
-        off_t fsize;  /* size of the opened file we close */
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-        fsize = ftell(options->file);
-
         /*
          * to prevent any memory leak in  case  of  double  open,  we  first
          * close already opened file Such situation may happen when  library
@@ -255,17 +249,6 @@ int el_file_open
          */
 
         fclose(options->file);
-
-        if (fsize == 0)
-        {
-            /*
-             * file is empty, so we get rid of it, as it was probably opened
-             * by mistake
-             */
-
-            remove(options->fname);
-        }
-
         options->file = NULL;
     }
 

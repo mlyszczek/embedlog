@@ -837,7 +837,7 @@ static void file_dir_no_access(void)
     mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
     mt_ferr(el_puts(s3), EBADF);
     unlink("/tmp/embedlog-no-write/log");
-    unlink("/tmp/embedlog-no-write");
+    rmdir("/tmp/embedlog-no-write");
 }
 
 
@@ -857,6 +857,8 @@ static void file_no_access_to_file(void)
 
     mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
     mt_ferr(el_puts("whatever"), EBADF);
+    unlink("/tmp/embedlog-no-write/log");
+    rmdir("/tmp/embedlog-no-write");
 }
 
 
@@ -884,6 +886,7 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s8));
+    unlink(WORKDIR"/log");
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
@@ -929,8 +932,8 @@ static void file_rotate_dir_no_access(void)
     mkdir("/tmp/embedlog-no-write", 0555);
     mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
     mt_ferr(el_puts(s3), EBADF);
-    unlink("/tmp/embedlog-no-write/log");
-    unlink("/tmp/embedlog-no-write");
+    unlink("/tmp/embedlog-no-write/log.0");
+    rmdir("/tmp/embedlog-no-write");
 }
 
 
@@ -946,11 +949,13 @@ static void file_rotate_no_access_to_file(void)
 
     el_option(EL_OPT_FROTATE_NUMBER, 5);
     mkdir("/tmp/embedlog-no-write", 0755);
-    fd = open("/tmp/embedlog-no-write/log", O_CREAT, 0444);
+    fd = open("/tmp/embedlog-no-write/log.0", O_CREAT, 0444);
     close(fd);
 
     mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
     mt_ferr(el_puts("whatever"), EBADF);
+    unlink("/tmp/embedlog-no-write/log.0");
+    rmdir("/tmp/embedlog-no-write");
 }
 
 
