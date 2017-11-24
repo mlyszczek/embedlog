@@ -70,7 +70,6 @@ static int print_to_buffer
 )
 {
     strcat(logbuf, s);
-    printf(s);
 }
 
 
