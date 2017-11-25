@@ -205,6 +205,7 @@ skip_rotate:
 
     if ((options->file = fopen(current_log, "w")) == NULL)
     {
+        options->fcurrent_rotate--;
         return -1;
     }
 
@@ -450,7 +451,11 @@ int el_file_puts
         return -1;
     }
 
-    fflush(options->file);
+    if (fflush(options->file) != 0)
+    {
+        return -1;
+    }
+
     options->fpos += sl;
     return 0;
 }

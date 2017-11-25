@@ -12,6 +12,7 @@
 
    ========================================================================== */
 
+
 #include <string.h>
 #include <errno.h>
 
@@ -20,6 +21,7 @@
 #include "mtest.h"
 #include "test-group-list.h"
 #include "config.h"
+
 
 /* ==========================================================================
                                __        __            __
@@ -42,6 +44,38 @@ extern struct el_options  g_options;  /* global embedlog options */
 
 
 /* ==========================================================================
+                                   _                __
+                     ____   _____ (_)_   __ ____ _ / /_ ___
+                    / __ \ / ___// /| | / // __ `// __// _ \
+                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
+                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
+                 /_/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
+
+
+static void test_prepare(void)
+{
+    el_init();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void test_cleanup(void)
+{
+    el_cleanup();
+}
+
+
+/* ==========================================================================
                            __               __
                           / /_ ___   _____ / /_ _____
                          / __// _ \ / ___// __// ___/
@@ -56,6 +90,7 @@ static void options_init(void)
     struct el_options          default_options; /* expected default options */
     struct el_options          options;         /* custom options to init */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 
     memset(&default_options, 0, sizeof(default_options));
     default_options.outputs         = 0;
@@ -106,15 +141,11 @@ static void options_level_set(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    mt_assert(el_init() == 0);
-
     for (i = 0; i != 32; ++i)
     {
         mt_fail(el_option(EL_OPT_LEVEL, i) == 0);
         mt_fail(g_options.level == i);
     }
-
-    mt_fail(el_cleanup() == 0);
 }
 
 
@@ -128,7 +159,6 @@ static void options_output(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     current_outputs = 0;
-    mt_assert(el_init() == 0);
     mt_fok(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR));
     mt_fail(g_options.outputs == EL_OPT_OUT_STDERR);
 
@@ -137,8 +167,6 @@ static void options_output(void)
 
     mt_ferr(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_ALL + 7), EINVAL);
     mt_fail(g_options.outputs == EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE);
-
-    mt_fail(el_cleanup() == 0);
 }
 
 
@@ -148,7 +176,6 @@ static void options_output(void)
 
 static void options_log_allowed(void)
 {
-    mt_assert(el_init() == 0);
     g_options.level = EL_ERROR;
     g_options.outputs = EL_OPT_OUT_STDERR;
 
@@ -160,8 +187,6 @@ static void options_log_allowed(void)
     mt_fail(el_log_allowed(&g_options, EL_NOTICE) == 0);
     mt_fail(el_log_allowed(&g_options, EL_INFO)   == 0);
     mt_fail(el_log_allowed(&g_options, EL_DBG)    == 0);
-
-    mt_fail(el_cleanup() == 0);
 }
 
 
@@ -171,8 +196,6 @@ static void options_log_allowed(void)
 
 static void options_opt_print_level(void)
 {
-    mt_assert(el_init() == 0);
-
     mt_fail(el_option(EL_OPT_PRINT_LEVEL, 0) == 0);
     mt_fail(g_options.print_log_level == 0);
     mt_fail(el_option(EL_OPT_PRINT_LEVEL, 1) == 0);
@@ -184,8 +207,6 @@ static void options_opt_print_level(void)
     errno = 0;
     mt_fail(el_option(EL_OPT_PRINT_LEVEL, 3) == -1);
     mt_fail(errno == EINVAL);
-
-    mt_fail(el_cleanup() == 0);
 }
 
 
@@ -195,9 +216,6 @@ static void options_opt_print_level(void)
 
 static void options_opt_colors(void)
 {
-#if ENABLE_COLORS
-    mt_assert(el_init() == 0);
-
     mt_fok(el_option(EL_OPT_COLORS, 0));
     mt_fail(g_options.colors == 0);
     mt_fok(el_option(EL_OPT_COLORS, 1));
@@ -205,9 +223,6 @@ static void options_opt_colors(void)
 
     mt_ferr(el_option(EL_OPT_COLORS, 2), EINVAL);
     mt_ferr(el_option(EL_OPT_COLORS, 3), EINVAL);
-
-    mt_fok(el_cleanup());
-#endif
 }
 
 
@@ -217,11 +232,17 @@ static void options_opt_colors(void)
 
 static void options_opt_timestamp(void)
 {
-#if ENABLE_TIMESTAMP
-    mt_assert(el_init() == 0);
+    int  i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    mt_fok(el_option(EL_OPT_TS, 1));
-#endif
+
+    for (i = EL_OPT_TS_OFF; i != EL_OPT_TS_ERROR; ++i)
+    {
+        mt_fok(el_option(EL_OPT_TS, i));
+        mt_fail(g_options.timestamp == i);
+    }
+
+    mt_ferr(el_option(EL_OPT_TS, i), EINVAL);
 }
 
 
@@ -229,6 +250,45 @@ static void options_opt_timestamp(void)
    ========================================================================== */
 
 
+static void options_opt_timestamp_timer(void)
+{
+    int  i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    for (i = EL_OPT_TS_TM_CLOCK; i != EL_OPT_TS_TM_ERROR; ++i)
+    {
+        mt_fok(el_option(EL_OPT_TS_TM, i));
+        mt_fail(g_options.timestamp_timer == i);
+    }
+
+    mt_ferr(el_option(EL_OPT_TS_TM, i), EINVAL);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void options_ooption_test(void)
+{
+    struct el_options  opts;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_ooption(&opts, EL_OPT_TS_TM, EL_OPT_TS_TM_MONOTONIC);
+    mt_fail(opts.timestamp_timer == EL_OPT_TS_TM_MONOTONIC);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void options_einval(void)
+{
+    mt_ferr(el_option(10000, 5), EINVAL);
+}
 
 
 /* ==========================================================================
@@ -245,9 +305,17 @@ void el_options_test_group(void)
 {
     mt_run(options_init);
     mt_run(options_init_einval);
+
+    mt_prepare_test = &test_prepare;
+    mt_cleanup_test = &test_cleanup;
+
     mt_run(options_level_set);
     mt_run(options_output);
     mt_run(options_log_allowed);
     mt_run(options_opt_print_level);
     mt_run(options_opt_colors);
+    mt_run(options_opt_timestamp);
+    mt_run(options_opt_timestamp_timer);
+    mt_run(options_ooption_test);
+    mt_run(options_einval);
 }

@@ -17,6 +17,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <libgen.h>
 
 #include "mtest.h"
 #include "stdlib.h"
@@ -96,6 +97,7 @@ static int print_to_buffer
 )
 {
     strcat(logbuf, s);
+    return 0;
 }
 
 
@@ -237,8 +239,12 @@ static int print_check(void)
          * check printing file information
          */
 
-        if (g_options.finfo)
+        if (g_options.finfo && expected.file != NULL && expected.line != 0)
         {
+            char  expected_file[FILENAME_MAX + 1];
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
             IS_CHAR('[');
             i = 0;
 
@@ -258,8 +264,9 @@ static int print_check(void)
 
             msg++;  /* skip ':' character */
             tmp[i] = '\0';
+            strcpy(expected_file, expected.file);
 
-            if (strcmp(tmp, expected.file) != 0)
+            if (strcmp(tmp, basename(expected_file)) != 0)
             {
                 /*
                  * file name in printed log is different than what we set
@@ -303,7 +310,8 @@ static int print_check(void)
             }
         }
 
-        if (g_options.finfo || g_options.timestamp != EL_OPT_TS_OFF)
+        if ((g_options.finfo && expected.file != NULL && expected.line != 0) ||
+             g_options.timestamp != EL_OPT_TS_OFF)
         {
             /*
              * file info or timestamp information is enabled, in that case
@@ -570,6 +578,28 @@ static void print_finfo(void)
    ========================================================================== */
 
 
+static void print_different_clocks(void)
+{
+    int  i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    for (i = EL_OPT_TS_TM_CLOCK; i != EL_OPT_TS_TM_ERROR; ++i)
+    {
+        test_prepare();
+        el_option(EL_OPT_TS_TM, i);
+        el_option(EL_OPT_TS, EL_OPT_TS_LONG);
+        add_log(ELI, "clock test");
+        mt_fok(print_check());
+        test_cleanup();
+    }
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void print_mix_of_everything(void)
 {
     int level;
@@ -579,13 +609,6 @@ static void print_mix_of_everything(void)
     int colors;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-
-    /*
-     * clean test, as we will init and cleanup this manually for every
-     * option set
-     */
-
-    test_cleanup();
 
     for (level = EL_FATAL;          level <= EL_DBG;              ++level)
     for (timestamp = EL_OPT_TS_OFF; timestamp != EL_OPT_TS_ERROR; ++timestamp)
@@ -612,13 +635,6 @@ static void print_mix_of_everything(void)
 
         test_cleanup();
     }
-
-    /*
-     * to avoid double free, we init test here, so mtest can free it
-     * without crash. Yup, this is cheap.
-     */
-
-    test_prepare();
 }
 
 
@@ -723,6 +739,39 @@ static void print_with_no_output_available(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+static void print_finfo_path(void)
+{
+    el_option(EL_OPT_FINFO, 1);
+    add_log("source/code/file.c", 10, EL_ALERT, "some message");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_nofinfo(void)
+{
+    el_option(EL_OPT_FINFO, 1);
+    add_log(NULL, 0, EL_ALERT, "no file info");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_null(void)
+{
+    mt_ferr(el_print(ELA, NULL), EINVAL);
+}
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -734,6 +783,9 @@ static void print_with_no_output_available(void)
 
 void el_print_test_group(void)
 {
+    mt_run(print_different_clocks);
+    mt_run(print_mix_of_everything);
+
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
 
@@ -745,9 +797,11 @@ void el_print_test_group(void)
     mt_run(print_timestamp_short);
     mt_run(print_timestamp_long);
     mt_run(print_finfo);
-    mt_run(print_mix_of_everything);
     mt_run(print_too_long_print_truncate);
     mt_run(print_truncate_with_date);
     mt_run(print_truncate_with_all_options);
     mt_run(print_with_no_output_available);
+    mt_run(print_finfo_path);
+    mt_run(print_nofinfo);
+    mt_run(print_null);
 }

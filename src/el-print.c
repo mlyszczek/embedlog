@@ -379,7 +379,7 @@ static size_t el_finfo
     size_t           fl;       /* number of bytes stored in 'buf' */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (options->finfo == 0)
+    if (options->finfo == 0 || file == NULL || num == 0)
     {
         /*
          * no file info for this caller

@@ -248,6 +248,28 @@ static void file_filename_too_long(void)
    ========================================================================== */
 
 
+static void file_path_too_long(void)
+{
+    char  path[PATH_MAX + 2];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    memset(path, 'a', sizeof(path));
+    path[0] = '/';
+    path[sizeof(path) - 5] = '/';
+    path[sizeof(path) - 4] = 'f';
+    path[sizeof(path) - 4] = 'i';
+    path[sizeof(path) - 3] = 'l';
+    path[sizeof(path) - 2] = 'e';
+    path[sizeof(path) - 1] = '\0';
+    mt_ferr(el_option(EL_OPT_FNAME, path), ENAMETOOLONG);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void file_print_without_init(void)
 {
     mt_ferr(el_puts("whatev..."), ENOMEDIUM);
@@ -977,6 +999,49 @@ static void file_rotate_filename_too_long(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_path_too_long(void)
+{
+    char  path[PATH_MAX + 2];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    memset(path, 'a', sizeof(path));
+    path[0] = '/';
+    path[sizeof(path) - 5] = '/';
+    path[sizeof(path) - 4] = 'f';
+    path[sizeof(path) - 4] = 'i';
+    path[sizeof(path) - 3] = 'l';
+    path[sizeof(path) - 2] = 'e';
+    path[sizeof(path) - 1] = '\0';
+    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    mt_ferr(el_option(EL_OPT_FNAME, path), ENAMETOOLONG);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_fail(void)
+{
+    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    mt_fok(el_puts(s8));
+    mt_fok(el_puts(s8));
+    unlink(WORKDIR"/log");
+    unlink(WORKDIR"/log.0");
+    rmdir(WORKDIR);
+    mt_ferr(el_puts(s3), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(el_puts(s8));
+
+    mt_fok(file_check(WORKDIR"/log.1", s8));
+}
+
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -1003,6 +1068,7 @@ void el_file_test_group(void)
     mt_run(file_reopen_different_file);
     mt_run(file_unexpected_third_party_delete);
     mt_run(file_filename_too_long);
+    mt_run(file_path_too_long);
     mt_run(file_rotate_1_no_rotate);
     mt_run(file_rotate_1_exact_print);
     mt_run(file_rotate_1_overflow_but_no_rotate);
@@ -1039,6 +1105,8 @@ void el_file_test_group(void)
     mt_run(file_rotate_dir_no_access);
     mt_run(file_rotate_no_access_to_file);
     mt_run(file_rotate_filename_too_long);
+    mt_run(file_rotate_path_too_long);
+    mt_run(file_rotate_fail);
 
     rmdir(WORKDIR);
 }

@@ -129,6 +129,29 @@ static void perror_user_message(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+static void perror_custom_options_user_message(void)
+{
+    struct el_options  opts;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_oinit(&opts);
+    el_ooption(&opts, EL_OPT_CUSTOM_PUTS, print_to_buffer);
+    el_ooption(&opts, EL_OPT_PRINT_LEVEL, 0);
+    el_ooption(&opts, EL_OPT_OUTPUT, EL_OPT_OUT_CUSTOM);
+
+    errno = 1;
+    el_operror(ELF, &opts, "additional message");
+    mt_fok(strcmp(logbuf, "additional message\n"
+        "errno num: 1, strerror: Operation not permitted\n"));
+
+}
+
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -145,4 +168,5 @@ void el_perror_test_group(void)
 
     mt_run(perror_no_message);
     mt_run(perror_user_message);
+    mt_run(perror_custom_options_user_message);
 }
