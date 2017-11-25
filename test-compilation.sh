@@ -1,13 +1,13 @@
 #!/bin/bash
 
-options=(--enable-out-file \
-         --enable-out-stderr \
-         --enable-timestamp \
-         --enable-realtime \
-         --enable-monotonic \
-         --enable-finfo \
-         --enable-colors \
-         --enable-reentrant)
+options=(--disable-out-file \
+         --disable-out-stderr \
+         --disable-timestamp \
+         --disable-realtime \
+         --disable-monotonic \
+         --disable-finfo \
+         --disable-colors \
+         --disable-reentrant)
 
 iterations=$((2**${#options[@]} - 1))
 for i in `seq 0 1 $iterations`

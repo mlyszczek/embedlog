@@ -6,9 +6,6 @@ AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
-#AC_CHECK_LIB
-
-AC_CHECK_FUNCS(access)
 
 
 ###
@@ -33,11 +30,13 @@ AC_SUBST(COVERAGE_LDFLAGS)
 
 
 AC_ARG_ENABLE([out-stderr],
-    AS_HELP_STRING([--enable-out-stderr], [Enable printing to stderr]))
+    AS_HELP_STRING([--enable-out-stderr], [Enable printing to stderr]),
+    [], [enable_out_stderr="yes"])
 
 AS_IF([test "x$enable_out_stderr" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr])
+    AC_CHECK_FUNCS(accesss)
     AC_CHECK_FUNCS([fputs],,
         AC_MSG_ERROR(not found, needed by --enable-out-stderr))
 ],
@@ -52,7 +51,8 @@ AS_IF([test "x$enable_out_stderr" = "xyes"],
 
 
 AC_ARG_ENABLE([out-file],
-    AS_HELP_STRING([--enable-out-file], [Enable printing to file]))
+    AS_HELP_STRING([--enable-out-file], [Enable printing to file]),
+    [], [enable_out_file="yes"])
 
 AM_CONDITIONAL([ENABLE_OUT_FILE], [test "x$enable_out_file" = "xyes"])
 AS_IF([test "x$enable_out_file" = "xyes"],
@@ -73,7 +73,8 @@ AS_IF([test "x$enable_out_file" = "xyes"],
 
 
 AC_ARG_ENABLE([out-custom],
-    AS_HELP_STRING([--enable-out-custom], [Enable printing to custom]))
+    AS_HELP_STRING([--enable-out-custom], [Enable printing to custom]),
+    [], [enable_out_custom="yes"])
 
 AM_CONDITIONAL([ENABLE_OUT_CUSTOM], [test "x$enable_out_custom" = "xyes"])
 AS_IF([test "x$enable_out_custom" = "xyes"],
@@ -94,7 +95,8 @@ AS_IF([test "x$enable_out_custom" = "xyes"],
 
 
 AC_ARG_ENABLE([timestamp],
-    AS_HELP_STRING([--enable-timestamp], [Enable printing timestamp with log]))
+    AS_HELP_STRING([--enable-timestamp], [Enable printing timestamp with log]),
+    [], [enable_timestamp="yes"])
 
 AS_IF([test "x$enable_timestamp" = "xyes"],
 [
@@ -114,7 +116,8 @@ AS_IF([test "x$enable_timestamp" = "xyes"],
 
 
 AC_ARG_ENABLE([realtime],
-    AS_HELP_STRING([--enable-realtime], [Enable using CLOCK_REALTIME in log]))
+    AS_HELP_STRING([--enable-realtime], [Enable using CLOCK_REALTIME in log]),
+    [], [enable_realtime="yes"])
 
 AS_IF([test "x$enable_realtime" = "xyes"],
 [
@@ -139,7 +142,8 @@ AS_IF([test "x$enable_realtime" = "xyes"],
 
 
 AC_ARG_ENABLE([monotonic],
-    AS_HELP_STRING([--enable-monotonic], [Enable using CLOCK_MONOTONIC in log]))
+    AS_HELP_STRING([--enable-monotonic], [Enable using CLOCK_MONOTONIC in log]),
+    [], [enable_monotonic="yes"])
 
 AS_IF([test "x$enable_monotonic" = "xyes"],
 [
@@ -164,7 +168,8 @@ AS_IF([test "x$enable_monotonic" = "xyes"],
 
 
 AC_ARG_ENABLE([finfo],
-    AS_HELP_STRING([--enable-finfo], [Enable printing file info with log]))
+    AS_HELP_STRING([--enable-finfo], [Enable printing file info with log]),
+    [], [enable_finfo="yes"])
 
 AS_IF([test "x$enable_finfo" = "xyes"],
 [
@@ -184,7 +189,8 @@ AS_IF([test "x$enable_finfo" = "xyes"],
 
 
 AC_ARG_ENABLE([colors],
-    AS_HELP_STRING([--enable-colors], [Enable output colorization]))
+    AS_HELP_STRING([--enable-colors], [Enable output colorization]),
+    [], [enable_colors="yes"])
 
 AS_IF([test "x$enable_colors" = "xyes"],
 [
@@ -204,7 +210,8 @@ AS_IF([test "x$enable_colors" = "xyes"],
 
 
 AC_ARG_ENABLE([reentrant],
-    AS_HELP_STRING([--enable-reentrant], [Enable reentrant functions]))
+    AS_HELP_STRING([--enable-reentrant], [Enable reentrant functions]),
+    [], [enable_reentrant="yes"])
 
 AS_IF([test "x$enable_reentrant" = "xyes"],
 [
@@ -268,6 +275,6 @@ echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "print file info with log.... : $enable_finfo"
 echo "colorize output............. : $enable_colors"
 echo "reentrant functions......... : $enable_reentrant"
-echo "maimum file length.......... : $EL_FLEN_MAX"
+echo "maximum file length......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
 echo "pmemory line size........... : $EL_MEM_LINE_SIZE"
