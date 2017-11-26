@@ -161,7 +161,7 @@ static int el_vooption
     case EL_OPT_OUTPUT:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~EL_OPT_OUT_ALL) == 0x00);
-        VALID(ENOMEDIUM, (value_int & ~VALID_OUTS) == 0x00);
+        VALID(ENODEV, (value_int & ~VALID_OUTS) == 0x00);
         options->outputs = value_int;
         return 0;
 

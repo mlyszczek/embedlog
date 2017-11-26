@@ -505,7 +505,7 @@ int el_vprint
     errno:
             EINVAL      level is invalid
             EINVAL      fmt is NULL
-            ECHRNG      printing is disabled
+            ERANGE      printing is disabled
             ENOBUFS     message was too long and has been truncated
    ========================================================================== */
 
@@ -528,8 +528,8 @@ int el_ovprint
 
 
     VALID(EINVAL, fmt);
-    VALID(ECHRNG, el_log_allowed(options, level));
-    VALID(ENOMEDIUM, options->outputs);
+    VALID(ERANGE, el_log_allowed(options, level));
+    VALID(ENODEV, options->outputs);
 
     e = 0;
 

@@ -93,7 +93,7 @@ int el_oputs
          * all outputs are disabled, no place to print
          */
 
-        errno = ENOMEDIUM;
+        errno = ENODEV;
         return -1;
     }
 

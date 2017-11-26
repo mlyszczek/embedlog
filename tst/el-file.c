@@ -272,7 +272,7 @@ static void file_path_too_long(void)
 
 static void file_print_without_init(void)
 {
-    mt_ferr(el_puts("whatev..."), ENOMEDIUM);
+    mt_ferr(el_puts("whatev..."), ENODEV);
 }
 
 
@@ -288,7 +288,7 @@ static int file_print_after_cleanup(void)
     el_option(EL_OPT_FROTATE_NUMBER, 0);
     el_option(EL_OPT_FNAME, WORKDIR"/log");
     el_cleanup();
-    mt_ferr(el_puts("whatev"), ENOMEDIUM);
+    mt_ferr(el_puts("whatev"), ENODEV);
 }
 
 

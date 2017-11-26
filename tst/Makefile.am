@@ -6,7 +6,9 @@ test_SOURCES  = main.c \
 				el-print.c \
 				el-file.c \
 				el-perror.c \
-				el-pmemory.c
+				el-pmemory.c \
+				mtest.h \
+				test-group-list.h
 
 test_SOURCES += ../src/el-print.c \
 				../src/el-puts.c \
@@ -22,9 +24,14 @@ if CUSTOM_SNPRINTF
 test_SOURCES += ../src/snprintf.c
 endif
 
-test_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -O0 -g3 -ggdb \
-			  -DNDEBUG $(COVERAGE_CFLAGS)
-test_LDFLAGS = $(COVERAGE_LDFLAGS)
+test_CFLAGS = -I$(top_srcdir)/include \
+			  -I$(top_srcdir)/src \
+			  -I/usr/local/include
+			  -O0 -g3 -ggdb \
+			  $(COVERAGE_CFLAGS)
+
+test_LDFLAGS = -L/usr/local/lib \
+			   $(COVERAGE_LDFLAGS)
 test_LDADD = -lrb
 
 TESTS = $(check_PROGRAMS)

@@ -734,7 +734,17 @@ static void print_truncate_with_all_options(void)
 static void print_with_no_output_available(void)
 {
     el_option(EL_OPT_OUTPUT, EL_OPT_OUT_NONE);
-    mt_ferr(el_print(ELI, "i'll be back"), ENOMEDIUM);
+    mt_ferr(el_print(ELI, "i'll be back"), ENODEV);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_level_not_high_enough(void)
+{
+    mt_ferr(el_print(ELD, "i won't be printed"), ERANGE);
 }
 
 
@@ -801,6 +811,7 @@ void el_print_test_group(void)
     mt_run(print_truncate_with_date);
     mt_run(print_truncate_with_all_options);
     mt_run(print_with_no_output_available);
+    mt_run(print_level_not_high_enough);
     mt_run(print_finfo_path);
     mt_run(print_nofinfo);
     mt_run(print_null);

@@ -206,7 +206,7 @@ directory doesn't exist at all). Log is lost, but \fBembedlog\fR will try to
 recreate log file everytime \fIel_print\fR is called.
 
 .TP
-.B ENOMEDIUM
+.B ENODEV
 All possible outputs are disabled
 
 .RE
@@ -214,7 +214,7 @@ All possible outputs are disabled
 may also return
 
 .TP
-.B ECHRNG
+.B ERANGE
 Message will not be logged as message log level is lower than configured one.
 
 .TP

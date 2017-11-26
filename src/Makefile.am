@@ -1,5 +1,14 @@
 lib_LTLIBRARIES = libembedlog.la
-libembedlog_la_SOURCES = el-print.c el-puts.c el-perror.c el-pmemory.c el-options.c
+libembedlog_la_SOURCES = el-print.c \
+						 el-puts.c \
+						 el-perror.c \
+						 el-pmemory.c \
+						 el-options.c
+
+libembedlog_la_SOURCES += config-priv.h \
+						  el-file.h \
+						  el-options.h \
+						  valid.h
 
 if ENABLE_OUT_FILE
 libembedlog_la_SOURCES += el-file.c

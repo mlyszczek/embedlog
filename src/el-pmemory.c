@@ -221,7 +221,7 @@ int el_opmemory
      * no need to waste cycles on useless string preparation
      */
 
-    VALID(ECHRNG, el_log_allowed(options, level));
+    VALID(ERANGE, el_log_allowed(options, level));
     VALID(EINVAL, mem);
     VALID(EINVAL, mlen);
 
