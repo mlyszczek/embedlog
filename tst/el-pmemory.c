@@ -70,6 +70,7 @@ static int print_to_buffer
 )
 {
     strcat(logbuf, s);
+    return 0;
 }
 
 

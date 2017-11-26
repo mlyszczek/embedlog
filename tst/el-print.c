@@ -40,10 +40,10 @@
 
 struct log_message
 {
-    const char          *file;
-    size_t               line;
-    enum el_level        level;
-    const char          *msg;
+    const char  *file;
+    size_t       line;
+    int          level;
+    const char   *msg;
 };
 
 
@@ -300,7 +300,7 @@ static int print_check(void)
             msg++;  /* skip ']' character */
             tmp[i] = '\0';
 
-            if (atoi(tmp) != expected.line)
+            if ((size_t)atoi(tmp) != expected.line)
             {
                 /*
                  * line number in printed log is different than what was set

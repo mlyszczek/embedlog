@@ -162,11 +162,11 @@ static void options_output(void)
     mt_fok(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR));
     mt_fail(g_options.outputs == EL_OPT_OUT_STDERR);
 
-    mt_fok(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE));
-    mt_fail(g_options.outputs == EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE);
+    mt_fok(el_option(EL_OPT_OUTPUT, (EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE)));
+    mt_fail(g_options.outputs == (EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE));
 
     mt_ferr(el_option(EL_OPT_OUTPUT, EL_OPT_OUT_ALL + 7), EINVAL);
-    mt_fail(g_options.outputs == EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE);
+    mt_fail(g_options.outputs == (EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE));
 }
 
 

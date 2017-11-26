@@ -123,7 +123,7 @@ struct el_options
 
 int el_init(void);
 int el_cleanup(void);
-int el_option(enum el_option option, ...);
+int el_option(int option, ...);
 int el_puts(const char *string);
 int el_print(const char *file, size_t line, enum el_level level,
         const char *fmt, ...);
@@ -137,7 +137,7 @@ int el_perror(const char *file, size_t line, enum el_level level,
 
 int el_oinit(struct el_options *options);
 int el_ocleanup(struct el_options *options);
-int el_ooption(struct el_options *options, enum el_option option, ...);
+int el_ooption(struct el_options *options, int option, ...);
 int el_oputs(struct el_options *options, const char *string);
 int el_oprint(const char *file, size_t line, enum el_level level,
         struct el_options *options, const char *fnt, ...);

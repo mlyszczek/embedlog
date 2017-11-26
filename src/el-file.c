@@ -99,7 +99,7 @@ static char  current_log[PATH_MAX + 1];  /* full path to current log file */
 
 static int el_file_exists
 (
-    struct el_options  *options
+    void
 )
 {
 #if HAVE_ACCESS
@@ -430,7 +430,7 @@ int el_file_puts
         }
     }
 
-    if (el_file_exists(options) == 0)
+    if (el_file_exists() == 0)
     {
         /*
          * file doesn't exist, it may happen when someone unlinks  currently

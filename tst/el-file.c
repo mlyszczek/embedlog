@@ -280,7 +280,7 @@ static void file_print_without_init(void)
    ========================================================================== */
 
 
-static int file_print_after_cleanup(void)
+static void file_print_after_cleanup(void)
 {
     el_init();
     el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
@@ -296,7 +296,7 @@ static int file_print_after_cleanup(void)
    ========================================================================== */
 
 
-static int file_print_without_setting_file(void)
+static void file_print_without_setting_file(void)
 {
     el_init();
     el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);

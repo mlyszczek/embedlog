@@ -383,7 +383,7 @@ int el_log_allowed
     enum el_level       level      /* log level to check */
 )
 {
-    return options->level >= level;
+    return options->level >= (int)level;
 }
 
 
@@ -394,15 +394,15 @@ int el_log_allowed
 
 int el_option
 (
-    enum el_option   option,   /* option to set */
-                     ...       /* option value */
+    int      option,   /* option to set */
+             ...       /* option value */
 )
 {
-    va_list ap;  /* variadic arguments */
-    int     rc;  /* return code from el_voooption */
+    va_list  ap;       /* variadic arguments */
+    int      rc;       /* return code from el_voooption */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    va_start(ap, option);
+    va_start(ap, (int)option);
     rc = el_vooption(&g_options, option, ap);
     va_end(ap);
 
@@ -418,12 +418,12 @@ int el_option
 int el_ooption
 (
     struct el_options  *options,  /* options object to set option to */
-    enum el_option      option,   /* option to set */
+    int                 option,   /* option to set */
                         ...       /* option value(s) */
 )
 {
-    va_list ap;  /* variadic arguments */
-    int     rc;  /* return code from el_voooption */
+    va_list             ap;       /* variadic arguments */
+    int                 rc;       /* return code from el_voooption */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
