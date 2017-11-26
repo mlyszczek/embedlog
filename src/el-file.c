@@ -39,18 +39,17 @@
    ========================================================================== */
 
 
+#include "config.h"
+#include "el-options.h"
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "el-options.h"
-#include "config.h"
-
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 
 /* ==========================================================================
@@ -68,6 +67,16 @@
 
    ========================================================================== */
 
+
+#ifndef PATH_MAX
+/*
+ * for systems that doesn't define PATH_MAX we use our MAX_PATH macro
+ * that is define in config.h during ./configure process
+ */
+
+#define PATH_MAX MAX_PATH
+
+#endif
 
 static char  current_log[PATH_MAX + 1];  /* full path to current log file */
 

@@ -44,10 +44,11 @@
    ========================================================================== */
 
 
-#include "embedlog.h"
 #include "config.h"
+
 #include "config-priv.h"
 #include "el-options.h"
+#include "embedlog.h"
 #include "valid.h"
 
 #if ENABLE_TIMESTAMP
@@ -55,8 +56,8 @@
 #endif
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 
 

@@ -4,7 +4,7 @@
    ========================================================================== */
 
 #ifndef EL_FILE_H
-#define EL_FILE_H
+#define EL_FILE_H 1
 
 #include "el-options.h"
 

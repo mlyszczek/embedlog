@@ -1,11 +1,15 @@
 AC_INIT([embedlog], [0.0.1], [michal.lyszczek@bofc.pl])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+AC_LANG([C])
 AC_PROG_CC
+AC_PROG_CC_C89
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
+
+AC_CHECK_FUNCS([snprintf])
 
 
 ###
@@ -129,6 +133,21 @@ AS_IF([test "x$enable_realtime" = "xyes"],
     AC_DEFINE([ENABLE_REALTIME], [1], [Enable using CLOCK_REALTIME in log])
     AC_CHECK_FUNCS([clock_gettime],,
         AC_MSG_ERROR(not found, needed by --enable-realtime))
+
+    AC_EGREP_CPP(posix_199309L_supported,
+    [
+        #define _POSIX_C_SOURCE 199309L
+        #include <unistd.h>
+        #ifdef _POSIX_VERSION
+        #if _POSIX_VERSION == 199309L
+        posix_199309L_supported
+        #endif
+        #endif
+    ],
+    [],
+    [
+        AC_MSG_FAILURE([You need Posix 1993 to use realtime clock.])
+    ])
 ],
 #else
 [
@@ -155,6 +174,22 @@ AS_IF([test "x$enable_monotonic" = "xyes"],
     AC_DEFINE([ENABLE_MONOTONIC], [1], [Enable using CLOCK_MONOTONIC in log])
     AC_CHECK_FUNCS([clock_gettime],,
         AC_MSG_ERROR(not found, needed by --enable-monotonic))
+
+    AC_EGREP_CPP(posix_199309L_supported,
+    [
+        #define _POSIX_C_SOURCE 199309L
+        #include <unistd.h>
+        #ifdef _POSIX_VERSION
+        #if _POSIX_VERSION == 199309L
+        posix_199309L_supported
+        #endif
+        #endif
+    ],
+    [],
+    [
+        AC_MSG_FAILURE([You need Posix 1993 to use monotonic clock.])
+    ])
+
 ],
 #else
 [
@@ -236,7 +271,7 @@ AS_IF([test "x$enable_reentrant" = "xyes"],
 
 
 AC_ARG_VAR([EL_LOG_MAX], [Maximum size of log message])
-AS_IF([test "x$EL_LOG_MAX" = x], [EL_LOG_MAX="2 * 1024"])
+AS_IF([test "x$EL_LOG_MAX" = x], [EL_LOG_MAX="8192"])
 AC_DEFINE_UNQUOTED([EL_LOG_MAX], [$EL_LOG_MAX], [Maximum size of log message])
 
 
@@ -260,6 +295,16 @@ AC_DEFINE_UNQUOTED([EL_MEM_LINE_SIZE], [$EL_MEM_LINE_SIZE],
     [Number of bytes to print in one line in el_pmemory function])
 
 
+###
+# MAX_PATH
+#
+
+AC_ARG_VAR([MAX_PATH], [Maximum size of path to log to file])
+AS_IF([test "x$MAX_PATH" = x], [MAX_PATH="4096"])
+AC_DEFINE_UNQUOTED([MAX_PATH], [$MAX_PATH],
+    [Maximum length of path to open when printing to file])
+
+
 AC_OUTPUT
 
 
@@ -277,4 +322,5 @@ echo "colorize output............. : $enable_colors"
 echo "reentrant functions......... : $enable_reentrant"
 echo "maximum file length......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
+echo "maximum path length......... : $MAX_PATH"
 echo "pmemory line size........... : $EL_MEM_LINE_SIZE"

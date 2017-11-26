@@ -37,13 +37,13 @@
 
 #include "config.h"
 
+#include "el-file.h"
+#include "el-options.h"
+#include "embedlog.h"
+#include "valid.h"
+
 #include <errno.h>
 #include <string.h>
-
-#include "embedlog.h"
-#include "el-options.h"
-#include "valid.h"
-#include "el-file.h"
 
 
 /* ==========================================================================

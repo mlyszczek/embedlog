@@ -38,13 +38,14 @@
    ========================================================================== */
 
 
+#include "config.h"
+#include "config-priv.h"
+#include "el-options.h"
+#include "embedlog.h"
+#include "valid.h"
+
 #include <ctype.h>
 #include <stdio.h>
-
-#include "config-priv.h"
-#include "embedlog.h"
-#include "el-options.h"
-#include "valid.h"
 
 
 /* ==========================================================================

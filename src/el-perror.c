@@ -24,12 +24,13 @@
    ========================================================================== */
 
 
+#include "config.h"
+#include "el-options.h"
+#include "embedlog.h"
+
 #include <errno.h>
 #include <stdarg.h>
 #include <string.h>
-
-#include "embedlog.h"
-#include "el-options.h"
 
 
 /* ==========================================================================
