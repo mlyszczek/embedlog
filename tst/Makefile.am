@@ -18,6 +18,10 @@ if ENABLE_OUT_FILE
 test_SOURCES += ../src/el-file.c
 endif
 
+if CUSTOM_SNPRINTF
+test_SOURCES += ../src/snprintf.c
+endif
+
 test_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -O0 -g3 -ggdb \
 			  -DNDEBUG $(COVERAGE_CFLAGS)
 test_LDFLAGS = $(COVERAGE_LDFLAGS)

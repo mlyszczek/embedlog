@@ -9,7 +9,14 @@ AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
+
+###
+# compile own snprintf if system doesn't provide one
+#
+
+
 AC_CHECK_FUNCS([snprintf])
+AM_CONDITIONAL([CUSTOM_SNPRINTF], [test "x$ac_cv_func_snprintf" != "xyes"])
 
 
 ###
@@ -133,21 +140,6 @@ AS_IF([test "x$enable_realtime" = "xyes"],
     AC_DEFINE([ENABLE_REALTIME], [1], [Enable using CLOCK_REALTIME in log])
     AC_CHECK_FUNCS([clock_gettime],,
         AC_MSG_ERROR(not found, needed by --enable-realtime))
-
-    AC_EGREP_CPP(posix_199309L_supported,
-    [
-        #define _POSIX_C_SOURCE 199309L
-        #include <unistd.h>
-        #ifdef _POSIX_VERSION
-        #if _POSIX_VERSION == 199309L
-        posix_199309L_supported
-        #endif
-        #endif
-    ],
-    [],
-    [
-        AC_MSG_FAILURE([You need Posix 1993 to use realtime clock.])
-    ])
 ],
 #else
 [
@@ -174,22 +166,6 @@ AS_IF([test "x$enable_monotonic" = "xyes"],
     AC_DEFINE([ENABLE_MONOTONIC], [1], [Enable using CLOCK_MONOTONIC in log])
     AC_CHECK_FUNCS([clock_gettime],,
         AC_MSG_ERROR(not found, needed by --enable-monotonic))
-
-    AC_EGREP_CPP(posix_199309L_supported,
-    [
-        #define _POSIX_C_SOURCE 199309L
-        #include <unistd.h>
-        #ifdef _POSIX_VERSION
-        #if _POSIX_VERSION == 199309L
-        posix_199309L_supported
-        #endif
-        #endif
-    ],
-    [],
-    [
-        AC_MSG_FAILURE([You need Posix 1993 to use monotonic clock.])
-    ])
-
 ],
 #else
 [
