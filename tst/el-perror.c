@@ -109,9 +109,9 @@ static void test_cleanup(void)
 
 static void perror_no_message(void)
 {
-    errno = 0;
+    errno = 1;
     el_perror(ELF, NULL);
-    mt_fok(strcmp(logbuf, "errno num: 0, strerror: Success\n"));
+    mt_fok(strcmp(logbuf, "errno num: 1, strerror: Operation not permitted\n"));
 }
 
 
