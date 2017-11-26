@@ -856,8 +856,21 @@ static void file_dir_removed_after_open_then_created_back_again(void)
 static void file_dir_no_access(void)
 {
     mkdir("/tmp/embedlog-no-write", 0555);
-    mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
-    mt_ferr(el_puts(s3), EBADF);
+    if (getuid() == 0)
+    {
+        /*
+         * root just doesn't give a fuck about no-write-permissions
+         */
+
+        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_puts(s3));
+        mt_fok(file_check("/tmp/embedlog-no-write/log", s3));
+    }
+    else
+    {
+        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_puts(s3), EBADF);
+    }
     unlink("/tmp/embedlog-no-write/log");
     rmdir("/tmp/embedlog-no-write");
 }
@@ -877,8 +890,17 @@ static void file_no_access_to_file(void)
     fd = open("/tmp/embedlog-no-write/log", O_CREAT, 0444);
     close(fd);
 
-    mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
-    mt_ferr(el_puts("whatever"), EBADF);
+    if (getuid() == 0)
+    {
+        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_puts(s5));
+        mt_fok(file_check("/tmp/embedlog-no-write/log", s5));
+    }
+    else
+    {
+        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_puts("whatever"), EBADF);
+    }
     unlink("/tmp/embedlog-no-write/log");
     rmdir("/tmp/embedlog-no-write");
 }
@@ -952,8 +974,19 @@ static void file_rotate_dir_no_access(void)
 {
     el_option(EL_OPT_FROTATE_NUMBER, 5);
     mkdir("/tmp/embedlog-no-write", 0555);
-    mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
-    mt_ferr(el_puts(s3), EBADF);
+
+    if (getuid() == 0)
+    {
+        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_puts(s3));
+        mt_fok(file_check("/tmp/embedlog-no-write/log.0", s3));
+    }
+    else
+    {
+        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_puts(s3), EBADF);
+    }
+
     unlink("/tmp/embedlog-no-write/log.0");
     rmdir("/tmp/embedlog-no-write");
 }
@@ -974,8 +1007,18 @@ static void file_rotate_no_access_to_file(void)
     fd = open("/tmp/embedlog-no-write/log.0", O_CREAT, 0444);
     close(fd);
 
-    mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
-    mt_ferr(el_puts("whatever"), EBADF);
+    if (getuid() == 0)
+    {
+        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_puts(s8));
+        mt_fok(file_check("/tmp/embedlog-no-write/log.0", s8));
+    }
+    else
+    {
+        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_puts("whatever"), EBADF);
+    }
+
     unlink("/tmp/embedlog-no-write/log.0");
     rmdir("/tmp/embedlog-no-write");
 }
