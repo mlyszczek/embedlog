@@ -1,0 +1,4 @@
+$ autoreconf -i (if ./configure doesn't exit)
+$ ./configure
+$ make
+# make install

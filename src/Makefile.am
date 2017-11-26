@@ -18,5 +18,5 @@ if CUSTOM_SNPRINTF
 libembedlog_la_SOURCES += snprintf.c
 endif
 
-libembedlog_la_LDFLAGS = -version-info 0:0:0
+libembedlog_la_LDFLAGS = -version-info 1:0:1
 libembedlog_la_CFLAGS = -I$(top_srcdir)/include
