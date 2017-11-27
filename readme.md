@@ -40,6 +40,9 @@ Library is licensed under BSD 2-clause license. See LICENSE file for details
 Compiling and installing
 ========================
 
+Compiling library
+-----------------
+
 Project uses standard automake so to build you need to:
 
 ~~~
@@ -48,6 +51,31 @@ $ ./configure
 $ make
 # make install
 ~~~
+
+Running tests
+-------------
+
+To run test simply run
+
+~~~
+$ make check
+~~~
+
+Compiling examples
+------------------
+
+Compile examples with
+
+~~~
+$ cd examples
+$ make
+~~~
+
+Examples
+========
+
+Check *examples* directory to get the idea of how to use **embedlog**. Examples
+can also be compiled to see how they work.
 
 Functions description
 =====================

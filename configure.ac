@@ -5,7 +5,12 @@ AC_PROG_CC
 AC_PROG_CC_C89
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIRS([m4])
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile \
+                 src/Makefile \
+                 include/Makefile \
+                 tst/Makefile \
+                 man/Makefile \
+                 examples/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
