@@ -32,3 +32,7 @@ test-suite.log
 test
 test.log
 test.trs
+examples/print_memory
+examples/print_options
+examples/print_simple
+examples/print_to_file

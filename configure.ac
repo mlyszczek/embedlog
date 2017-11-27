@@ -52,7 +52,7 @@ AC_ARG_ENABLE([out-stderr],
 AS_IF([test "x$enable_out_stderr" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr])
-    AC_CHECK_FUNCS(accesss)
+    AC_CHECK_FUNCS(access)
     AC_CHECK_FUNCS([fputs],,
         AC_MSG_ERROR(not found, needed by --enable-out-stderr))
 ],
@@ -251,9 +251,9 @@ AS_IF([test "x$enable_reentrant" = "xyes"],
 #
 
 
-AC_ARG_VAR([EL_LOG_MAX], [Maximum size of log message])
+AC_ARG_VAR([EL_LOG_MAX], [Maximum size of single log message])
 AS_IF([test "x$EL_LOG_MAX" = x], [EL_LOG_MAX="8192"])
-AC_DEFINE_UNQUOTED([EL_LOG_MAX], [$EL_LOG_MAX], [Maximum size of log message])
+AC_DEFINE_UNQUOTED([EL_LOG_MAX], [$EL_LOG_MAX], [Maximum size of single log message])
 
 
 ###
@@ -261,16 +261,16 @@ AC_DEFINE_UNQUOTED([EL_LOG_MAX], [$EL_LOG_MAX], [Maximum size of log message])
 #
 
 
-AC_ARG_VAR([EL_FLEN_MAX], [Maximum size of file in message])
+AC_ARG_VAR([EL_FLEN_MAX], [Maximum size of file info in message])
 AS_IF([test "x$EL_FLEN_MAX" = x], [EL_FLEN_MAX="32"])
-AC_DEFINE_UNQUOTED([EL_FLEN_MAX], [$EL_FLEN_MAX], [Maximum size of file in message])
+AC_DEFINE_UNQUOTED([EL_FLEN_MAX], [$EL_FLEN_MAX], [Maximum size of file info in message])
 
 ###
 # EL_MEM_LINE_SIZE
 #
 
 
-AC_ARG_VAR([EL_MEM_LINE_SIZE], [Maximum size of file in message])
+AC_ARG_VAR([EL_MEM_LINE_SIZE], [Number of bytes to print in single lin in pmemory function])
 AS_IF([test "x$EL_MEM_LINE_SIZE" = x], [EL_MEM_LINE_SIZE="16"])
 AC_DEFINE_UNQUOTED([EL_MEM_LINE_SIZE], [$EL_MEM_LINE_SIZE],
     [Number of bytes to print in one line in el_pmemory function])
@@ -280,7 +280,7 @@ AC_DEFINE_UNQUOTED([EL_MEM_LINE_SIZE], [$EL_MEM_LINE_SIZE],
 # MAX_PATH
 #
 
-AC_ARG_VAR([MAX_PATH], [Maximum size of path to log to file])
+AC_ARG_VAR([MAX_PATH], [Maximum length of path to log file (used when PATH_MAX is not available)])
 AS_IF([test "x$MAX_PATH" = x], [MAX_PATH="4096"])
 AC_DEFINE_UNQUOTED([MAX_PATH], [$MAX_PATH],
     [Maximum length of path to open when printing to file])
