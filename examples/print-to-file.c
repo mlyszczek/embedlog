@@ -43,7 +43,7 @@ int main(void)
      * instruct logger to print into both file and standard error
      */
 
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE | EL_OPT_OUT_STDERR);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE | EL_OPT_OUT_STDERR);
 
     el_print(ELI, "This message will appear both in standard error");
     el_print(ELI, "and in file %s", WORKDIR"/log");

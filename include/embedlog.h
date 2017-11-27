@@ -66,7 +66,7 @@ enum el_level
 enum el_option
 {
     EL_OPT_LEVEL,
-    EL_OPT_OUTPUT,
+    EL_OPT_OUT,
     EL_OPT_COLORS,
     EL_OPT_TS,
     EL_OPT_TS_TM,

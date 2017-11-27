@@ -100,7 +100,7 @@ static int file_check
 static void test_prepare(void)
 {
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 0);
     el_option(EL_OPT_FNAME, WORKDIR"/log");
@@ -184,7 +184,7 @@ static void file_reopen(void)
     el_cleanup();
 
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 0);
     el_option(EL_OPT_FNAME, WORKDIR"/log");
@@ -204,7 +204,7 @@ static void file_reopen_different_file(void)
     el_cleanup();
 
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 0);
     el_option(EL_OPT_FNAME, WORKDIR"/log-another");
@@ -283,7 +283,7 @@ static void file_print_without_init(void)
 static void file_print_after_cleanup(void)
 {
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 0);
     el_option(EL_OPT_FNAME, WORKDIR"/log");
@@ -299,7 +299,7 @@ static void file_print_after_cleanup(void)
 static void file_print_without_setting_file(void)
 {
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 0);
     mt_ferr(el_puts("no file set"), EBADF);
@@ -387,7 +387,7 @@ static void file_rotate_1_reopen(void)
 
     el_cleanup();
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 1);
     el_option(EL_OPT_FNAME, WORKDIR"/log");
@@ -529,7 +529,7 @@ static void file_rotate_2_reopen(void)
 
     el_cleanup();
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 2);
     el_option(EL_OPT_FNAME, WORKDIR"/log");
@@ -710,7 +710,7 @@ static void file_rotate_5_reopen(void)
 
     el_cleanup();
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_FILE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
     el_option(EL_OPT_FROTATE_SIZE, 16);
     el_option(EL_OPT_FROTATE_NUMBER, 5);
     el_option(EL_OPT_FNAME, WORKDIR"/log");

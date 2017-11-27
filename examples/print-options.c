@@ -8,7 +8,7 @@
 int main(void)
 {
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_STDERR);
 
     el_option(EL_OPT_PRINT_LEVEL, 0);
     el_print(ELI, "We can disable information about log level");

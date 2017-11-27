@@ -18,7 +18,7 @@ int main(void)
      * will be printed to /dev/null
      */
 
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_STDERR);
 
     /*
      * now we can simply print messages like we would do it with ordinary

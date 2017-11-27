@@ -19,7 +19,7 @@ int main(void)
     }
 
     el_init();
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_STDERR);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_STDERR);
 
     el_pmemory(ELI, ascii, sizeof(ascii));
     el_pmemory(ELI, s, sizeof(s));

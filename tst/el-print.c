@@ -429,7 +429,7 @@ static void test_prepare(void)
     el_init();
     el_option(EL_OPT_CUSTOM_PUTS, print_to_buffer);
     el_option(EL_OPT_PRINT_LEVEL, 0);
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_CUSTOM);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_CUSTOM);
     memset(logbuf, 0, sizeof(logbuf));
     expected_logs = rb_new(1024, sizeof(struct log_message),
         O_NONTHREAD | O_NONBLOCK);
@@ -733,7 +733,7 @@ static void print_truncate_with_all_options(void)
 
 static void print_with_no_output_available(void)
 {
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_NONE);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_NONE);
     mt_ferr(el_print(ELI, "i'll be back"), ENODEV);
 }
 

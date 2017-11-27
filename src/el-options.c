@@ -158,7 +158,7 @@ static int el_vooption
         options->level = value_int;
         return 0;
 
-    case EL_OPT_OUTPUT:
+    case EL_OPT_OUT:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~EL_OPT_OUT_ALL) == 0x00);
         VALID(ENODEV, (value_int & ~VALID_OUTS) == 0x00);

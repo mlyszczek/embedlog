@@ -83,7 +83,7 @@ static void test_prepare(void)
     el_init();
     el_option(EL_OPT_CUSTOM_PUTS, print_to_buffer);
     el_option(EL_OPT_PRINT_LEVEL, 0);
-    el_option(EL_OPT_OUTPUT, EL_OPT_OUT_CUSTOM);
+    el_option(EL_OPT_OUT, EL_OPT_OUT_CUSTOM);
     logbuf[0] = '\0';
 }
 
