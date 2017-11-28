@@ -53,12 +53,6 @@ Library implements following functions:
 .br
 .BI "int el_cleanup(void)"
 .br
-.BI "int el_level_set(enum el_level " level ")"
-.br
-.BI "int el_output_enable(enum el_output " output ")"
-.br
-.BI "int el_output_disable(enum el_output " output ")"
-.br
 .BI "int el_option(enum el_option " option ", ...)"
 .br
 .BI "int el_puts(const char *" string ")"
@@ -83,14 +77,6 @@ in a single program. Please see \fBel_option\fR(3) for more information.
 .BI "int el_oinit(struct el_options *" options ")"
 .br
 .BI "int el_ocleanup(struct el_options *" options ")"
-.br
-.BI "int el_olevel_set(struct el_options *" options ", enum el_level " level ")"
-.br
-.BI "int el_ooutput_enable(struct el_options *" options ","
-.BI "enum el_output " output ")"
-.br
-.BI "int el_ooutput_disable(struct el_options *" options ","
-.BI "enum el_output " output ")"
 .br
 .BI "int el_ooption(struct el_options *" options ", enum el_option " option ","
 .BI "...)"
@@ -163,9 +149,8 @@ int main(void)
     /* initialize library */
     el_init();
 
-
     /* tell logger to print onto stderr */
-    el_output_enable(EL_OUT_STDERR);
+    el_option(EL_OPT_OUT, EL_OUT_STDERR);
 
     /* print message with info severity */
     el_print(ELI, "answer is %d", 42);
@@ -180,9 +165,6 @@ int main(void)
 .BR el_overview (7),
 .BR el_init (3),
 .BR el_cleanup (3),
-.BR el_level_set (3),
-.BR el_output_enable (3),
-.BR el_output_disable (3),
 .BR el_option (3),
 .BR el_puts (3),
 .BR el_print (3),
@@ -191,9 +173,6 @@ int main(void)
 .BR el_pmemory (3),
 .BR el_oinit (3),
 .BR el_ocleanup (3),
-.BR el_olevel_set (3),
-.BR el_ooutput_enable (3),
-.BR el_ooutput_disable (3),
 .BR el_ooption (3),
 .BR el_oputs (3),
 .BR el_oprint (3),
