@@ -26,7 +26,7 @@ endif
 
 test_CFLAGS = -I$(top_srcdir)/include \
 			  -I$(top_srcdir)/src \
-			  -I/usr/local/include
+			  -I/usr/local/include \
 			  -O0 -g3 -ggdb \
 			  $(COVERAGE_CFLAGS)
 
