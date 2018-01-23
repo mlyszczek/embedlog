@@ -1,36 +1,42 @@
 .TH "el_option" "3" "22 Sep 2017 (v1.0.0)" "bofc.pl"
-
 .SH NAME
-\fBel_option\fR - sets optional configuration of the logger
-
+.B el_option
+- sets optional configuration of the logger
 .SH SYNOPSIS
-
-.sh
+.PP
 .B #include <embedlog.h>
-
-.sh
+.PP
 .BI "int el_option(enum el_option " option ", " ... ")"
 .br
-.BI "int el_ooption(struct el_options *" options ","
-.BI "enum el_option " option ", " ... ")"
-
+.BI "int el_ooption(struct el_options *" options ", \
+enum el_option " option ", " ... ")"
 .SH DESCRIPTION
-\fBel_option\fR allows user to configure logger's internal options, to tune
-logging to users needs.
-
+.PP
+.BR el_option (3)
+allows user to configure logger's internal options, to tune logging to users
+needs.
 .SH OPTIONS
-\fIoption\fR can be (value inside parenthesis determines argument types of
-variadic arguments \fI...\fR)
-
-.BI "EL_OPT_LEVEL (" enum " " el_level ")"
-.RS 4
-\fBEL_OPT_LEVEL\fR sets what the current logging level shall be. Altough it
-accepts \fBenum el_level\fR this can be whatever number from range <0, INT_MAX>.
-The higher the level, the lower priority of the message. All messages that have
-lower priority (higher number) then currently set \fIel_level\fR will not be
-printed. There are 8 predefined levels, sorted by priority (highest first):
-
-.   RS 4
+.PP
+Below is a list of
+.I option
+that can be configured.
+Value inside parenthesis determines argument types of variadic arguments
+.I ...
+.PP
+.BI "EL_LEVEL (" enum " " el_level "level)"
+.RS
+.   B EL_LEVEL
+sets what the current logging level shall be.
+Altough it accepts
+.   B enum el_level
+type, this can be whatever number from range <0, INT_MAX>.
+The higher the level, the lower priority of the message.
+All messages that have lower priority (higher number) then currently set
+.   I level
+will not be printed.
+There are 8 predefined levels, sorted by priority (highest first):
+.   PP
+.   RS
 .       B EL_FATAL,
 .       br
 .       B EL_ALERT,
@@ -47,343 +53,411 @@ printed. There are 8 predefined levels, sorted by priority (highest first):
 .       br
 .       B EL_DBG
 .   RE
-
+.   PP
 If 8 print levels are not enough, one can define new levels, knowing that
-\fBEL_FATAL\fR has int value of 0, and \fBEL_DBG\fR has int value of
-7. User can also use debug level and add an integer like: \fBEL_DBG\fR +
-\fIn\fR - where \fIn\fR can be any number from range <0, INT_MAX - 8>.
-
-If messages are printed with lower priority than \fBEL_DBG\fR they all
-will be treated as messages printed with level \fBEL_DBG\fR, that means
-message printed with level \fBEL_DBG\fR and \fBEL_DBG + 3\fR, will
-be printed exactly the same, so same color (if colors are enabled) and if log
-level printig is enabled, such messages will have same 'd/' prefix no matter
+.   B EL_FATAL
+has int value of 0, and
+.   B EL_DBG
+has int value of 7.
+User can also use debug level and add an integer like:
+.   B EL_DBG
++
+.   I n
+- where
+.   I n
+can be any number from range <0, INT_MAX - 8>.
+.   PP
+If messages are printed with lower priority than
+.   B EL_DBG
+they all will be treated as messages printed with level
+.   BR EL_DBG ,
+that means message printed with level
+.   B EL_DBG
+and
+.   BR "EL_DBG + 3" ,
+will be printed exactly the same, so same color (if colors are enabled) and if
+log level printig is enabled, such messages will have same 'd/' prefix no matter
 the level.
-
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 Setting log level cannot fail
 .   RE
 .RE
-
-.BI "EL_OPT_OUT (" enum " " el_output ")"
-.RS 4
-\fBEL_OPT_OUT\fR simply sets to what output(s) logs will be printed to
-with any of the printing function. User can enable as many outputs as he
-desires - it can be all inputs or even none (if one wants to surpress logging
-for some time). To enable multiple outputs join values with \fBor\fR operator
-(\fB|\fR).
-
+.PP
+.BI "EL_OUT (" enum " " el_output ")"
+.RS
+.   B EL_OUT
+simply sets to what output(s) logs will be printed to with any of the printing
+function.
+User can enable as many outputs as he desires - it can be all inputs or even
+none (if one wants to surpress logging for some time).
+To enable multiple outputs join values with
+.   B or
+operator (
+.   B |
+).
+.   PP
 Currently following \fIoutputs\fR can be enabled.
-
+.   PP
 .   B EL_OUT_STDERR
-.   RS 4
+.   RS
 Messages will be printed to standard error output
 .   RE
-
+.   PP
 .   B EL_OUT_SYSLOG
-.   RS 4
+.   RS
 Messages will be sent to syslog facility. This requires system with implemented
 POSIX.1-2001 and any syslog daemon
 .   RE
-
+.   PP
 .   B EL_OUT_FILE
-.   RS 4
-Messages will be printed to file. To work user should set output file with
-\fBEL_OPT_FNAME\fR. Log rotation can be configured with
-\fBEL_OPT_FROTATE_NUMBER\fR and \fREL_OPT_FROTATE_SIZE\fB options.
+.   RS
+Messages will be printed to file.
+To work user should set output file with
+.       BR EL_FNAME .
+Log rotation can be configured with
+.       B EL_FROTATE_NUMBER
+and
+.       R EL_FROTATE_SIZE
+options.
 .   RE
-
+.   PP
 .   B EL_OUT_NET
-.   RS 4
-Messages shall be printed to external server. This requires BSD Sockets to be
-enabled on the clients system, and listening server. (TODO Not implemented yet)
+.   RS
+Messages shall be printed to external server.
+This requires BSD Sockets to be enabled on the clients system, and listening
+server.
+(TODO Not implemented yet)
 .   RE
-
+.   PP
 .   B EL_OUT_TTY
-.   RS 4
+.   RS
 Prints messages directly to configured serial console
 .   RE
-
+.   PP
 .   B EL_OUT_ALL
-.   RS 4
+.   RS
 Enables all supported outputs at once
 .   RE
-
+.   PP
 .   B EL_OUT_NONE
-.   RS 4
+.   RS
 Disables every output - logs won't be printed at all
 .   RE
-
+.   PP
 .   B EL_OUT_CUSTOM
-.   RS 4
-Enables custom function to be called on log print. Pointer to custom function
-needs to be set with \fBEL_CUSTOM_PUTS\fR option.
+.   RS
+Enables custom function to be called on log print.
+Pointer to custom function needs to be set with
+.       B EL_CUSTOM_PUTS
+option.
 .   RE
-
+.   PP
 Many of the outputs can be configured for special needs, and some of them need
-mandatory configuration. For information about output configuration see proper
-option description
-
-
+mandatory configuration.
+For information about output configuration see proper option description
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
-Specified \fIoutput\fR is invalid
+.       RS
+Specified
+.           I output
+is invalid
 .       RE
 .   RE
-
-.   RS 4
+.   PP
+.   RS
 .       B ENODEV
-.       RS 4
-Specified \fIoutput\fR is not implemented on current system (support was not
-compiled into library)
+.       RS
+Specified
+.I          output
+is not implemented on current system (support was not compiled into library)
 .       RE
 .   RE
 .RE
-
-.BI "EL_OPT_COLORS (" int ")"
-.RS 4
+.PP
+.BI "EL_COLORS (" int ")"
+.RS
 If this is set to 1, output will be enriched with ANSI colors depending on the
-message severity. This option needs terminal supporting colors. You can store
-messages with colors to file, and then read them with colors on color-enabled
-terminal. If this is set to 0, no colors will be added.
-
+message severity.
+This option needs terminal supporting colors.
+You can store messages with colors to file, and then read them with colors on
+color-enabled terminal.
+If this is set to 0, no colors will be added.
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Input argument is different than 1 or 0
 .       RE
 .   RE
 .RE
-
-.BI "EL_OPT_TS (" enum " " el_option_timestamp ")"
-.RS 4
+.PP
+.BI "EL_TS (" enum " " el_option_timestamp ")"
+.RS
 Allows timestamp to be added to each log message. Possible values are:
-
-.   B EL_OPT_TS_OFF
-.   RS 4
+.   PP
+.   B EL_TS_OFF
+.   RS
 Timestamp will not be added to messages
 .   RE
-
-.   B EL_OPT_TS_SHORT
-.   RS 4
-Short timestamp will be added to log in format \fB[1503661223.537631]\fR
+.   PP
+.   B EL_TS_SHORT
+.   RS
+Short timestamp will be added to log in format
+.       B [1503661223.537631]
 .   RE
-
-.   B EL_OPT_TS_LONG
-.   RS 4
-Long timestamp will be added to log in format \fB[2017-08-25 11:40:23.537651]\fR
+.   PP
+.   B EL_TS_LONG
+.   RS
+Long timestamp will be added to log in format
+.       B [2017-08-25 11:40:23.537651]
 .   RE
-
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Input argument is invalid
 .       RE
 .   RE
 .RE
-
-.BI "EL_OPT_TS_TM (" enum " " el_option_timestamp_timer ")"
-.RS 4
+.PP
+.BI "EL_TS_TM (" enum " " el_option_timestamp_timer ")"
+.RS
 Sets the clock source for the timestamp print.
-
-.   B EL_OPT_TS_TM_CLOCK
-.   RS 4
-Library will use value from \fBclock\fR() function. With this clock precission
-varies from 10^-3[s] to 10^-9[s]. On POSIX systems, this clock has precision
-of 10^-6[s]. This timer has a lot drawbacks, time value is unspecified at the
-beggining of the program, timer is not incremented when thread is sleeping,
-timer will overlap eventually (on 32bit systems with POSIX it takes around 72
-minutes for the clock to overlap). On the other hand this is the most precise
-clock for pure c89 systems without POSIX.
+.   PP
+.   B EL_TS_TM_CLOCK
+.   RS
+Library will use value from
+.       BR clock ()
+function.
+With this clock precission varies from 10^-3[s] to 10^-9[s].
+On POSIX systems, this clock has precision of 10^-6[s].
+This timer has a lot drawbacks, time value is unspecified at the beggining of
+the program, timer is not incremented when thread is sleeping, timer will
+overlap eventually (on 32bit systems with POSIX it takes around 72 minutes for
+the clock to overlap).
+On the other hand this is the most precise clock for pure c89 systems without
+POSIX.
 .   RE
-
-.   B EL_OPT_TS_TM_TIME
-.   RS 4
-Time is taken from \fBtime\fR() function. This returns current wall clock of
-the system, it's precision is very low (1[s]), but it's pure c89 and it is
-good for logging low frequent messages. This clock is susceptible to unexpected
-time change (from NTP or by root itself).
+.   PP
+.   B EL_TS_TM_TIME
+.   RS
+Time is taken from
+.       BR time ()
+function.
+This returns current wall clock of the system, it's precision is very low
+(1[s]), but it's pure c89 and it is good for logging low frequent messages.
+This clock is susceptible to unexpected time change (from NTP or by root
+itself).
 .   RE
-
-.   B EL_OPT_TS_TM_REALTIME
-.   RS 4
-Time is taken from \fBclock_gettime\fR() using \fBCLOCK_REALTIME\fR clock.
-This required system with POSIX.1-2001. This time returns current system
-wall clock, but it's precision is much higher that \fBEL_OPT_TS_TM_TIME\fR
+.   PP
+.   B EL_TS_TM_REALTIME
+.   RS
+Time is taken from
+.       BR clock_gettime ()
+using
+.       B CLOCK_REALTIME
+clock.
+This required system with POSIX.1-2001.
+This time returns current system wall clock, but it's precision is much higher
+than
+.       B EL_TS_TM_TIME
 clock (depending on system it can vary from 10^-3[s] up to even 10^-9[s]).
-Just like it is with \fBEL_OPT_TS_TM_TIME\fR this timestamp can jump forward of
-backward if it is changed in the system.
+Just like it is with
+.       B EL_TS_TM_TIME
+this timestamp can jump forward of backward if it is changed in the system.
 .   RE
-
-.   B EL_OPT_TS_TM_MONOTONIC
-.   RS 4
-This clock is similar to \fBEL_OPT_TS_TM_REALTIME\fR but it shows time from
-unspecified time and is not affected by time change (it can still be altered
-with \fBadjtime\fR(3) or NTP)
+.   PP
+.   B EL_TS_TM_MONOTONIC
+.   RS
+This clock is similar to
+.       B EL_TS_TM_REALTIME
+but it shows time from unspecified time and is not affected by time change
+(it can still be altered with
+.       BR adjtime ()
+or NTP)
 .   RE
-
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Input argument is invalid
 .       RE
 .   RE
 .RE
-
-
-.BI "EL_OPT_PRINT_LEVEL (" int ")"
-.RS 4
+.PP
+.BI "EL_PRINT_LEVEL (" int ")"
+.RS
 If this is set to 1, each log will have log level information prefix in format
 "l/" where 'l' is first character of level message is printed with, for example:
-
-.   RS 4
+.   PP
+.   RS
 c/this is critical message
-.br
+.       br
 n/this is just a notice
-.br
+.       br
 d/debug print
 .   RE
-
+.PP
 If value is set to 0, level information will not be added, and above messages
 would like like this
-
-.   RS 4
+.PP
+.   RS
 this is critical message
-.br
+.       br
 this is just an notice
-.br
+.       br
 debug print
 .   RE
-
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Input argument is different than 1 or 0
 .       RE
 .   RE
 .RE
-
-.BI "EL_OPT_FINFO (" int ")"
-.RS 4
+.PP
+.BI "EL_FINFO (" int ")"
+.RS
 If set to 1, adds information about log location to each message in format
 [some_file.c:123]. Setting this to 0, will result in no file information at all
-
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Input argument is different than 1 or 0
 .       RE
 .   RE
 .RE
-
+.PP
 .BI "EL_CUSTOM_PUTS (" int " "(*el_custom_puts)(const " " char " " *s) ")
-.RS 4
-Sets function pointer for custom message print. Function will receive complete
-messsage to print, just as it would be printed to ie. stderr or another
-facility. Function cannot fail, if NULL is passed, custom function won't be
-called. It is still mandatory to enable custom printing with
-\fBel_enable_output\fR()
+.RS
+Sets function pointer for custom message print.
+Function will receive complete messsage to print, just as it would be printed to
+ie. stderr or another facility.
+Function cannot fail, if NULL is passed, custom function won't be called.
+It is still mandatory to enable custom printing with
+.   BR el_option (3)
 .RE
-
-.BI "EL_OPT_FNAME (" const " " char " " * ")"
-.RS 4
+.PP
+.BI "EL_FNAME (" const " " char " " * ")"
+.RS
 Sets the file name for the logs. Logs will be stored in this file. If file
 rotation is enabled, a numer will be postfixed to each file. See
-\fBEL_OPT_FROTATE_NUMBER\fR in this page for more details.
-
+.   B EL_FROTATE_NUMBER
+in this page for more details.
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Input parameter is NULL
 .       RE
-
+.       PP
 .       B ENAMETOOLONG
-.       RS 4
+.       RS
 File name is too long
 .       RE
-
-Function can also fail and set \fIerrno\fR for any of the errors specified for
-the routing \fBfopen(3)\fR
-
+.       PP
+Function can also fail and set
+.       I errno
+for any of the errors specified for the routing
+.       BR fopen ()
 .   RE
-
+.PP
 If function fails, file is not opened and any calls that logs to file will
 result in failure.
 .RE
-
-.BI "EL_OPT_FROTATE_NUMBER (" long ")"
-.RS 4
+.PP
+.BI "EL_FROTATE_NUMBER (" long ")"
+.RS
 If set to 0, file rotation will be disabled and logs will be printed into
-specified file without size limit. The only size limit is the one presented
-by the filesystem and architecture.
-
+specified file without size limit.
+The only size limit is the one presented by the filesystem and architecture.
+.   PP
 If this value is bigger than 0, file rotation will be enabled. All files will
-have suffixes added to name set in EL_OPT_FNAME. For example,
-\fIprogram.log.0\fR. Files are enumareted from \fI.0\fR to \fI.n\fR, where
-\fIn\fR is set rotate number. File with suffix \fI.0\fR is the oldest one,
-and the higher the number, the newer the file is. If logger reaches maximum
-number of files, oldest one with suffix \fI.0\fR will be deleted and suffixes
-of the files will be decremented by 1 (ie. \fIlog.1\fR will be renamed to
-\fIlog.0\fR, \fIlog.2\fR will be renamed to \fIlog.1\fR and so on.
-
+have suffixes added to name set in EL_FNAME. For example,
+.   IR program.log.0 .
+Files are enumareted from
+.   I .0
+to
+.   IR .n ,
+where
+.   I n
+is set rotate number.
+File with suffix
+.   I .0
+is the oldest one, and the higher the number, the newer the file is.
+If logger reaches maximum number of files, oldest one with suffix
+.   I .0
+will be deleted and suffixes of the files will be decremented by 1 (ie.
+.   I log.1
+will be renamed to
+.   IR log.0 ,
+.   I log.2
+will be renamed to
+.   I log.1
+and so on.
+.   PP
 User can also pass 1 here, but if file reaches its size limit, it will be
 deleted and printing will continue from the empty file
-
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Input parameter is less than 0
 .       RE
 .   RE
 .RE
-
-.BI "EL_OPT_FROTATE_SIZE (" long ")"
-.RS 4
-This defines size at which files will be rotated. If message being printed
-would overflow rotate size, current file will be closed and new one will be
-created, and current message will be stored in that new file. It is guaranteed
-that file will not be bigger than value set in this option. If log printed
-into file is bigger than configure rotate size, message will be truncated, to
-prevent file bigger than configure rotate size. It's very rare situation as
-it doesn't make a lot of sense to set rotate size to such small value.
-
+.PP
+.BI "EL_FROTATE_SIZE (" long ")"
+.RS
+This defines size at which files will be rotated.
+If message being printed would overflow rotate size, current file will be closed
+and new one will be created, and current message will be stored in that new
+file.
+It is guaranteed that file will not be bigger than value set in this option.
+If log printed into file is bigger than configure rotate size, message will be
+truncated, to prevent file bigger than configure rotate size.
+It's very rare situation as it doesn't make a lot of sense to set rotate size to
+such small value.
+.   PP
 .   B ERRORS
-.   RS 4
+.   RS
 .       B EINVAL
-.       RS 4
+.       RS
 Value is less than 1
 .       RE
 .   RE
 .RE
-
-
 .SH RETURN VALUE
-On success 0 is returned. -1 is returned when some error occured
-
+.PP
+On success 0 is returned. -1 is returned when any error occured.
 .SH ERRORS
 .TP
 .B EINVAL
-Passed \fIoption\fR is invalid
-
+Passed
+.I option
+is invalid.
 .TP
 .B ENOSYS
-Passed \fIoption\fR is not supported on this system (support was not compiled)
-
-.RE
+Passed
+.I option
+is not supported on this system (support was not compiled)/
 Also check for error description of specific option that failed for more
 informations
-
 .SH SEE ALSO
+.PP
 .BR el_init (3),
 .BR el_cleanup (3),
 .BR el_overview (7),

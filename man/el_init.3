@@ -1,68 +1,78 @@
 .TH "el_init" "3" "22 Sep 2017 (v1.0.0)" "bofc.pl"
-
 .SH NAME
-\fBel_init\fR - initializes library and options for printing.
-
+.PP
+.B el_init
+- initializes library and options for printing.
 .SH SYNOPSIS
-
-.sh
+.PP
 .BI "#include <embedlog.h>
-
-.sh
+.PP
 .BI "int el_init(void)"
 .br
 .BI "int el_oinit(struct options *" options ")"
-
 .SH DESCRIPTION
-\fBel_init()\fR initializes library and default options structure. This function
-must be called once before using any other function.
-
-\fBel_oinit()\fR initializes only \fIoptions\fR structure passed to it. Only after
-that functions that accepts \fIoptions\fR may be used.
-
+.PP
+.BR el_init (3)
+initializes static global option structure. This option structure is used by all
+functions that don't accept
+.I options
+parameter.
+If you want to use only one instance of
+.BR embedlog ,
+this is the function you want to use.
+.PP
+.BR el_oinit (3)
+initializes only
+.I options
+structure passed to it. Only after that functions that accepts
+.I options
+may be used.
+If you want to have multiple embedlog instances (ie. one for program logs,
+and one for queries) that stores logs differently - this is the function you
+want to use.
 .SH RETURN VALUE
-
-Both functions will return 0 upon success and -1 on errors
-
+.PP
+Both functions will return 0 upon success and -1 on errors.
 .SH ERRORS
-
 .TP
 .B EINVAL
-\fIoptions\fR is invalid (null)
-
+.I options
+is invalid (null).
 .SH EXAMPLE
-Error handling has been ommited for clarity sake
+.PP
+Note: error handling has been ommited for clarity sake
+.PP
+.EX
+    #include <embedlog.h>
 
-.nf
-#include <embedlog.h>
+    int main(void)
+    {
+        struct el_options opts;
 
-int main(void)
-{
-    struct el_options opts;
+        /* initialize both default and opts */
+        el_init();
+        el_oinit(&opts);
 
-    /* initialize both default and opts */
-    el_init();
-    el_oinit(&opts);
+        /* make default logger to print to stderr */
+        el_option(EL_OUT, EL_OUT_STDERR);
 
-    /* make default logger to print to stderr */
-    el_option(EL_OPT_OUT, EL_OUT_STDERR);
+        /* make opts to print to file */
+        el_ooption(&opts, EL_OUT, EL_OUT_STDERR);
+        el_ooption(&opts, EL_FNAME, "/tmp/test.log");
 
-    /* make opts to print to file */
-    el_ooption(&opts, EL_OPT_OUT, EL_OUT_STDERR);
-    el_ooption(&opts, EL_OPT_FNAME, "/tmp/test.log");
+        /* print messages */
+        el_print(ELI, "will print to stderr");
+        el_oprint(ELI, &opts, "will print to file /tmp/test.log");
 
-    /* print messages */
-    el_print(ELI, "will print to stderr");
-    el_oprint(ELI, &opts, "will print to file /tmp/test.log");
+        /* cleanup after any initialization code (like fopen) */
+        el_ocleanup(&opts);
+        el_cleanup();
 
-    /* cleanup after any initialization code (like fopen) */
-    el_ocleanup(&opts);
-    el_cleanup();
-
-    return 0;
-}
-
+        return 0;
+    }
+.EE
 .SH SEE ALSO
+.PP
 .BR el_init (3),
 .BR el_cleanup (3),
 .BR el_overview (7),

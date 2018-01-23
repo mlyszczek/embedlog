@@ -1,49 +1,47 @@
 .TH "el_print" "3" "22 sep 2017 (v1.0.0)" "bofc.pl"
-
 .SH NAME
-\fBel_print\fR, \fBel_vprint\fR, \fBel_puts\fR, \fBel_perror\fR - prints message
-to previously configured outputs.
-
+.PP
+.BR el_print ,
+.BR el_vprint ,
+.BR el_puts ,
+.B el_perror
+- prints message to previously configured outputs.
 .SH SYNOPSIS
-
-.sh
+.PP
 .B "#include <embedlog.h>"
-
-.sh
+.PP
 .BI "int el_puts(const char *" message ")"
 .br
-.BI "int el_print(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", const char *" fmt ", " ... ")"
+.BI "int el_print(const char *" file ", size_t " line ", \
+enum el_level " level ", const char *" fmt ", " ... ")"
 .br
-.BI "int el_vprint(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", const char *" fmt ", va_list " ap ")"
+.BI "int el_vprint(const char *" file ", size_t " line ", \
+enum el_level " level ", const char *" fmt ", va_list " ap ")"
 .br
-.BI "int el_perror(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", const char *" fmt ", " ... ")"
+.BI "int el_perror(const char *" file ", size_t " line ", \
+enum el_level " level ", const char *" fmt ", " ... ")"
 .br
-.BI "int el_pmemory(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", const void *" memory ", size_t " mlen ")
-
-.sh
+.BI "int el_pmemory(const char *" file ", size_t " line ", \
+enum el_level " level ", const void *" memory ", size_t " mlen ")
+.PP
 .BI "int el_oputs(struct el_options *" options ", const char *" message ")"
 .br
-.BI "int el_oprint(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", struct el_options *" options ","
-.BI "const char *" fmt ", " ... ")"
+.BI "int el_oprint(const char *" file ", size_t " line ", \
+enum el_level " level ", struct el_options *" options ", \
+const char *" fmt ", " ... ")"
 .br
-.BI "int el_ovprint(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", struct el_options *" options ","
-.BI "const char *" fmt ", va_list " ap ")"
+.BI "int el_ovprint(const char *" file ", size_t " line ", \
+enum el_level " level ", struct el_options *" options ", \
+const char *" fmt ", va_list " ap ")"
 .br
-.BI "int el_operror(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", struct el_options *" options ","
-.BI "const char *" fmt ", " ... ")"
+.BI "int el_operror(const char *" file ", size_t " line ", \
+enum el_level " level ", struct el_options *" options ", \
+const char *" fmt ", " ... ")"
 .br
-.BI "int el_pmemory(const char *" file ", size_t " line ","
-.BI "enum el_level " level ", struct el_options *" options ","
-.BI "const void *" memory ", size_t " mlen ")"
-
-.sh
+.BI "int el_pmemory(const char *" file ", size_t " line ", \
+enum el_level " level ", struct el_options *" options ", \
+const void *" memory ", size_t " mlen ")"
+.PP
 .BI "#define ELF " __FILE__ ", " __LINE__ ", " EL_FATAL
 .br
 .BI "#define ELA " __FILE__ ", " __LINE__ ", " EL_ALERT
@@ -59,173 +57,223 @@ to previously configured outputs.
 .BI "#define ELI " __FILE__ ", " __LINE__ ", " EL_INFO
 .br
 .BI "#define ELD " __FILE__ ", " __LINE__ ", " EL_DBG
-.br
-
-ish
+.PP
 .BI "#define EL_DEBUG(" ... ") el_print(ELD, __VA_ARGS__)
-
+.PP
 Feature Test Macro
-
+.PP
 .BR "#define EL_DEBUG" ()
-.RS 4
+.RS
 __ISOC99_SOURCE
 .RE
-
 .SH DESCRIPTION
+.PP
 Functions print log into configured outputs.
 
-\fBel_puts\fR() function prints \fImessage\fR that is simple string,
-\fImessage\fR is not altered in anyway - that means no automatic log levels,
-location of the log nor timestamp is printed - even if they are enabled. Logs
-printed with this functions are not filtered by log level, and will always be
-printed. Prints can still be suppressed by disabling output.
-
-\fBel_print\fR() function behaves similar to standard \fBprintf\fR(3) function
-from the standard library, but it adds (if enabled) additional information, such
-as \fIfile\fR and \fIline\fR number from where log is printed, log \fIlevel\fR,
-and timestamp of the message. \fIfmt\fR and variadic variables \fI...\fR have
-the same role as it is described in \fBprintf\fR(3) function.
-
-\fBel_vprint\fR() function behaves just like \fBel_print\fR() but it accepts
-argument pointer \fIap\fR instead of variadic variables. Check \fBvprintf\fR(3)
+.BR el_puts (3)
+function prints
+.I message
+that is simple string,
+.I message
+is not altered in anyway - that means no automatic log levels, location of the
+log nor timestamp is printed - even if they are enabled.
+Logs printed with this functions are not filtered by log level, and will always
+be printed. Prints can still be suppressed by disabling output.
+.PP
+.BR el_print (3)
+function behaves similar to standard
+.BR printf ()
+function from the standard library, but it adds (if enabled) additional
+information, such as
+.I file
+and
+.I line
+number from where log is printed, log
+.IR level ,
+and timestamp of the message.
+.I fmt
+and variadic variables
+.I ...
+have the same role as it is described in
+.BR printf ()
+manual page.
+.PP
+.BR el_vprint (3)
+function behaves just like
+.BR el_print (3)
+but it accepts argument pointer
+.I ap
+instead of variadic variables.
+Check
+.BR vprintf ()
 for more information.
-
-\fBel_perror\fR() works the same way as \fBel_print\fR() but will also print
-information about current errno that was set. If \fIfmt\fR is \fBNULL\fR,
-only information about errno will be printed. It is similar to \fBperror\fR(3)
+.PP
+.BR el_perror (3)
+works the same way as
+.BR el_print (3)
+but will also print information about current errno that was set.
+If
+.I fmt
+is
+.BR NULL ,
+only information about errno will be printed.
+It is similar to
+.BR perror ()
 function.
-
-\fBel_pmemory\fR() is designed to print memory location in a nice hex+ascii
-format that may look like this. In this example we print all ascii table, to
-present printing of printable and non-printable values
-
-.RS 4
-------  -----------------------------------------------  ----------------
-.br
-offset  hex                                              ascii
-.br
-------  -----------------------------------------------  ----------------
-.br
-0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................
-.br
-0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................
-.br
-0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !"#$%&'()*+,-./
-.br
-0x0030  30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f  0123456789:;<=>?
-.br
-0x0040  40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO
-.br
-0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[\]^_
-.br
-0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno
-.br
-0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
-.br
-------  -----------------------------------------------  ----------------
-.RE
-
-\fBel_print\fR(), \fBel_vprint\fR(), \fBel_perror\fR() and \fBel_pmemory\fR()
-are filtered based on their \fIlevel\fR.
-
+.PP
+.BR el_pmemory (3)
+is designed to print memory location in a nice hex+ascii format that may look
+like this.
+In this example we print all ascii table, to present printing of printable and
+non-printable values.
+.PP
+.EX
+    ------  -----------------------------------------------  ----------------
+    offset  hex                                              ascii
+    ------  -----------------------------------------------  ----------------
+    0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................
+    0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................
+    0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !"#$%&'()*+,-./
+    0x0030  30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f  0123456789:;<=>?
+    0x0040  40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO
+    0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[\]^_
+    0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno
+    0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
+    ------  -----------------------------------------------  ----------------
+.EE
+.PP
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3)
+and
+.BR el_pmemory (3)
+are filtered based on their
+.IR level .
+.PP
 All of above functions have their counterpart that also accepts custom
-\fIoptions\fR object. This is useful if we want for example, print logs into
-one file, and program queries into another. It can also be used to print
-every level into different file.
-
-It is real pain in the ass to provice information about file in every print
+.I options
+object.
+This is useful if we want for example, print logs into one file, and program
+queries into another.
+It can also be used to print every level into different file.
+.PP
+It is real pain in the ass to provide information about file in every print
 function. For that matter very simple macros have been provided.
-
-.RS 4
-.BR ELF "   fatal "
+.PP
+.RS
+.BR ELF "    Fatal errors, usually precedes application crash"
 .br
-.BR ELA "   alert "
+.BR ELA "    Alert, vey major error that should be fixed as soon as possible"
 .br
-.BR ELC "   critical "
+.BR ELC "    Critical"
 .br
-.BR ELE "   error "
+.BR ELE "    Error"
 .br
-.BR ELW "   warning "
+.BR ELW "    Warning"
 .br
-.BR ELN "   notice "
+.BR ELN "    Normal log, but of high importance"
 .br
-.BR ELI "   information "
+.BR ELI "    Information message, shouldn't spam too much here"
 .br
-.BR ELD "   debug "
+.BR ELD "    Debug messages, can spam as much as you'd like"
 .RE
-
-These macros comprese first 3 parameters \fIfile\fR, \fIline\fR and
-\fIlevel\fR into single, short parameter. For example instead calling this
-
-.RS 4
-el_print(__FILE__, __LINE__, EL_NOTICE, "notice message number %d", num);
-.RE
-
+.PP
+These macros comprese first 3 parameters
+.IR file ,
+.I line
+and
+.I level
+into single, short parameter.
+For example instead calling this
+.PP
+.EX
+    el_print(__FILE__, __LINE__, EL_NOTICE, "notice message number %d", num);
+.EE
+.PP
 you can simply call
-
-.RS 4
-el_print(ELN, "notice message number %d", num);
-.RE
-
-This solution works both for c89 and c99 standards. All side effects
-(like from calling function or incrementing variable in print function call)
-will take effect always regardless of set logging level. Also strings used in
-functions will be compiled and put into binary - always.
-
-If user has access to c99 compiler, one can use \fBEL_DEBUG\fR for debuging
-messages only. Later when application is compiled with NDEBUG, all side effects
-as well as strings used will be stripped out from final binary - so no vital
-information will be leaked in such way. This is not possible on c89 compiller
-due to absence of variadic variables in preprocesor macros.
-
+.PP
+.EX
+    el_print(ELN, "notice message number %d", num);
+.EE
+.PP
+This solution works both for
+.B c89
+and
+.B c99
+standards.
+All side effects (like from calling function or incrementing variable in print
+function call) will take effect always regardless of set logging level.
+Also strings used in functions will be compiled and put into binary - always.
+.PP
+If user has access to
+.B c99
+compiler, one can use
+.B EL_DEBUG
+for debuging messages only.
+Later when application is compiled with NDEBUG, all side effects as well as
+strings used will be stripped out from final binary - so no vital information
+will be leaked in such way.
+This is not possible on
+.B c89
+compiller due to absence of variadic variables in
+preprocesor macros.
 .SH RETURN VALUE
+.PP
 All functions return 0 when whole message has been successfuly printed to all
-configured outputs. If message couldn't be printed, it was printed only
-partially, or was not send to at least one configured output -1 is returned.
+configured outputs.
+If message couldn't be printed, it was printed only partially, or was not send
+to at least one configured output -1 is returned.
 Note that only one error is returned even if there was multiple errors.
-
 .SH ERRORS
-
+.PP
 All functions may return one of these on error
-
 .TP
 .B EINVAL
 Any of the input parameters is invalid.
-
 .TP
 .B EBADF
-Loggig to file is enabled and filename was not set with \fBEL_OPT_FNAME\fR
+Loggig to file is enabled and filename was not set with
+.B EL_FNAME
 option
-
 .TP
 .B EBADF
 Logging to file is enabled, file was opened sucessfuly, but log cannot be stored
-into file. This usually happen that file was unlinked from the file system and
-\fBembedlog\fR couldn't create new file again (no access to directory or
-directory doesn't exist at all). Log is lost, but \fBembedlog\fR will try to
-recreate log file everytime \fIel_print\fR is called.
-
+into file.
+This usually happen that file was unlinked from the file system and
+.B embedlog
+couldn't create new file again (no access to directory or directory doesn't
+exist at all).
+Log is lost, but
+.B embedlog
+will try to recreate log file everytime
+.BR el_print (3)
+is called.
 .TP
 .B ENODEV
 All possible outputs are disabled
-
-.RE
-\fBel_print\fR(), \fBel_vprint\fR(), \fBel_perror\fR() \fBel_pmemory\fR
-may also return
-
+.PP
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3)
+and
+.BR el_pmemory (3)
+may also return:
 .TP
 .B ERANGE
 Message will not be logged as message log level is lower than configured one.
-
 .TP
 .B ENOBUFS
-Message is bigger than \fBEL_LOG_MAX\fR and will be truncated.
-
-.RE
+Message is bigger than
+.B EL_LOG_MAX
+and will be truncated.
+.PP
 When logging to file is enabled, all functions may also return errors
-from \fBfwrite\fR(3) and if file rotation is enabled also from \fBfopen\fR(3)
-
+from
+.BR fwrite ()
+and if file rotation is enabled also from
+.BR fopen ()
 .SH SEE ALSO
+.PP
 .BR el_init (3),
 .BR el_cleanup (3),
 .BR el_overview (7),

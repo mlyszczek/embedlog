@@ -1,0 +1,59 @@
+pre#logo
+{
+    font-size: 3px;
+    max-width: 100%;
+}
+
+pre#logo-footer
+{
+    font-size: 1px;
+    max-width: 100%;
+}
+
+div#footer a:hover, div#header a:hover
+{
+    color: red;
+    text-decoration: none;
+}
+
+div.codehilite:before
+{
+    content: "// code";
+}
+
+img[alt=test-result-svg]
+{
+    float: right;
+}
+
+p.info
+{
+    margin-top: 2ch;
+    margin-bottom: 2ch;
+    margin-left: 0ch;
+    margin-right: 0ch;
+    float: left;
+}
+
+p.left
+{
+    text-align: left;
+    width: 33%
+}
+
+p.center
+{
+    text-align: center;
+    width: 33%
+}
+
+p.right
+{
+    text-align: right;
+    width: 34%
+}
+
+ul.man-toc
+{
+    clear: both;
+}

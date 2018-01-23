@@ -1,0 +1,7 @@
+in_title="embedlog.kurwinet.pl - c/c++ logger with embedded devices in mind"
+in_description="Logger written in C89 targeting embedded systems. It's main goals are to be small and fast. Many features can be disabled during compilation to generate smaller binary."
+in_keywords="c, embedded, logger, file, rotate, network"
+in_author="Michał Łyszczek"
+in_lang="en"
+in_pygment=vim
+in_style=man
