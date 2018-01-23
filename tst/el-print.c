@@ -173,7 +173,7 @@ static int print_check(void)
          * check printing timestamp
          */
 
-        if (g_options.timestamp == EL_OPT_TS_LONG)
+        if (g_options.timestamp == EL_TS_LONG)
         {
             IS_CHAR('[');
             IS_DIGIT();
@@ -204,7 +204,7 @@ static int print_check(void)
             IS_CHAR(']');
 
         }
-        else if (g_options.timestamp == EL_OPT_TS_SHORT)
+        else if (g_options.timestamp == EL_TS_SHORT)
         {
             IS_CHAR('[');
             while (*msg != '.' )
@@ -220,7 +220,7 @@ static int print_check(void)
             }
             IS_CHAR(']');
         }
-        else if (g_options.timestamp == EL_OPT_TS_OFF)
+        else if (g_options.timestamp == EL_TS_OFF)
         {
             /*
              * we check for nothing here
@@ -311,7 +311,7 @@ static int print_check(void)
         }
 
         if ((g_options.finfo && expected.file != NULL && expected.line != 0) ||
-             g_options.timestamp != EL_OPT_TS_OFF)
+             g_options.timestamp != EL_TS_OFF)
         {
             /*
              * file info or timestamp information is enabled, in that case
@@ -427,9 +427,9 @@ static void add_log
 static void test_prepare(void)
 {
     el_init();
-    el_option(EL_OPT_CUSTOM_PUTS, print_to_buffer);
-    el_option(EL_OPT_PRINT_LEVEL, 0);
-    el_option(EL_OPT_OUT, EL_OPT_OUT_CUSTOM);
+    el_option(EL_CUSTOM_PUTS, print_to_buffer);
+    el_option(EL_PRINT_LEVEL, 0);
+    el_option(EL_OUT, EL_OUT_CUSTOM);
     memset(logbuf, 0, sizeof(logbuf));
     expected_logs = rb_new(1024, sizeof(struct log_message),
         O_NONTHREAD | O_NONBLOCK);
@@ -484,8 +484,8 @@ static void print_simple_multiple_message(void)
 
 static void print_log_level(void)
 {
-    el_option(EL_OPT_PRINT_LEVEL, 1);
-    el_option(EL_OPT_LEVEL, EL_DBG);
+    el_option(EL_PRINT_LEVEL, 1);
+    el_option(EL_LEVEL, EL_DBG);
     add_log(ELF, "print_log_level fatal message");
     add_log(ELA, "print_log_level alert message");
     add_log(ELC, "print_log_level critical message");
@@ -504,8 +504,8 @@ static void print_log_level(void)
 
 static void print_colorful_output(void)
 {
-    el_option(EL_OPT_COLORS, 1);
-    el_option(EL_OPT_LEVEL, EL_DBG + 2);
+    el_option(EL_COLORS, 1);
+    el_option(EL_LEVEL, EL_DBG + 2);
     add_log(ELF, "print_colorful_output fatal message");
     add_log(ELA, "print_colorful_output alert message");
     add_log(ELC, "print_colorful_output critical message");
@@ -526,8 +526,8 @@ static void print_colorful_output(void)
 
 static void print_custom_log_level(void)
 {
-    el_option(EL_OPT_PRINT_LEVEL, 1);
-    el_option(EL_OPT_LEVEL, EL_DBG + 5);
+    el_option(EL_PRINT_LEVEL, 1);
+    el_option(EL_LEVEL, EL_DBG + 5);
     add_log(ELD + 4, "print_custom_log_level custom debug 4");
     add_log(ELD + 5, "print_custom_log_level custom debug 5");
     add_log(ELD + 6, "print_custom_log_level custom debug 6");
@@ -541,7 +541,7 @@ static void print_custom_log_level(void)
 
 static void print_timestamp_short(void)
 {
-    el_option(EL_OPT_TS, EL_OPT_TS_SHORT);
+    el_option(EL_TS, EL_TS_SHORT);
     add_log(ELF, "print_timestamp_short first");
     add_log(ELF, "print_timestamp_short second");
     mt_fok(print_check());
@@ -554,7 +554,7 @@ static void print_timestamp_short(void)
 
 static void print_timestamp_long(void)
 {
-    el_option(EL_OPT_TS, EL_OPT_TS_LONG);
+    el_option(EL_TS, EL_TS_LONG);
     add_log(ELF, "print_timestamp_long first");
     add_log(ELF, "print_timestamp_long second");
     mt_fok(print_check());
@@ -567,7 +567,7 @@ static void print_timestamp_long(void)
 
 static void print_finfo(void)
 {
-    el_option(EL_OPT_FINFO, 1);
+    el_option(EL_FINFO, 1);
     add_log(ELF, "print_finfo first");
     add_log(ELF, "print_finfo second");
     mt_fok(print_check());
@@ -584,11 +584,11 @@ static void print_different_clocks(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (i = EL_OPT_TS_TM_CLOCK; i != EL_OPT_TS_TM_ERROR; ++i)
+    for (i = EL_TS_TM_CLOCK; i != EL_TS_TM_ERROR; ++i)
     {
         test_prepare();
-        el_option(EL_OPT_TS_TM, i);
-        el_option(EL_OPT_TS, EL_OPT_TS_LONG);
+        el_option(EL_TS_TM, i);
+        el_option(EL_TS, EL_TS_LONG);
         add_log(ELI, "clock test");
         mt_fok(print_check());
         test_cleanup();
@@ -611,17 +611,17 @@ static void print_mix_of_everything(void)
 
 
     for (level = EL_FATAL;          level <= EL_DBG;              ++level)
-    for (timestamp = EL_OPT_TS_OFF; timestamp != EL_OPT_TS_ERROR; ++timestamp)
+    for (timestamp = EL_TS_OFF; timestamp != EL_TS_ERROR; ++timestamp)
     for (printlevel = 0;            printlevel <= 1;              ++printlevel)
     for (finfo = 0;                 finfo <= 1;                   ++finfo)
     for (colors = 0;                colors <= 1;                  ++colors)
     {
         test_prepare();
-        el_option(EL_OPT_LEVEL, level);
-        el_option(EL_OPT_TS, timestamp);
-        el_option(EL_OPT_PRINT_LEVEL, printlevel);
-        el_option(EL_OPT_FINFO, finfo);
-        el_option(EL_OPT_COLORS, colors);
+        el_option(EL_LEVEL, level);
+        el_option(EL_TS, timestamp);
+        el_option(EL_PRINT_LEVEL, printlevel);
+        el_option(EL_FINFO, finfo);
+        el_option(EL_COLORS, colors);
 
         add_log(ELF, "fatal message");
         add_log(ELA, "alert message");
@@ -681,7 +681,7 @@ static void print_truncate_with_date(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_option(EL_OPT_TS, EL_OPT_TS_LONG);
+    el_option(EL_TS, EL_TS_LONG);
     memset(msg, 'a', sizeof(msg));
     msg[sizeof(msg) - 1] = '\0';
     msg[sizeof(msg) - 2] = '3';
@@ -708,9 +708,9 @@ static void print_truncate_with_all_options(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_option(EL_OPT_TS, EL_OPT_TS_LONG);
-    el_option(EL_OPT_FINFO, 1);
-    el_option(EL_OPT_PRINT_LEVEL, 1);
+    el_option(EL_TS, EL_TS_LONG);
+    el_option(EL_FINFO, 1);
+    el_option(EL_PRINT_LEVEL, 1);
     memset(msg, 'a', sizeof(msg));
     msg[sizeof(msg) - 1] = '\0';
     msg[sizeof(msg) - 2] = '3';
@@ -733,7 +733,7 @@ static void print_truncate_with_all_options(void)
 
 static void print_with_no_output_available(void)
 {
-    el_option(EL_OPT_OUT, EL_OPT_OUT_NONE);
+    el_option(EL_OUT, EL_OUT_NONE);
     mt_ferr(el_print(ELI, "i'll be back"), ENODEV);
 }
 
@@ -754,7 +754,7 @@ static void print_level_not_high_enough(void)
 
 static void print_finfo_path(void)
 {
-    el_option(EL_OPT_FINFO, 1);
+    el_option(EL_FINFO, 1);
     add_log("source/code/file.c", 10, EL_ALERT, "some message");
     mt_fok(print_check());
 }
@@ -766,7 +766,7 @@ static void print_finfo_path(void)
 
 static void print_nofinfo(void)
 {
-    el_option(EL_OPT_FINFO, 1);
+    el_option(EL_FINFO, 1);
     add_log(NULL, 0, EL_ALERT, "no file info");
     mt_fok(print_check());
 }

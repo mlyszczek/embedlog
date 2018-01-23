@@ -243,7 +243,7 @@ static size_t el_timestamp
     size_t           tl;       /* timestamp length */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (options->timestamp == EL_OPT_TS_OFF)
+    if (options->timestamp == EL_TS_OFF)
     {
         /*
          * user doesn't want us to print timestamp, that's fine
@@ -260,7 +260,7 @@ static size_t el_timestamp
     {
 #if ENABLE_REALTIME
 
-    case EL_OPT_TS_TM_REALTIME:
+    case EL_TS_TM_REALTIME:
         el_ts_clock_gettime(&s, &us, CLOCK_REALTIME);
         break;
 
@@ -268,17 +268,17 @@ static size_t el_timestamp
 
 #if ENABLE_MONOTONIC
 
-    case EL_OPT_TS_TM_MONOTONIC:
+    case EL_TS_TM_MONOTONIC:
         el_ts_clock_gettime(&s, &us, CLOCK_MONOTONIC);
         break;
 
 #endif
 
-    case EL_OPT_TS_TM_TIME:
+    case EL_TS_TM_TIME:
         el_ts_time(&s, &us);
         break;
 
-    case EL_OPT_TS_TM_CLOCK:
+    case EL_TS_TM_CLOCK:
         el_ts_clock(&s, &us);
         break;
 
@@ -294,7 +294,7 @@ static size_t el_timestamp
      * then convert retrieved time into string timestamp
      */
 
-    if (options->timestamp == EL_OPT_TS_LONG)
+    if (options->timestamp == EL_TS_LONG)
     {
         struct tm   tm;   /* timestamp splitted */
         struct tm  *tmp;  /* timestamp splitted pointer */

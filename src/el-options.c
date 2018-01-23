@@ -84,27 +84,27 @@ struct el_options g_options;
 static const int VALID_OUTS = 0
 
 #if ENABLE_OUT_STDERR
-    | EL_OPT_OUT_STDERR
+    | EL_OUT_STDERR
 #endif
 
 #if ENABLE_OUT_SYSLOG
-    | EL_OPT_OUT_SYSLOG
+    | EL_OUT_SYSLOG
 #endif
 
 #if ENABLE_OUT_FILE
-    | EL_OPT_OUT_FILE
+    | EL_OUT_FILE
 #endif
 
 #if ENABLE_OUT_NET
-    | EL_OPT_OUT_NET
+    | EL_OUT_NET
 #endif
 
 #if ENABLE_OUT_TTY
-    | EL_OPT_OUT_TTY
+    | EL_OUT_TTY
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    | EL_OPT_OUT_CUSTOM
+    | EL_OUT_CUSTOM
 #endif
     ;
 
@@ -153,19 +153,19 @@ static int el_vooption
 
     switch (option)
     {
-    case EL_OPT_LEVEL:
+    case EL_LEVEL:
         value_int = va_arg(ap, int);
         options->level = value_int;
         return 0;
 
-    case EL_OPT_OUT:
+    case EL_OUT:
         value_int = va_arg(ap, int);
-        VALID(EINVAL, (value_int & ~EL_OPT_OUT_ALL) == 0x00);
+        VALID(EINVAL, (value_int & ~EL_OUT_ALL) == 0x00);
         VALID(ENODEV, (value_int & ~VALID_OUTS) == 0x00);
         options->outputs = value_int;
         return 0;
 
-    case EL_OPT_PRINT_LEVEL:
+    case EL_PRINT_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
@@ -174,7 +174,7 @@ static int el_vooption
 
     #if ENABLE_COLORS
 
-    case EL_OPT_COLORS:
+    case EL_COLORS:
         /*
          * only 1 or 0 is allowed, if any other bit is set return EINVAL
          */
@@ -189,16 +189,16 @@ static int el_vooption
 
     #if ENABLE_TIMESTAMP
 
-    case EL_OPT_TS:
+    case EL_TS:
         value_int = va_arg(ap, int);
-        VALID(EINVAL, 0 <= value_int && value_int < EL_OPT_TS_ERROR);
+        VALID(EINVAL, 0 <= value_int && value_int < EL_TS_ERROR);
 
         options->timestamp = value_int;
         return 0;
 
-    case EL_OPT_TS_TM:
+    case EL_TS_TM:
         value_int = va_arg(ap, int);
-        VALID(EINVAL, 0 <= value_int && value_int < EL_OPT_TS_TM_ERROR);
+        VALID(EINVAL, 0 <= value_int && value_int < EL_TS_TM_ERROR);
 
         options->timestamp_timer = value_int;
         return 0;
@@ -207,7 +207,7 @@ static int el_vooption
 
     #if ENABLE_FINFO
 
-    case EL_OPT_FINFO:
+    case EL_FINFO:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
@@ -218,13 +218,13 @@ static int el_vooption
 
     #if ENABLE_OUT_FILE
 
-    case EL_OPT_FNAME:
+    case EL_FNAME:
         value_str = va_arg(ap, const char *);
         VALID(EINVAL, value_str);
         options->fname = value_str;
         return el_file_open(options);
 
-    case EL_OPT_FROTATE_NUMBER:
+    case EL_FROTATE_NUMBER:
     {
         int previous_frotate; /* previous value of frotate number */
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -251,7 +251,7 @@ static int el_vooption
         return 0;
     }
 
-    case EL_OPT_FROTATE_SIZE:
+    case EL_FROTATE_SIZE:
         value_long = va_arg(ap, long);
         VALID(EINVAL, value_long >= 1);
         options->frotate_size = value_long;
@@ -261,7 +261,7 @@ static int el_vooption
 
     #if ENABLE_OUT_CUSTOM
 
-    case EL_OPT_CUSTOM_PUTS:
+    case EL_CUSTOM_PUTS:
         value_ptr = va_arg(ap, void (*)());
         options->custom_puts = (el_custom_puts)value_ptr;
         return 0;

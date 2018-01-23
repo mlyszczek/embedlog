@@ -41,14 +41,14 @@
 
 enum el_output
 {
-    EL_OPT_OUT_NONE   = 0x0000,
-    EL_OPT_OUT_STDERR = 0x0001,
-    EL_OPT_OUT_SYSLOG = 0x0002,
-    EL_OPT_OUT_FILE   = 0x0004,
-    EL_OPT_OUT_NET    = 0x0008,
-    EL_OPT_OUT_TTY    = 0x0010,
-    EL_OPT_OUT_CUSTOM = 0x0020,
-    EL_OPT_OUT_ALL    = 0x003f,
+    EL_OUT_NONE   = 0x0000,
+    EL_OUT_STDERR = 0x0001,
+    EL_OUT_SYSLOG = 0x0002,
+    EL_OUT_FILE   = 0x0004,
+    EL_OUT_NET    = 0x0008,
+    EL_OUT_TTY    = 0x0010,
+    EL_OUT_CUSTOM = 0x0020,
+    EL_OUT_ALL    = 0x003f,
 };
 
 enum el_level
@@ -65,39 +65,39 @@ enum el_level
 
 enum el_option
 {
-    EL_OPT_LEVEL,
-    EL_OPT_OUT,
-    EL_OPT_COLORS,
-    EL_OPT_TS,
-    EL_OPT_TS_TM,
-    EL_OPT_PRINT_LEVEL,
-    EL_OPT_FINFO,
-    EL_OPT_CUSTOM_PUTS,
+    EL_LEVEL,
+    EL_OUT,
+    EL_COLORS,
+    EL_TS,
+    EL_TS_TM,
+    EL_PRINT_LEVEL,
+    EL_FINFO,
+    EL_CUSTOM_PUTS,
 
-    EL_OPT_FNAME,
-    EL_OPT_FROTATE_NUMBER,
-    EL_OPT_FROTATE_SIZE,
+    EL_FNAME,
+    EL_FROTATE_NUMBER,
+    EL_FROTATE_SIZE,
 
     EL_OPT_ERROR /* internal use only */
 };
 
 enum el_option_timestamp
 {
-    EL_OPT_TS_OFF,
-    EL_OPT_TS_SHORT,
-    EL_OPT_TS_LONG,
+    EL_TS_OFF,
+    EL_TS_SHORT,
+    EL_TS_LONG,
 
-    EL_OPT_TS_ERROR /* internal use only */
+    EL_TS_ERROR /* internal use only */
 };
 
 enum el_option_timestamp_timer
 {
-    EL_OPT_TS_TM_CLOCK,
-    EL_OPT_TS_TM_TIME,
-    EL_OPT_TS_TM_REALTIME,
-    EL_OPT_TS_TM_MONOTONIC,
+    EL_TS_TM_CLOCK,
+    EL_TS_TM_TIME,
+    EL_TS_TM_REALTIME,
+    EL_TS_TM_MONOTONIC,
 
-    EL_OPT_TS_TM_ERROR /* internal use only */
+    EL_TS_TM_ERROR /* internal use only */
 };
 
 typedef int (*el_custom_puts)(const char *s);

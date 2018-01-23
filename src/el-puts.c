@@ -98,40 +98,40 @@ int el_oputs
     }
 
 #if ENABLE_OUT_STDERR
-    if (options->outputs & EL_OPT_OUT_STDERR)
+    if (options->outputs & EL_OUT_STDERR)
     {
         rv |= fputs(s, stderr) == EOF ? -1 : 0;
     }
 #endif
 
 #if 0 /* TODO */
-    if (options->outputs & EL_OPT_OUT_SYSLOG)
+    if (options->outputs & EL_OUT_SYSLOG)
     {
         el_puts_syslog(s);
     }
 #endif
 
 #if ENABLE_OUT_FILE
-    if (options->outputs & EL_OPT_OUT_FILE)
+    if (options->outputs & EL_OUT_FILE)
     {
         rv |= el_file_puts(options, s);
     }
 #endif
 
 #if 0
-    if (options->outputs & EL_OPT_OUT_NET)
+    if (options->outputs & EL_OUT_NET)
     {
         el_puts_net(s);
     }
 
-    if (options->outputs & EL_OPT_OUT_TTY)
+    if (options->outputs & EL_OUT_TTY)
     {
         el_puts_tty(s);
     }
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    if (options->outputs & EL_OPT_OUT_CUSTOM && options->custom_puts)
+    if (options->outputs & EL_OUT_CUSTOM && options->custom_puts)
     {
         rv |= options->custom_puts(s);
     }

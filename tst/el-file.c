@@ -100,10 +100,10 @@ static int file_check
 static void test_prepare(void)
 {
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 0);
-    el_option(EL_OPT_FNAME, WORKDIR"/log");
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 0);
+    el_option(EL_FNAME, WORKDIR"/log");
 
 }
 
@@ -184,10 +184,10 @@ static void file_reopen(void)
     el_cleanup();
 
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 0);
-    el_option(EL_OPT_FNAME, WORKDIR"/log");
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 0);
+    el_option(EL_FNAME, WORKDIR"/log");
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log", s9 s8));
@@ -204,10 +204,10 @@ static void file_reopen_different_file(void)
     el_cleanup();
 
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 0);
-    el_option(EL_OPT_FNAME, WORKDIR"/log-another");
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 0);
+    el_option(EL_FNAME, WORKDIR"/log-another");
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log", s9));
@@ -240,7 +240,7 @@ static void file_filename_too_long(void)
 
     memset(path, 'a', sizeof(path));
     path[sizeof(path) - 1] = '\0';
-    mt_ferr(el_option(EL_OPT_FNAME, path), ENAMETOOLONG);
+    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
 }
 
 
@@ -262,7 +262,7 @@ static void file_path_too_long(void)
     path[sizeof(path) - 3] = 'l';
     path[sizeof(path) - 2] = 'e';
     path[sizeof(path) - 1] = '\0';
-    mt_ferr(el_option(EL_OPT_FNAME, path), ENAMETOOLONG);
+    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
 }
 
 
@@ -283,10 +283,10 @@ static void file_print_without_init(void)
 static void file_print_after_cleanup(void)
 {
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 0);
-    el_option(EL_OPT_FNAME, WORKDIR"/log");
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 0);
+    el_option(EL_FNAME, WORKDIR"/log");
     el_cleanup();
     mt_ferr(el_puts("whatev"), ENODEV);
 }
@@ -299,9 +299,9 @@ static void file_print_after_cleanup(void)
 static void file_print_without_setting_file(void)
 {
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 0);
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 0);
     mt_ferr(el_puts("no file set"), EBADF);
     el_cleanup();
 }
@@ -313,7 +313,7 @@ static void file_print_without_setting_file(void)
 
 static void file_rotate_1_no_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s9));
 }
@@ -325,7 +325,7 @@ static void file_rotate_1_no_rotate(void)
 
 static void file_rotate_1_exact_print(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s8);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
@@ -339,7 +339,7 @@ static void file_rotate_1_exact_print(void)
 
 static void file_rotate_1_overflow_but_no_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s9 s5 s5);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5 "qw"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
@@ -352,7 +352,7 @@ static void file_rotate_1_overflow_but_no_rotate(void)
 
 static void file_rotate_1_overflow(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s9);
     el_puts(s9);
     el_puts(s3);
@@ -367,7 +367,7 @@ static void file_rotate_1_overflow(void)
 
 static void file_rotate_1_overflow_exact(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s8);
     el_puts(s8);
     el_puts(s5);
@@ -382,15 +382,15 @@ static void file_rotate_1_overflow_exact(void)
 
 static void file_rotate_1_reopen(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s5);
 
     el_cleanup();
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
-    el_option(EL_OPT_FNAME, WORKDIR"/log");
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 1);
+    el_option(EL_FNAME, WORKDIR"/log");
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s5 s8));
@@ -404,7 +404,7 @@ static void file_rotate_1_reopen(void)
 
 static void file_rotate_1_unexpected_third_party_remove(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s5);
     el_puts(s8);
     unlink(WORKDIR"/log.0");
@@ -421,10 +421,10 @@ static void file_rotate_1_unexpected_third_party_remove(void)
 
 static void file_rotate_1_change_size_up(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s9);
     el_puts(s5);
-    el_option(EL_OPT_FROTATE_SIZE, 32);
+    el_option(EL_FROTATE_SIZE, 32);
     el_puts(s9);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5 s9 s8));
@@ -438,9 +438,9 @@ static void file_rotate_1_change_size_up(void)
 
 static void file_rotate_1_change_size_down(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 1);
+    el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s9);
-    el_option(EL_OPT_FROTATE_SIZE, 8);
+    el_option(EL_FROTATE_SIZE, 8);
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s5));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
@@ -453,7 +453,7 @@ static void file_rotate_1_change_size_down(void)
 
 static void file_rotate_2_no_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s9));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
@@ -466,7 +466,7 @@ static void file_rotate_2_no_rotate(void)
 
 static void file_rotate_2_exact_print(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s8);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
@@ -480,7 +480,7 @@ static void file_rotate_2_exact_print(void)
 
 static void file_rotate_2_overflow_but_no_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9 s5 s5);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5 "qw"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
@@ -493,7 +493,7 @@ static void file_rotate_2_overflow_but_no_rotate(void)
 
 static void file_rotate_2_overflow(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9);
     el_puts(s9);
     el_puts(s3);
@@ -508,7 +508,7 @@ static void file_rotate_2_overflow(void)
 
 static void file_rotate_2_overflow_exact(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s8);
     el_puts(s8);
     el_puts(s5);
@@ -523,16 +523,16 @@ static void file_rotate_2_overflow_exact(void)
 
 static void file_rotate_2_reopen(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9);
     el_puts(s8);
 
     el_cleanup();
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
-    el_option(EL_OPT_FNAME, WORKDIR"/log");
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 2);
+    el_option(EL_FNAME, WORKDIR"/log");
 
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s9));
@@ -546,7 +546,7 @@ static void file_rotate_2_reopen(void)
 
 static void file_rotate_2_unexpected_third_party_remove(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s5);
     el_puts(s8);
     unlink(WORKDIR"/log.0");
@@ -564,11 +564,11 @@ static void file_rotate_2_unexpected_third_party_remove(void)
 
 static void file_rotate_2_change_size_up(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9);
     el_puts(s5);
     el_puts(s9);
-    el_option(EL_OPT_FROTATE_SIZE, 32);
+    el_option(EL_FROTATE_SIZE, 32);
     el_puts(s9);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5));
@@ -582,10 +582,10 @@ static void file_rotate_2_change_size_up(void)
 
 static void file_rotate_2_change_size_down(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9);
     el_puts(s9);
-    el_option(EL_OPT_FROTATE_SIZE, 8);
+    el_option(EL_FROTATE_SIZE, 8);
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s9));
     mt_fok(file_check(WORKDIR"/log.1", s5));
@@ -598,7 +598,7 @@ static void file_rotate_2_change_size_down(void)
 
 static void file_rotate_2_many_rotates(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 2);
+    el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9);
     el_puts(s8);
     el_puts(s5);
@@ -616,7 +616,7 @@ static void file_rotate_2_many_rotates(void)
 
 static void file_rotate_5_no_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s9));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
@@ -629,7 +629,7 @@ static void file_rotate_5_no_rotate(void)
 
 static void file_rotate_5_exact_print_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     el_puts(s8);
     el_puts(s8);
     el_puts(s8);
@@ -645,7 +645,7 @@ static void file_rotate_5_exact_print_rotate(void)
 
 static void file_rotate_5_overflow_but_no_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     el_puts(s8);
     el_puts(s8);
     el_puts(s9 s5 s5);
@@ -660,7 +660,7 @@ static void file_rotate_5_overflow_but_no_rotate(void)
 
 static void file_rotate_5_overflow(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     el_puts(s9);
     el_puts(s9);
     el_puts(s3);
@@ -681,7 +681,7 @@ static void file_rotate_5_overflow(void)
 
 static void file_rotate_5_overflow_exact(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     el_puts(s8);
     el_puts(s8);
     el_puts(s8);
@@ -699,7 +699,7 @@ static void file_rotate_5_overflow_exact(void)
 
 static void file_rotate_5_reopen(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
 
     el_puts(s9);
     el_puts(s9);
@@ -710,10 +710,10 @@ static void file_rotate_5_reopen(void)
 
     el_cleanup();
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_FILE);
-    el_option(EL_OPT_FROTATE_SIZE, 16);
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
-    el_option(EL_OPT_FNAME, WORKDIR"/log");
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_SIZE, 16);
+    el_option(EL_FROTATE_NUMBER, 5);
+    el_option(EL_FNAME, WORKDIR"/log");
 
     el_puts(s9);
     el_puts(s8);
@@ -731,8 +731,8 @@ static void file_rotate_5_reopen(void)
 
 static void file_rotate_5_hole_in_log_rotate(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
-    el_option(EL_OPT_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_SIZE, 3);
     el_puts("qaz");
     el_puts("wsx");
     el_puts("edc");
@@ -793,15 +793,15 @@ static void file_rotate_5_hole_in_log_rotate(void)
 
 static void file_rotate_5_rename_file_halfway(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
-    el_option(EL_OPT_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_SIZE, 3);
     el_puts("qaz");
     el_puts("wsx");
     el_puts("edc");
     el_puts("rfv");
     el_puts("tgb");
 
-    el_option(EL_OPT_FNAME, WORKDIR"/log-another");
+    el_option(EL_FNAME, WORKDIR"/log-another");
 
     el_puts("123");
     el_puts("456");
@@ -829,7 +829,7 @@ static void file_rotate_5_rename_file_halfway(void)
 
 static void file_no_dir_for_logs(void)
 {
-    mt_ferr(el_option(EL_OPT_FNAME, "/tmp/i-dont/exist"), ENOENT);
+    mt_ferr(el_option(EL_FNAME, "/tmp/i-dont/exist"), ENOENT);
     mt_ferr(el_puts("whatever"), EBADF);
 }
 
@@ -862,13 +862,13 @@ static void file_dir_no_access(void)
          * root just doesn't give a fuck about no-write-permissions
          */
 
-        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s3));
         mt_fok(file_check("/tmp/embedlog-no-write/log", s3));
     }
     else
     {
-        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts(s3), EBADF);
     }
     unlink("/tmp/embedlog-no-write/log");
@@ -892,13 +892,13 @@ static void file_no_access_to_file(void)
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s5));
         mt_fok(file_check("/tmp/embedlog-no-write/log", s5));
     }
     else
     {
-        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts("whatever"), EBADF);
     }
     unlink("/tmp/embedlog-no-write/log");
@@ -912,8 +912,8 @@ static void file_no_access_to_file(void)
 
 static void file_rotate_no_dir_for_logs(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
-    mt_ferr(el_option(EL_OPT_FNAME, "/tmp/i-dont/exist"), ENOENT);
+    el_option(EL_FROTATE_NUMBER, 5);
+    mt_ferr(el_option(EL_FNAME, "/tmp/i-dont/exist"), ENOENT);
     mt_ferr(el_puts("whatever"), EBADF);
 }
 
@@ -924,7 +924,7 @@ static void file_rotate_no_dir_for_logs(void)
 
 static void file_rotate_dir_removed_after_open_then_created_back_again(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s8));
@@ -972,18 +972,18 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
 
 static void file_rotate_dir_no_access(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     mkdir("/tmp/embedlog-no-write", 0555);
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s3));
         mt_fok(file_check("/tmp/embedlog-no-write/log.0", s3));
     }
     else
     {
-        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts(s3), EBADF);
     }
 
@@ -1002,20 +1002,20 @@ static void file_rotate_no_access_to_file(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     mkdir("/tmp/embedlog-no-write", 0755);
     fd = open("/tmp/embedlog-no-write/log.0", O_CREAT, 0444);
     close(fd);
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s8));
         mt_fok(file_check("/tmp/embedlog-no-write/log.0", s8));
     }
     else
     {
-        mt_ferr(el_option(EL_OPT_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts("whatever"), EBADF);
     }
 
@@ -1036,8 +1036,8 @@ static void file_rotate_filename_too_long(void)
 
     memset(path, 'a', sizeof(path));
     path[sizeof(path) - 1] = '\0';
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
-    mt_ferr(el_option(EL_OPT_FNAME, path), ENAMETOOLONG);
+    el_option(EL_FROTATE_NUMBER, 5);
+    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
 }
 
 
@@ -1059,8 +1059,8 @@ static void file_rotate_path_too_long(void)
     path[sizeof(path) - 3] = 'l';
     path[sizeof(path) - 2] = 'e';
     path[sizeof(path) - 1] = '\0';
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
-    mt_ferr(el_option(EL_OPT_FNAME, path), ENAMETOOLONG);
+    el_option(EL_FROTATE_NUMBER, 5);
+    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
 }
 
 
@@ -1070,7 +1070,7 @@ static void file_rotate_path_too_long(void)
 
 static void file_rotate_fail(void)
 {
-    el_option(EL_OPT_FROTATE_NUMBER, 5);
+    el_option(EL_FROTATE_NUMBER, 5);
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s8));
     unlink(WORKDIR"/log");

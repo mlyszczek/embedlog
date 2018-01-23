@@ -96,8 +96,8 @@ static void options_init(void)
     default_options.outputs         = 0;
     default_options.level           = EL_INFO;
     default_options.colors          = 0;
-    default_options.timestamp       = EL_OPT_TS_OFF;
-    default_options.timestamp_timer = EL_OPT_TS_TM_CLOCK;
+    default_options.timestamp       = EL_TS_OFF;
+    default_options.timestamp_timer = EL_TS_TM_CLOCK;
     default_options.print_log_level = 1;
     default_options.custom_puts     = NULL;
 
@@ -143,7 +143,7 @@ static void options_level_set(void)
 
     for (i = 0; i != 32; ++i)
     {
-        mt_fail(el_option(EL_OPT_LEVEL, i) == 0);
+        mt_fail(el_option(EL_LEVEL, i) == 0);
         mt_fail(g_options.level == i);
     }
 }
@@ -159,14 +159,14 @@ static void options_output(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     current_outputs = 0;
-    mt_fok(el_option(EL_OPT_OUT, EL_OPT_OUT_STDERR));
-    mt_fail(g_options.outputs == EL_OPT_OUT_STDERR);
+    mt_fok(el_option(EL_OUT, EL_OUT_STDERR));
+    mt_fail(g_options.outputs == EL_OUT_STDERR);
 
-    mt_fok(el_option(EL_OPT_OUT, (EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE)));
-    mt_fail(g_options.outputs == (EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE));
+    mt_fok(el_option(EL_OUT, (EL_OUT_STDERR | EL_OUT_FILE)));
+    mt_fail(g_options.outputs == (EL_OUT_STDERR | EL_OUT_FILE));
 
-    mt_ferr(el_option(EL_OPT_OUT, EL_OPT_OUT_ALL + 7), EINVAL);
-    mt_fail(g_options.outputs == (EL_OPT_OUT_STDERR | EL_OPT_OUT_FILE));
+    mt_ferr(el_option(EL_OUT, EL_OUT_ALL + 7), EINVAL);
+    mt_fail(g_options.outputs == (EL_OUT_STDERR | EL_OUT_FILE));
 }
 
 
@@ -177,7 +177,7 @@ static void options_output(void)
 static void options_log_allowed(void)
 {
     g_options.level = EL_ERROR;
-    g_options.outputs = EL_OPT_OUT_STDERR;
+    g_options.outputs = EL_OUT_STDERR;
 
     mt_fail(el_log_allowed(&g_options, EL_FATAL)  == 1);
     mt_fail(el_log_allowed(&g_options, EL_ALERT)  == 1);
@@ -196,16 +196,16 @@ static void options_log_allowed(void)
 
 static void options_opt_print_level(void)
 {
-    mt_fail(el_option(EL_OPT_PRINT_LEVEL, 0) == 0);
+    mt_fail(el_option(EL_PRINT_LEVEL, 0) == 0);
     mt_fail(g_options.print_log_level == 0);
-    mt_fail(el_option(EL_OPT_PRINT_LEVEL, 1) == 0);
+    mt_fail(el_option(EL_PRINT_LEVEL, 1) == 0);
     mt_fail(g_options.print_log_level == 1);
 
     errno = 0;
-    mt_fail(el_option(EL_OPT_PRINT_LEVEL, 2) == -1);
+    mt_fail(el_option(EL_PRINT_LEVEL, 2) == -1);
     mt_fail(errno == EINVAL);
     errno = 0;
-    mt_fail(el_option(EL_OPT_PRINT_LEVEL, 3) == -1);
+    mt_fail(el_option(EL_PRINT_LEVEL, 3) == -1);
     mt_fail(errno == EINVAL);
 }
 
@@ -216,13 +216,13 @@ static void options_opt_print_level(void)
 
 static void options_opt_colors(void)
 {
-    mt_fok(el_option(EL_OPT_COLORS, 0));
+    mt_fok(el_option(EL_COLORS, 0));
     mt_fail(g_options.colors == 0);
-    mt_fok(el_option(EL_OPT_COLORS, 1));
+    mt_fok(el_option(EL_COLORS, 1));
     mt_fail(g_options.colors == 1);
 
-    mt_ferr(el_option(EL_OPT_COLORS, 2), EINVAL);
-    mt_ferr(el_option(EL_OPT_COLORS, 3), EINVAL);
+    mt_ferr(el_option(EL_COLORS, 2), EINVAL);
+    mt_ferr(el_option(EL_COLORS, 3), EINVAL);
 }
 
 
@@ -236,13 +236,13 @@ static void options_opt_timestamp(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (i = EL_OPT_TS_OFF; i != EL_OPT_TS_ERROR; ++i)
+    for (i = EL_TS_OFF; i != EL_TS_ERROR; ++i)
     {
-        mt_fok(el_option(EL_OPT_TS, i));
+        mt_fok(el_option(EL_TS, i));
         mt_fail(g_options.timestamp == i);
     }
 
-    mt_ferr(el_option(EL_OPT_TS, i), EINVAL);
+    mt_ferr(el_option(EL_TS, i), EINVAL);
 }
 
 
@@ -256,13 +256,13 @@ static void options_opt_timestamp_timer(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (i = EL_OPT_TS_TM_CLOCK; i != EL_OPT_TS_TM_ERROR; ++i)
+    for (i = EL_TS_TM_CLOCK; i != EL_TS_TM_ERROR; ++i)
     {
-        mt_fok(el_option(EL_OPT_TS_TM, i));
+        mt_fok(el_option(EL_TS_TM, i));
         mt_fail(g_options.timestamp_timer == i);
     }
 
-    mt_ferr(el_option(EL_OPT_TS_TM, i), EINVAL);
+    mt_ferr(el_option(EL_TS_TM, i), EINVAL);
 }
 
 
@@ -276,8 +276,8 @@ static void options_ooption_test(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_ooption(&opts, EL_OPT_TS_TM, EL_OPT_TS_TM_MONOTONIC);
-    mt_fail(opts.timestamp_timer == EL_OPT_TS_TM_MONOTONIC);
+    el_ooption(&opts, EL_TS_TM, EL_TS_TM_MONOTONIC);
+    mt_fail(opts.timestamp_timer == EL_TS_TM_MONOTONIC);
 }
 
 
