@@ -13,6 +13,7 @@
 
    ========================================================================== */
 
+
 #include <rb.h>
 #include <string.h>
 #include <ctype.h>
@@ -43,7 +44,7 @@ struct log_message
     const char  *file;
     size_t       line;
     int          level;
-    const char   *msg;
+    const char  *msg;
 };
 
 
@@ -611,7 +612,7 @@ static void print_mix_of_everything(void)
 
 
     for (level = EL_FATAL;          level <= EL_DBG;              ++level)
-    for (timestamp = EL_TS_OFF; timestamp != EL_TS_ERROR; ++timestamp)
+    for (timestamp = EL_TS_OFF;     timestamp != EL_TS_ERROR;     ++timestamp)
     for (printlevel = 0;            printlevel <= 1;              ++printlevel)
     for (finfo = 0;                 finfo <= 1;                   ++finfo)
     for (colors = 0;                colors <= 1;                  ++colors)
