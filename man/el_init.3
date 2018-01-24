@@ -12,6 +12,23 @@
 .BI "int el_oinit(struct options *" options ")"
 .SH DESCRIPTION
 .PP
+There are two types of functions in
+.BR embedlog.
+Functions that use global static structure inside library, these functions don't
+accept
+.I options
+argument, and are not thread-safe.
+.PP
+Another type are functions that accept
+.I options
+argument. These functions are prefixed with
+.BR el_o .
+Options functions are thread-safe provided that threads are working on different
+.I options
+objects and
+.B \-\-enable\-reentrant
+is turned on.
+.PP
 .BR el_init (3)
 initializes static global option structure. This option structure is used by all
 functions that don't accept
@@ -24,7 +41,8 @@ this is the function you want to use.
 .BR el_oinit (3)
 initializes only
 .I options
-structure passed to it. Only after that functions that accepts
+structure passed to it.
+Functions that accepts
 .I options
 may be used.
 If you want to have multiple embedlog instances (ie. one for program logs,

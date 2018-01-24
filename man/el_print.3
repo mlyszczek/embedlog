@@ -4,6 +4,7 @@
 .BR el_print ,
 .BR el_vprint ,
 .BR el_puts ,
+.BR el_pmemory,
 .B el_perror
 - prints message to previously configured outputs.
 .SH SYNOPSIS
@@ -122,10 +123,20 @@ It is similar to
 function.
 .PP
 .BR el_pmemory (3)
-is designed to print memory location in a nice hex+ascii format that may look
-like this.
-In this example we print all ascii table, to present printing of printable and
-non-printable values.
+is designed to print memory location in a nice hex+ascii format.
+Function accepts pointer to
+.I memory
+and
+.I mlen
+number of bytes caller wants to print.
+Function doesn't care what is under passed address, memory block may contain
+strings with null characters '\\0', integers, floats or even
+.B struct
+objects.
+.PP
+Example output can look like this.
+We print all ascii table, to present printing of printable and non-printable
+values.
 .PP
 .EX
     ------  -----------------------------------------------  ----------------
