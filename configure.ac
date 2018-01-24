@@ -10,7 +10,8 @@ AC_CONFIG_FILES([Makefile \
                  include/Makefile \
                  tst/Makefile \
                  man/Makefile \
-                 examples/Makefile])
+                 examples/Makefile \
+                 www/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
