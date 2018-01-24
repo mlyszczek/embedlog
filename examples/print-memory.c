@@ -3,7 +3,7 @@
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ========================================================================== */
 
-#include <embedlog.h>
+#include "embedlog.h"
 
 int main(void)
 {
@@ -19,7 +19,7 @@ int main(void)
     }
 
     el_init();
-    el_option(EL_OPT_OUT, EL_OPT_OUT_STDERR);
+    el_option(EL_OUT, EL_OUT_STDERR);
 
     el_pmemory(ELI, ascii, sizeof(ascii));
     el_pmemory(ELI, s, sizeof(s));

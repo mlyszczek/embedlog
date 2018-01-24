@@ -3,7 +3,7 @@
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ========================================================================== */
 
-#include <embedlog.h>
+#include "embedlog.h"
 
 int main(void)
 {
@@ -18,7 +18,7 @@ int main(void)
      * will be printed to /dev/null
      */
 
-    el_option(EL_OPT_OUT, EL_OPT_OUT_STDERR);
+    el_option(EL_OUT, EL_OUT_STDERR);
 
     /*
      * now we can simply print messages like we would do it with ordinary
@@ -34,7 +34,7 @@ int main(void)
      * prints
      */
 
-    el_option(EL_OPT_LEVEL, EL_DBG);
+    el_option(EL_LEVEL, EL_DBG);
     el_print(ELD, "But now debug will be printed");
 
     /*
