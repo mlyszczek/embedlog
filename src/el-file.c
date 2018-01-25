@@ -273,9 +273,9 @@ int el_file_open
         /*
          * file rotation is enabled, in such case we need  to  find,  oldest
          * rotate file, as app could have  been  restarted,  and  we  surely
-         * don't want to overwrite the newest file.  Newest file has  suffix
-         * .0 while the oldest one has suffix  .${frotate_number}  (or  less
-         * if there is less files).
+         * don't want to overwrite the newest file.  Oldest file has  suffix
+         * .0 while the newest one has suffix  .${frotate_number}  (or  less
+         * if there are less files).
          */
 
         for (i = options->frotate_number - 1; i >= 0; --i)
@@ -307,6 +307,13 @@ int el_file_open
                 current_log[0] = '\0';
                 return -1;
             }
+
+            /*
+             *  position  returned  by  ftell  is  implementation   specific
+             * (stdio(3)), it can be either end or begin of  file.
+             */
+
+            fseek(f, 0, SEEK_END);
 
             if (i == 0)
             {
