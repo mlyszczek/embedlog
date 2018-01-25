@@ -112,7 +112,14 @@ static void perror_no_message(void)
 {
     errno = 1;
     el_perror(ELF, NULL);
-    mt_fok(strcmp(logbuf, "errno num: 1, strerror: Operation not permitted\n"));
+
+    /*
+     *  as  different  implementations  might  have  different  values   for
+     *  strerror(errno),  we  check  only  first  part   of   message   that
+     *  we are sure, will be printed.
+     */
+
+    mt_fok(strncmp(logbuf, "errno num: 1, strerror: ", 24));
 }
 
 
@@ -124,8 +131,8 @@ static void perror_user_message(void)
 {
     errno = 1;
     el_perror(ELF, "additional message");
-    mt_fok(strcmp(logbuf, "additional message\n"
-        "errno num: 1, strerror: Operation not permitted\n"));
+    mt_fok(strncmp(logbuf, "additional message\n"
+        "errno num: 1, strerror: ", 43));
 }
 
 
@@ -146,8 +153,8 @@ static void perror_custom_options_user_message(void)
 
     errno = 1;
     el_operror(ELF, &opts, "additional message");
-    mt_fok(strcmp(logbuf, "additional message\n"
-        "errno num: 1, strerror: Operation not permitted\n"));
+    mt_fok(strncmp(logbuf, "additional message\n"
+        "errno num: 1, strerror: ", 43));
 
 }
 
