@@ -16,7 +16,6 @@ test_CFLAGS = -I$(top_srcdir)/include \
 	-I$(top_srcdir)/src \
 	-I/usr/local/include \
 	-I/usr/include \
-	-O0 -g3 -ggdb \
 	$(COVERAGE_CFLAGS)
 
 test_LDFLAGS = -L/usr/local/lib \
