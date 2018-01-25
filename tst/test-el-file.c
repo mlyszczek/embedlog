@@ -14,13 +14,14 @@
    ========================================================================== */
 
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <limits.h>
+#include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "mtest.h"
 #include "embedlog.h"
@@ -234,7 +235,7 @@ static void file_unexpected_third_party_delete(void)
 
 static void file_filename_too_long(void)
 {
-    char  path[NAME_MAX + 1 + 1];
+    char  path[FILENAME_MAX + 1 + 1];
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -1030,7 +1031,7 @@ static void file_rotate_no_access_to_file(void)
 
 static void file_rotate_filename_too_long(void)
 {
-    char  path[NAME_MAX];
+    char  path[FILENAME_MAX + 1 + 1];
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
