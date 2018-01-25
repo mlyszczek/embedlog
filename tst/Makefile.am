@@ -25,4 +25,5 @@ test_LDFLAGS = -L/usr/local/lib \
 test_LDADD = -lrb
 
 TESTS = $(check_PROGRAMS)
-LOG_DRIVER = $(top_srcdir)/tap-driver
+LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
+	$(top_srcdir)/tap-driver.sh
