@@ -262,8 +262,7 @@ static int el_vooption
     #if ENABLE_OUT_CUSTOM
 
     case EL_CUSTOM_PUTS:
-        value_ptr = va_arg(ap, void (*)());
-        options->custom_puts = (el_custom_puts)value_ptr;
+        options->custom_puts = va_arg(ap, el_custom_puts);
         return 0;
 
     #endif /* ENABLE_OUT_CUSTOM */
