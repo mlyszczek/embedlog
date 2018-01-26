@@ -156,17 +156,68 @@ static void options_level_set(void)
 static void options_output(void)
 {
     int current_outputs;
+    int i;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     current_outputs = 0;
-    mt_fok(el_option(EL_OUT, EL_OUT_STDERR));
-    mt_fail(g_options.outputs == EL_OUT_STDERR);
 
-    mt_fok(el_option(EL_OUT, (EL_OUT_STDERR | EL_OUT_FILE)));
-    mt_fail(g_options.outputs == (EL_OUT_STDERR | EL_OUT_FILE));
+    for (i = 0; i != EL_OUT_ALL; ++i)
+    {
+        int ok = 1;
+
+#ifndef ENABLE_OUT_STDERR
+        if (i & EL_OUT_STDERR)
+        {
+            ok = 0;
+        }
+#endif
+
+#ifndef ENABLE_OUT_SYSLOG
+        if (i & EL_OUT_SYSLOG)
+        {
+            ok = 0;
+        }
+#endif
+
+#ifndef ENABLE_OUT_FILE
+        if (i & EL_OUT_FILE)
+        {
+            ok = 0;
+        }
+#endif
+
+#ifndef ENABLE_OUT_NET
+        if (i & EL_OUT_NET)
+        {
+            ok = 0;
+        }
+#endif
+
+#ifndef ENABLE_OUT_TTY
+        if (i & EL_OUT_TTY)
+        {
+            ok = 0;
+        }
+#endif
+
+#ifndef ENABLE_OUT_CUSTOM
+        if (i & EL_OUT_CUSTOM)
+        {
+            ok = 0;
+        }
+#endif
+
+        if (ok)
+        {
+            mt_fok(el_option(EL_OUT, i));
+            continue;
+        }
+
+        printf("i %02x\n", i);
+        mt_ferr(el_option(EL_OUT, i), ENODEV);
+    }
 
     mt_ferr(el_option(EL_OUT, EL_OUT_ALL + 7), EINVAL);
-    mt_fail(g_options.outputs == (EL_OUT_STDERR | EL_OUT_FILE));
 }
 
 
