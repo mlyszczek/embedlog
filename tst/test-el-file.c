@@ -14,6 +14,8 @@
    ========================================================================== */
 
 
+#include "config.h"
+
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -1097,6 +1099,7 @@ static void file_rotate_fail(void)
 
 void el_file_test_group(void)
 {
+#if ENABLE_OUT_FILE
     mkdir(WORKDIR, 0755);
 
     mt_run(file_print_without_init);
@@ -1153,4 +1156,5 @@ void el_file_test_group(void)
     mt_run(file_rotate_fail);
 
     rmdir(WORKDIR);
+#endif
 }
