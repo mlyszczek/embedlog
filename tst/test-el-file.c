@@ -45,7 +45,7 @@
    ========================================================================== */
 
 
-#define WORKDIR "/tmp/embedlog-tests"
+#define WORKDIR "./embedlog-tests"
 #define s9 "123456789"
 #define s8 "qwertyui"
 #define s5 "qwert"
