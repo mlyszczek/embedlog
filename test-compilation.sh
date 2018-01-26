@@ -6,8 +6,7 @@ options=(--disable-out-file \
          --disable-realtime \
          --disable-monotonic \
          --disable-finfo \
-         --disable-colors \
-         --disable-reentrant)
+         --disable-colors)
 
 iterations=$((2**${#options[@]} - 1))
 for i in `seq 0 1 $iterations`
@@ -53,5 +52,14 @@ do
         exit 1
     fi
 
+    echo -n "tests... "
+    tests_output=`make check 2>&1`
+
+    if [ $? -ne 0 ]
+    then
+        echo "failed"
+        echo "$tests_output"
+        exit 1
+    fi
     echo ""
 done
