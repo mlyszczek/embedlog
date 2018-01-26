@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS = include src tst man examples www
-EXTRA_DIST = tap-driver.sh man2html.sh
+EXTRA_DIST = man2html.sh
 
 www:
 	./gen-download-page.sh
