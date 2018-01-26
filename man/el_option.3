@@ -23,7 +23,7 @@ that can be configured.
 Value inside parenthesis determines argument types of variadic arguments
 .I ...
 .PP
-.BI "EL_LEVEL (" enum " " el_level "level)"
+.BI "EL_LEVEL (" enum " " el_level " level)"
 .RS
 .   B EL_LEVEL
 sets what the current logging level shall be.
@@ -85,10 +85,12 @@ Setting log level cannot fail
 .   RE
 .RE
 .PP
-.BI "EL_OUT (" enum " " el_output ")"
+.BI "EL_OUT (" enum " " el_output " outputs)"
 .RS
 .   B EL_OUT
-simply sets to what output(s) logs will be printed to with any of the printing
+simply sets to what
+.IR outputs .
+logs will be printed to with any of the printing
 function.
 User can enable as many outputs as he desires - it can be all inputs or even
 none (if one wants to surpress logging for some time).
@@ -98,7 +100,9 @@ operator (
 .   B |
 ).
 .   PP
-Currently following \fIoutputs\fR can be enabled.
+Currently following
+.I outputs
+can be enabled.
 .   PP
 .   B EL_OUT_STDERR
 .   RS
@@ -178,7 +182,7 @@ is not implemented on current system (support was not compiled into library)
 .   RE
 .RE
 .PP
-.BI "EL_COLORS (" int ")"
+.BI "EL_COLORS (" int " colors)"
 .RS
 If this is set to 1, output will be enriched with ANSI colors depending on the
 message severity.
@@ -196,9 +200,11 @@ Input argument is different than 1 or 0
 .   RE
 .RE
 .PP
-.BI "EL_TS (" enum " " el_option_timestamp ")"
+.BI "EL_TS (" enum " " el_option_timestamp " timestamp)"
 .RS
-Allows timestamp to be added to each log message. Possible values are:
+Allows timestamp to be added to each log message. Possible values for
+.I timestamp
+are:
 .   PP
 .   B EL_TS_OFF
 .   RS
@@ -231,9 +237,9 @@ Timestamp support was not compiled in and setting this options is disabled
 .   RE
 .RE
 .PP
-.BI "EL_TS_TM (" enum " " el_option_timestamp_timer ")"
+.BI "EL_TS_TM (" enum " " el_option_timestamp_timer " timer)"
 .RS
-Sets the clock source for the timestamp print.
+Sets the timer source for the timestamp print.
 .   PP
 .   B EL_TS_TM_CLOCK
 .   RS
@@ -297,12 +303,12 @@ Input argument is invalid
 .       PP
 .       B ENODEV
 .       RS
-Specified timer source was not compiled in and is no available
+Specified timer source was not compiled in and is not available
 .       RE
 .   RE
 .RE
 .PP
-.BI "EL_PRINT_LEVEL (" int ")"
+.BI "EL_PRINT_LEVEL (" int " print)"
 .RS
 If this is set to 1, each log will have log level information prefix in format
 "l/" where 'l' is first character of level message is printed with, for example:
@@ -335,7 +341,7 @@ Input argument is different than 1 or 0
 .   RE
 .RE
 .PP
-.BI "EL_FINFO (" int ")"
+.BI "EL_FINFO (" int " finfo)"
 .RS
 If set to 1, adds information about log location to each message in format
 [some_file.c:123]. Setting this to 0, will result in no file information at all
@@ -349,7 +355,9 @@ Input argument is different than 1 or 0
 .   RE
 .RE
 .PP
-.BI "EL_CUSTOM_PUTS (" int " "(*el_custom_puts)(const " " char " " *s) ")
+.B EL_CUSTOM_PUTS (
+.I int (*el_custom_puts)(const char *s)
+.B )
 .RS
 Sets function pointer for custom message print.
 Function will receive complete messsage to print, just as it would be printed to
@@ -359,9 +367,11 @@ It is still mandatory to enable custom printing with
 .   BR el_option (3)
 .RE
 .PP
-.BI "EL_FNAME (" const " " char " " * ")"
+.BI "EL_FNAME (" const " " char " " * "path)"
 .RS
-Sets the file name for the logs. Logs will be stored in this file. If file
+Sets the
+.I path
+for the logs. Logs will be stored in this file. If file
 rotation is enabled, a numer will be postfixed to each file. See
 .   B EL_FROTATE_NUMBER
 in this page for more details.
@@ -388,7 +398,7 @@ If function fails, file is not opened and any calls that logs to file will
 result in failure.
 .RE
 .PP
-.BI "EL_FROTATE_NUMBER (" long ")"
+.BI "EL_FROTATE_NUMBER (" long " number)"
 .RS
 If set to 0, file rotation will be disabled and logs will be printed into
 specified file without size limit.
@@ -430,9 +440,11 @@ Input parameter is less than 0
 .   RE
 .RE
 .PP
-.BI "EL_FROTATE_SIZE (" long ")"
+.BI "EL_FROTATE_SIZE (" long " size)"
 .RS
-This defines size at which files will be rotated.
+This defines
+.I size
+at which files will be rotated.
 If message being printed would overflow rotate size, current file will be closed
 and new one will be created, and current message will be stored in that new
 file.
