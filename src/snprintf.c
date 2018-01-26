@@ -278,6 +278,7 @@
  *   implementation, there may be other incompatibilities.
  */
 
+#include "config.h"
 
 /* ============================================= */
 /* NO USER SERVICABLE PARTS FOLLOWING THIS POINT */

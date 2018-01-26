@@ -23,7 +23,32 @@ AC_CONFIG_HEADERS([config.h])
 
 
 AC_CHECK_FUNCS([snprintf])
-AM_CONDITIONAL([CUSTOM_SNPRINTF], [test "x$ac_cv_func_snprintf" != "xyes"])
+AS_IF([test "x$ac_cv_func_snprintf" != "xyes"],
+[
+    ###
+    # system is missing snprintf, provide one from the library
+    #
+
+    AC_DEFINE([NEED_SNPRINTF_ONLY], [1], [Library uses only snprintf])
+])
+
+
+###
+# force portable snprintf (from library source tree) instead of provided one
+# by the system
+#
+# --enable-portable-snprintf
+#
+
+
+AC_ARG_ENABLE([portable-snprintf],
+    AS_HELP_STRING([--enable-portable-snprintf], [Use snprintf provided by library]),
+    [], [enable_portable_snprintf="no"])
+
+AS_IF([test "x$enable_portable_snprintf" = "xyes"],
+[
+    AC_DEFINE([PREFER_PORTABLE_SNPRINTF], [1], [Use snprintf provided by library])
+])
 
 
 ###
@@ -301,6 +326,7 @@ echo "print timestamp enabled..... : $enable_timestamp"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "print file info with log.... : $enable_finfo"
+echo "force portable snprintf......: $enable_portable_snprintf"
 echo "colorize output............. : $enable_colors"
 echo "reentrant functions......... : $enable_reentrant"
 echo "maximum file length......... : $EL_FLEN_MAX"

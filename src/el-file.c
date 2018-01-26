@@ -70,8 +70,8 @@
 
 #ifndef PATH_MAX
 /*
- * for systems that doesn't define PATH_MAX we use our MAX_PATH macro
- * that is define in config.h during ./configure process
+ * for systems that don't define PATH_MAX we use our MAX_PATH macro that  is
+ * defined in config.h during ./configure process
  */
 
 #define PATH_MAX MAX_PATH
@@ -309,8 +309,8 @@ int el_file_open
             }
 
             /*
-             *  position  returned  by  ftell  is  implementation   specific
-             * (stdio(3)), it can be either end or begin of  file.
+             * position returned by ftell is implementation specific it  can
+             * be either end or begin of file (check stdio(3))
              */
 
             fseek(f, 0, SEEK_END);
