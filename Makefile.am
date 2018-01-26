@@ -8,4 +8,7 @@ www:
 	./man2html.sh
 	make www -C www
 
+analyze:
+	make analyze -C src
+
 .PHONY: www

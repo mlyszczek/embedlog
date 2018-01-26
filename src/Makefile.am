@@ -9,3 +9,14 @@ libembedlog_la_SOURCES += config-priv.h \
 	valid.h
 libembedlog_la_LDFLAGS = -version-info 2:0:2
 libembedlog_la_CFLAGS = -I$(top_srcdir)/include
+
+# static code analyzer
+
+analyze_plists = $(embedlog_sources:%.c=%.plist)
+MOSTLYCLEANFILES = $(analyze_plists)
+
+$(analyze_plists): %.plist: %.c
+	@echo "  CCSA  " $@
+	@clang --analyze -I.. $< -o $@
+
+analyze: $(analyze_plists)
