@@ -267,6 +267,7 @@ static void options_opt_print_level(void)
 
 static void options_opt_colors(void)
 {
+#if ENABLE_COLORS
     mt_fok(el_option(EL_COLORS, 0));
     mt_fail(g_options.colors == 0);
     mt_fok(el_option(EL_COLORS, 1));
@@ -274,6 +275,12 @@ static void options_opt_colors(void)
 
     mt_ferr(el_option(EL_COLORS, 2), EINVAL);
     mt_ferr(el_option(EL_COLORS, 3), EINVAL);
+#else
+    mt_ferr(el_option(EL_COLORS, 0), ENOSYS);
+    mt_ferr(el_option(EL_COLORS, 1), ENOSYS);
+    mt_ferr(el_option(EL_COLORS, 2), ENOSYS);
+    mt_ferr(el_option(EL_COLORS, 3), ENOSYS);
+#endif
 }
 
 
