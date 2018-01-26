@@ -213,7 +213,6 @@ static void options_output(void)
             continue;
         }
 
-        printf("i %02x\n", i);
         mt_ferr(el_option(EL_OUT, i), ENODEV);
     }
 
