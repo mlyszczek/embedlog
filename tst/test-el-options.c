@@ -318,6 +318,22 @@ static void options_opt_timestamp_timer(void)
     for (i = EL_TS_TM_CLOCK; i != EL_TS_TM_ERROR; ++i)
     {
 #if ENABLE_TIMESTAMP
+#   ifndef ENABLE_REALTIME
+        if (i == EL_TS_TM_REALTIME)
+        {
+            mt_ferr(el_option(EL_TS_TM, i), ENODEV);
+            continue;
+        }
+#   endif
+
+#   ifndef ENABLE_MONOTONIC
+        if (i == EL_TS_TM_MONOTONIC)
+        {
+            mt_ferr(el_option(EL_TS_TM, i), ENODEV);
+            continue;
+        }
+#   endif
+
         mt_fok(el_option(EL_TS_TM, i));
         mt_fail(g_options.timestamp_timer == i);
 #else
@@ -344,10 +360,10 @@ static void options_ooption_test(void)
 
 
 #if ENABLE_TIMESTAMP
-    el_ooption(&opts, EL_TS_TM, EL_TS_TM_MONOTONIC);
-    mt_fail(opts.timestamp_timer == EL_TS_TM_MONOTONIC);
+    el_ooption(&opts, EL_TS_TM, EL_TS_TM_CLOCK);
+    mt_fail(opts.timestamp_timer == EL_TS_TM_CLOCK);
 #else
-    mt_ferr(el_ooption(&opts, EL_TS_TM, EL_TS_TM_MONOTONIC), ENOSYS);
+    mt_ferr(el_ooption(&opts, EL_TS_TM, EL_TS_TM_CLOCK), ENOSYS);
 #endif
 }
 

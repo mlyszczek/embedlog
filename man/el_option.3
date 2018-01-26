@@ -223,6 +223,11 @@ Long timestamp will be added to log in format
 .       RS
 Input argument is invalid
 .       RE
+.       PP
+.       B ENOSYS
+.       RS
+Timestamp support was not compiled in and setting this options is disabled
+.       RE
 .   RE
 .RE
 .PP
@@ -288,6 +293,11 @@ or NTP)
 .       B EINVAL
 .       RS
 Input argument is invalid
+.       RE
+.       PP
+.       B ENODEV
+.       RS
+Specified timer source was not compiled in and is no available
 .       RE
 .   RE
 .RE

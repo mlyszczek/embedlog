@@ -200,6 +200,14 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_TM_ERROR);
 
+#ifndef ENABLE_REALTIME
+        VALID(ENODEV, value_int != EL_TS_TM_REALTIME);
+#endif
+
+#ifndef ENABLE_MONOTONIC
+        VALID(ENODEV, value_int != EL_TS_TM_MONOTONIC);
+#endif
+
         options->timestamp_timer = value_int;
         return 0;
 
