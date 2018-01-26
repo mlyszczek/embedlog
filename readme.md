@@ -113,6 +113,77 @@ $ cd examples
 $ make
 ~~~
 
+Build time options
+==================
+
+Many features can be disabled to save space and ram. While this may not be
+neccessary to change on big operating systems such as **linux** or **freebsd**,
+it may come in handy when compiling for very small embedded systems. All options
+are passed to configure script in common way **./configure --enable-_feature_**.
+Run **./configure --help** to see help on that matter. For all **--enable**
+options it is also valid to pass **--disable**. All enabled options can be later
+disabled in runtime.
+
+--enable-out-stderr (default: enable)
+-------------------------------------
+
+When set, library will be able to print logs to standard error output. Nothing
+fancy.
+
+--enable-out-file (default: enable)
+-----------------------------------
+
+Allows to configure logger to print logs to file. Optional file rotation can be
+enabled. Number of rotation files and maximum size of rotation log file can be
+defined in runtime
+
+--enable-out-custom (default: enable)
+-------------------------------------
+
+Allows to pas own function which will receive fully constructed message to print
+as **const char \***. Usefull when there is no output facility that suits your
+needs.
+
+--enable-timestamp
+------------------
+
+When enabled, logger will be able to add timestamp to every message. Timestamp
+can be in short or long format and timer source can be configured. Check out
+[man page](http://embedlog.kurwinet.pl/manuals/el_option.3.html) to read more
+about it.
+
+--enable-realtime, --enable-monotonic (default: enable)
+-------------------------------------------------------
+
+Allows to use better precision timers - **CLOCK_REALTIME** and
+**CLOCK_MONOTONIC** but requires **POSIX**
+
+
+--enable-finfo (default: enable)
+--------------------------------
+
+When enabled, information about line and file name from where log originated
+will be added to each message.
+
+--enable-colors (default: enable)
+---------------------------------
+
+If enabled, output logs can be colored depending on their level. Good for
+quick error spotting.
+
+--enable-reentrant (default: enable)
+------------------------------------
+
+Uses reentrant functions where possible. Not available on every platform, but
+if enabled, provides thread-safety on line level - that means, lines won't
+overlap with another thread
+
+--enable-portable-snprintf (default: disable)
+---------------------------------------------
+
+When enabled, library will use internal implementation of **snprintf** even if
+**snprintf** is provided by the operating system.
+
 Contact
 =======
 

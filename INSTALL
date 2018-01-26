@@ -1,4 +1,4 @@
-$ autoreconf -i (if ./configure doesn't exist)
+$ ./autogen.sh (if ./configure doesn't exist)
 $ ./configure
 $ make
 # make install
