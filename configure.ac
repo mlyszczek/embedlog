@@ -278,6 +278,17 @@ AC_DEFINE_UNQUOTED([MAX_PATH], [$MAX_PATH],
     [Maximum length of path to open when printing to file])
 
 
+###
+# --enable-analyzer
+#
+
+
+AC_ARG_ENABLE([analyzer],
+    AS_HELP_STRING([--enable-analyzer], [Enable static code analyzer]),
+    [enable_analyzer="yes"], [enable_analyzer="no"])
+AM_CONDITIONAL([ENABLE_ANALYZER], [test "x$enable_analyzer" = "xyes"])
+
+
 AC_OUTPUT
 
 

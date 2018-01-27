@@ -12,6 +12,8 @@ libembedlog_la_CFLAGS = -I$(top_srcdir)/include
 
 # static code analyzer
 
+if ENABLE_ANALYZER
+
 analyze_plists = $(embedlog_sources:%.c=%.plist)
 MOSTLYCLEANFILES = $(analyze_plists)
 
@@ -20,3 +22,5 @@ $(analyze_plists): %.plist: %.c
 	@clang --analyze -I.. $< -o $@
 
 analyze: $(analyze_plists)
+
+endif
