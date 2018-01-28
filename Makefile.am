@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS = include src tst man examples www
-EXTRA_DIST = man2html.sh gen-download-page.sh
+EXTRA_DIST = man2html.sh gen-download-page.sh readme.md
 
 www:
 	./gen-download-page.sh
