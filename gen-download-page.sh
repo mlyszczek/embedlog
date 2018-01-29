@@ -24,5 +24,5 @@ echo "<h2>tarballs</h2>"
 echo "<pre>"
 
 # convert links to absolute
-echo "${links}" | sed "s:a href=\":a href=\"${remote_sed}/:"
+echo "${links}" | sed "s!a href=\"!a href=\"${remote}/!"
 echo "</pre>"
