@@ -57,6 +57,7 @@
 
 #include <errno.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -164,7 +165,7 @@ static size_t el_color
 
 static void el_ts_clock
 (
-    long     *s,   /* seconds will be stored here */
+    time_t   *s,   /* seconds will be stored here */
     long     *us   /* microseconds will be stored here */
 )
 {
@@ -186,8 +187,8 @@ static void el_ts_clock
 
 static void el_ts_time
 (
-    long *s,  /* seconds will be stored here */
-    long *us  /* microseconds will be stored here */
+    time_t  *s,  /* seconds will be stored here */
+    long    *us  /* microseconds will be stored here */
 )
 {
     *s = (long)time(NULL);
@@ -204,7 +205,7 @@ static void el_ts_time
 
 static void el_ts_clock_gettime
 (
-    long           *s,     /* seconds will be stored here */
+    time_t         *s,     /* seconds will be stored here */
     long           *us,    /* microseconds will be stored here */
     clockid_t       clkid  /* clock id */
 )
@@ -238,7 +239,7 @@ static size_t el_timestamp
 )
 {
 #if ENABLE_TIMESTAMP
-    long             s;        /* timestamp seconds */
+    time_t           s;        /* timestamp seconds */
     long             us;       /* timestamp microseconds */
     size_t           tl;       /* timestamp length */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -301,17 +302,20 @@ static size_t el_timestamp
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     #if ENABLE_REENTRANT
-        gmtime_r((const time_t *)&s, &tm);
-        tmp = &tm;
+        tmp = gmtime_r(&s, &tm);
     #else
-        tmp = gmtime((const time_t *)&s);
+        tmp = gmtime(&s);
     #endif
 
         tl = strftime(buf, 21, "[%Y-%m-%d %H:%M:%S", tmp);
     }
     else
     {
-        tl = sprintf(buf, "[%ld", s);
+        intmax_t  sec;  /* seconds in well known format */
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        sec = (intmax_t)s;
+        tl = sprintf(buf, "[%jd", s);
     }
 
     tl += sprintf(buf + tl, ".%06ld]", us);
