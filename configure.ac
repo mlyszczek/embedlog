@@ -4,7 +4,6 @@ AC_LANG([C])
 AC_PROG_CC
 AC_PROG_CC_C89
 AC_PROG_LIBTOOL
-AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([Makefile \
                  src/Makefile \
