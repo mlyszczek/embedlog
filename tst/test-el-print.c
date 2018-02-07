@@ -242,7 +242,7 @@ static int print_check(void)
 
         if (g_options.finfo && expected.file != NULL && expected.line != 0)
         {
-            char  expected_file[FILENAME_MAX + 1];
+            char  expected_file[8192];
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 

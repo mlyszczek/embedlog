@@ -237,7 +237,7 @@ static void file_unexpected_third_party_delete(void)
 
 static void file_filename_too_long(void)
 {
-    char  path[FILENAME_MAX + 1 + 1];
+    char  path[8192];
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -1033,7 +1033,7 @@ static void file_rotate_no_access_to_file(void)
 
 static void file_rotate_filename_too_long(void)
 {
-    char  path[FILENAME_MAX + 1 + 1];
+    char  path[8192];
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
