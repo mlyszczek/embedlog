@@ -311,11 +311,17 @@ static size_t el_timestamp
     }
     else
     {
-        intmax_t  sec;  /* seconds in well known format */
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        sec = (intmax_t)s;
-        tl = sprintf(buf, "[%jd", sec);
+#ifdef LLONG_MAX
+        tl = sprintf(buf, "[%lld", (long long)s);
+#else
+        /*
+         * if long long is not available, code may be suscible to 2038  bug.
+         * If you are sure your compiler does support long  long  type,  but
+         * doesn't define LLONG_MAX, define this value  yourself  to  enable
+         * long long.
+         */
+        tl = sprintf(buf, "[%ld", (long)s);
+#endif
     }
 
     tl += sprintf(buf + tl, ".%06ld]", us);
