@@ -315,7 +315,7 @@ static size_t el_timestamp
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         sec = (intmax_t)s;
-        tl = sprintf(buf, "[%jd", s);
+        tl = sprintf(buf, "[%jd", sec);
     }
 
     tl += sprintf(buf + tl, ".%06ld]", us);
