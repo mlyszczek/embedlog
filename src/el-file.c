@@ -38,8 +38,10 @@
 
    ========================================================================== */
 
-
+#if HAVE_CONFIG_H
 #include "config.h"
+#endif
+
 #include "el-options.h"
 
 #if HAVE_UNISTD_H

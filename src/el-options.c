@@ -35,7 +35,9 @@
    ========================================================================== */
 
 
+#if HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include "el-file.h"
 #include "el-options.h"
