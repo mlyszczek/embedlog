@@ -11,7 +11,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#if NOFINFO
+#ifdef NOFINFO
 #   define ELF NULL, 0, EL_FATAL
 #   define ELA NULL, 0, EL_ALERT
 #   define ELC NULL, 0, EL_CRIT
@@ -32,7 +32,7 @@
 #endif
 
 #if (__STDC_VERSION__ >= 199901L)
-#   if NDEBUG
+#   ifdef NDEBUG
 #       define EL_DEBUG(...) ((void)0)
 #   else
 #       define EL_DEBUG(...) el_print(ELD, __VA_ARGS__)
