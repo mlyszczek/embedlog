@@ -147,7 +147,6 @@ static int el_vooption
     int          value_int;       /* ap value treated as integer */
     long         value_long;      /* ap value treated as long */
     const char  *value_str;       /* ap value treated as string */
-    void       (*value_ptr)();    /* ap value threated as function pointer */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
