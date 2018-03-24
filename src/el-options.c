@@ -285,6 +285,10 @@ static int el_vooption
         errno = ENOSYS;
         return -1;
     }
+
+    (void)value_str;
+    (void)value_int;
+    (void)value_long;
 }
 
 
