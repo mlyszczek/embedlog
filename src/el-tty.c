@@ -19,6 +19,8 @@
 #endif
 
 #include "el-options.h"
+#include "el-tty.h"
+#include "valid.h"
 
 #include <termios.h>
 #include <unistd.h>
@@ -68,7 +70,7 @@ int el_tty_open
      * socket first
      */
 
-    el_tty_close(options->serial_fd)
+    el_tty_close(options);
 
     if ((sfd = open(dev, O_WRONLY | O_NOCTTY | O_SYNC)) < 0)
     {

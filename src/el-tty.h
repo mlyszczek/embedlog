@@ -11,6 +11,6 @@
 
 int el_tty_open(struct el_options *, const char *, speed_t);
 int el_tty_puts(struct el_options *, const char *);
-void el_tty_close(struct el_options *);
+int el_tty_close(struct el_options *);
 
 #endif
