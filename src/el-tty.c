@@ -62,6 +62,14 @@ int el_tty_open
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+    /*
+     * it is possible to reopen serial device (like changing output device
+     * with EL_TTY_DEV again) during runtime, so we need to close previous
+     * socket first
+     */
+
+    el_tty_close(options->serial_fd)
+
     if ((sfd = open(dev, O_WRONLY | O_NOCTTY | O_SYNC)) < 0)
     {
         return -1;
@@ -84,7 +92,7 @@ int el_tty_open
 
     tty.c_cflag |= CLOCAL;  /* ignore modem lines */
     tty.c_cflag &= ~CREAD;  /* disable receiver - we only send data */
-    tty.c_oflag |= OPOST;   /* enable output post-processing by OS */
+    tty.c_oflag |= OPOST | ONLCR;   /* enable output post-processing by OS */
 
     if (tcsetattr(sfd, TCSANOW, &tty) != 0)
     {
@@ -112,6 +120,8 @@ int el_tty_close
     struct el_options  *options  /* options object with serial descriptor */
 )
 {
+    VALID(EINVAL, options->serial_fd != -1);
+
     close(options->serial_fd);
     options->serial_fd = -1;
     return 0;
