@@ -2,6 +2,7 @@
 
 options=(--disable-out-file \
          --disable-out-stderr \
+         --disable-out-tty \
          --disable-timestamp \
          --disable-realtime \
          --disable-monotonic \
