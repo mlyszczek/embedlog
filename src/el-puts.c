@@ -37,13 +37,16 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "el-file.h"
 #include "el-options.h"
 #include "embedlog.h"
 #include "valid.h"
 
+#if ENABLE_OUT_FILE
+#include "el-file.h"
+#endif
+
 #if ENABLE_OUT_TTY
-#   include "el-tty.h"
+#include "el-tty.h"
 #endif
 
 /* ==========================================================================

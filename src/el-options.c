@@ -39,13 +39,16 @@
 #include "config.h"
 #endif
 
-#include "el-file.h"
 #include "el-options.h"
 #include "embedlog.h"
 #include "valid.h"
 
 #include <errno.h>
 #include <string.h>
+
+#if ENABLE_OUT_FILE
+#include "el-file.h"
+#endif
 
 #if ENABLE_OUT_TTY
 #include "el-tty.h"
