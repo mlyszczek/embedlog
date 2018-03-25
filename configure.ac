@@ -103,6 +103,24 @@ AS_IF([test "x$enable_out_file" = "xyes"],
 
 
 ###
+# --enable-out-tty
+#
+
+
+AC_ARG_ENABLE([out-tty],
+    AS_HELP_STRING([--enable-out-tty], [Enable printing to tty]),
+    [], [enable_out_tty="yes"])
+
+AM_CONDITIONAL([ENABLE_OUT_TTY], [test "x$enable_out_tty" = "xyes"])
+AS_IF([test "x$enable_out_tty" = "xyes"],
+[
+    AC_DEFINE([ENABLE_OUT_TTY], [1], [Enable printing to tty])
+    AC_CHECK_FUNCS([open tcgetattr cfsetispeed tcsetattr close],,
+        AC_MSG_ERROR(not found, needed by --enable-out-tty))
+])
+
+
+###
 # --enable-out-custom
 #
 
@@ -296,6 +314,7 @@ echo "embedlog compilation configuration summary"
 echo
 echo "print to stderr............. : $enable_out_stderr"
 echo "print to file............... : $enable_out_file"
+echo "print to tty................ : $enable_out_tty"
 echo "print to custom routine..... : $enable_out_custom"
 echo "print timestamp enabled..... : $enable_timestamp"
 echo "clock_realtime timestamp.... : $enable_realtime"

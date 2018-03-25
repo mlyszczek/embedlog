@@ -41,6 +41,9 @@
 #include "embedlog.h"
 #include "el-options.h"
 
+#if ENABLE_OUT_TTY
+#   include <el-tty.h>
+#endif
 
 /* ==========================================================================
                                         __     __ _
@@ -126,10 +129,12 @@ int el_oputs
     {
         el_puts_net(s);
     }
+#endif
 
+#if ENABLE_OUT_TTY
     if (options->outputs & EL_OUT_TTY)
     {
-        el_puts_tty(s);
+        el_tty_puts(options, s);
     }
 #endif
 

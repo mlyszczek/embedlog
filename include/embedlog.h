@@ -73,6 +73,7 @@ enum el_option
     EL_PRINT_LEVEL,
     EL_FINFO,
     EL_CUSTOM_PUTS,
+    EL_TTY_DEV,
 
     EL_FNAME,
     EL_FROTATE_NUMBER,
@@ -111,6 +112,7 @@ struct el_options
     int             timestamp_timer;
     int             print_log_level;
 
+    int             serial_fd;
     int             finfo;
     int             frotate_number;
     int             fcurrent_rotate;
