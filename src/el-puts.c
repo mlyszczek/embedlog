@@ -38,8 +38,9 @@
 #include <stdio.h>
 
 #include "el-file.h"
-#include "embedlog.h"
 #include "el-options.h"
+#include "embedlog.h"
+#include "valid.h"
 
 #if ENABLE_OUT_TTY
 #   include "el-tty.h"
@@ -90,18 +91,11 @@ int el_oputs
     int                 rv;        /* return value from function */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+    VALID(EINVAL, options);
+    VALID(EINVAL, s);
+    VALID(ENODEV, options->outputs != 0);
 
     rv = 0;
-
-    if (options->outputs == 0)
-    {
-        /*
-         * all outputs are disabled, no place to print
-         */
-
-        errno = ENODEV;
-        return -1;
-    }
 
 #if ENABLE_OUT_STDERR
     if (options->outputs & EL_OUT_STDERR)
