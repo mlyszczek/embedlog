@@ -42,7 +42,7 @@
 #include "el-options.h"
 
 #if ENABLE_OUT_TTY
-#   include <el-tty.h>
+#   include "el-tty.h"
 #endif
 
 /* ==========================================================================

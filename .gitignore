@@ -26,6 +26,7 @@ examples/print_memory
 examples/print_options
 examples/print_simple
 examples/print_to_file
+examples/print_tty
 install-sh
 libtool
 ltmain.sh
