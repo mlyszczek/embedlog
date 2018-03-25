@@ -8,7 +8,6 @@
 #define EL_OPTIONS_H 1
 
 
-#include "config.h"
 #include "embedlog.h"
 
 

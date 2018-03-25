@@ -30,14 +30,24 @@
 
    ========================================================================== */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <errno.h>
 #include <stdio.h>
 
-#include "el-file.h"
-#include "embedlog.h"
 #include "el-options.h"
+#include "embedlog.h"
+#include "valid.h"
 
+#if ENABLE_OUT_FILE
+#include "el-file.h"
+#endif
+
+#if ENABLE_OUT_TTY
+#include "el-tty.h"
+#endif
 
 /* ==========================================================================
                                         __     __ _
@@ -84,18 +94,11 @@ int el_oputs
     int                 rv;        /* return value from function */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+    VALID(EINVAL, options);
+    VALID(EINVAL, s);
+    VALID(ENODEV, options->outputs != 0);
 
     rv = 0;
-
-    if (options->outputs == 0)
-    {
-        /*
-         * all outputs are disabled, no place to print
-         */
-
-        errno = ENODEV;
-        return -1;
-    }
 
 #if ENABLE_OUT_STDERR
     if (options->outputs & EL_OUT_STDERR)
@@ -123,10 +126,12 @@ int el_oputs
     {
         el_puts_net(s);
     }
+#endif
 
+#if ENABLE_OUT_TTY
     if (options->outputs & EL_OUT_TTY)
     {
-        el_puts_tty(s);
+        el_tty_puts(options, s);
     }
 #endif
 

@@ -35,9 +35,10 @@
    ========================================================================== */
 
 
+#if HAVE_CONFIG_H
 #include "config.h"
+#endif
 
-#include "el-file.h"
 #include "el-options.h"
 #include "embedlog.h"
 #include "valid.h"
@@ -45,6 +46,13 @@
 #include <errno.h>
 #include <string.h>
 
+#if ENABLE_OUT_FILE
+#include "el-file.h"
+#endif
+
+#if ENABLE_OUT_TTY
+#include "el-tty.h"
+#endif
 
 /* ==========================================================================
                                __        __            __
@@ -145,7 +153,6 @@ static int el_vooption
     int          value_int;       /* ap value treated as integer */
     long         value_long;      /* ap value treated as long */
     const char  *value_str;       /* ap value treated as string */
-    void       (*value_ptr)();    /* ap value threated as function pointer */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -267,6 +274,22 @@ static int el_vooption
 
     #endif  /* ENABLE_OUT_FILE */
 
+    #if ENABLE_OUT_TTY
+
+    case EL_TTY_DEV:
+    {
+        speed_t speed;
+
+        value_str = va_arg(ap, const char *);  /* serial tty to open */
+        speed = va_arg(ap, speed_t);
+
+        VALID(EINVAL, value_str);
+
+        return el_tty_open(options, value_str, speed);
+    }
+
+    #endif /* ENABLE_OUT_TTY */
+
     #if ENABLE_OUT_CUSTOM
 
     case EL_CUSTOM_PUTS:
@@ -284,6 +307,10 @@ static int el_vooption
         errno = ENOSYS;
         return -1;
     }
+
+    (void)value_str;
+    (void)value_int;
+    (void)value_long;
 }
 
 
@@ -335,6 +362,7 @@ int el_oinit
     memset(options, 0, sizeof(struct el_options));
     options->print_log_level = 1;
     options->level = EL_INFO;
+    options->serial_fd = -1;
     return 0;
 }
 
@@ -372,6 +400,13 @@ int el_ocleanup
     g_options.outputs = 0;
 #if ENABLE_OUT_FILE
     el_file_cleanup(options);
+#endif
+
+#if ENABLE_OUT_TTY
+    if (options->serial_fd != -1)
+    {
+        el_tty_close(options);
+    }
 #endif
 
     return 0;

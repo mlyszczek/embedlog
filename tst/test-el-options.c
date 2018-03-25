@@ -100,6 +100,7 @@ static void options_init(void)
     default_options.timestamp_timer = EL_TS_TM_CLOCK;
     default_options.print_log_level = 1;
     default_options.custom_puts     = NULL;
+    default_options.serial_fd       = -1;
 
     default_options.finfo           = 0;
     default_options.frotate_number  = 0;

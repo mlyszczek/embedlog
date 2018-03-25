@@ -8,3 +8,7 @@ embedlog_sources = el-options.c \
 if ENABLE_OUT_FILE
 embedlog_sources += el-file.c
 endif
+
+if ENABLE_OUT_TTY
+embedlog_sources += el-tty.c
+endif

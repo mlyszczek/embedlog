@@ -137,7 +137,9 @@ server.
 .   PP
 .   B EL_OUT_TTY
 .   RS
-Prints messages directly to configured serial console
+Prints messages directly to configured serial console.
+Apart from setting this, user should also configure device and speed with
+.   BR EL_TTY_DEV .
 .   RE
 .   PP
 .   B EL_OUT_ALL
@@ -462,7 +464,33 @@ Value is less than 1
 .       RE
 .   RE
 .RE
-.SH RETURN VALUE
+.PP
+.BI "EL_TTY_DEV (" const\ char\ * "dev, " speed_t " speed)"
+.RS
+Tells
+.I embedlog
+to use
+.I dev
+serial device configured to
+.IR speed .
+Serial device will also be configured to transmit in 8 bits of data, without
+parity and one stop bit (8N1).
+Logger uses only transmit pin (TX) and will translate all
+.B LF
+into
+.BR CR-LF .
+.   PP
+.   B ERRORS
+.   RS
+Function can return errors from
+.   BR open ,
+.   BR tcgetattr ,
+.   B cfsetispeed
+and
+.   BR tcsetattr .
+.   SH RETURN VALUE
+.   RE
+.RE
 .PP
 On success 0 is returned. -1 is returned when any error occured.
 .SH ERRORS
