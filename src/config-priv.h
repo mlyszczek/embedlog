@@ -82,9 +82,9 @@
 
 
 #if ENABLE_TIMESTAMP
-    #define EL_PRE_TS_LONG_LEN 28
+#   define EL_PRE_TS_LONG_LEN 28
 #else
-    #define EL_PRE_TS_LONG_LEN 0
+#   define EL_PRE_TS_LONG_LEN 0
 #endif
 
 
@@ -124,9 +124,9 @@
 
 
 #if ENABLE_FINFO
-    #define EL_PRE_FINFO_LEN ((EL_FLEN_MAX) + 3 + EL_PRE_FINFO_LINE_MAX_LEN)
+#   define EL_PRE_FINFO_LEN ((EL_FLEN_MAX) + 3 + EL_PRE_FINFO_LINE_MAX_LEN)
 #else
-    #define EL_PRE_FINFO_LEN 0
+#   define EL_PRE_FINFO_LEN 0
 #endif
 
 
@@ -159,9 +159,9 @@
 
 
 #if ENABLE_COLORS
-    #define EL_COLORS_LEN (5 + 4)
+#   define EL_COLORS_LEN (5 + 4)
 #else
-    #define EL_COLORS_LEN 0
+#   define EL_COLORS_LEN 0
 #endif
 
 

@@ -179,7 +179,7 @@ static int el_vooption
         options->print_log_level = value_int;
         return 0;
 
-    #if ENABLE_COLORS
+#   if ENABLE_COLORS
 
     case EL_COLORS:
         /*
@@ -192,9 +192,9 @@ static int el_vooption
         options->colors = value_int;
         return 0;
 
-    #endif /* ENABLE_COLORS */
+#   endif /* ENABLE_COLORS */
 
-    #if ENABLE_TIMESTAMP
+#   if ENABLE_TIMESTAMP
 
     case EL_TS:
         value_int = va_arg(ap, int);
@@ -207,24 +207,24 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_TM_ERROR);
 
-#ifndef ENABLE_REALTIME
+#   if ENABLE_REALTIME == 0
         VALID(ENODEV, value_int != EL_TS_TM_REALTIME);
-#endif
+#   endif
 
-#ifndef ENABLE_MONOTONIC
+#   if ENABLE_MONOTONIC == 0
         VALID(ENODEV, value_int != EL_TS_TM_MONOTONIC);
-#endif
+#   endif
 
-    #if ENABLE_CLOCK == 0
+#   if ENABLE_CLOCK == 0
         VALID(ENODEV, value_int != EL_TS_TM_CLOCK);
-    #endif
+#   endif
 
         options->timestamp_timer = value_int;
         return 0;
 
-    #endif /* ENABLE_TIMESTAMP */
+#   endif /* ENABLE_TIMESTAMP */
 
-    #if ENABLE_FINFO
+#   if ENABLE_FINFO
 
     case EL_FINFO:
         value_int = va_arg(ap, int);
@@ -233,9 +233,9 @@ static int el_vooption
         options->finfo = value_int;
         return 0;
 
-    #endif /* ENABLE_FINFO */
+#   endif /* ENABLE_FINFO */
 
-    #if ENABLE_OUT_FILE
+#   if ENABLE_OUT_FILE
 
     case EL_FNAME:
         value_str = va_arg(ap, const char *);
@@ -276,9 +276,9 @@ static int el_vooption
         options->frotate_size = value_long;
         return 0;
 
-    #endif  /* ENABLE_OUT_FILE */
+#   endif  /* ENABLE_OUT_FILE */
 
-    #if ENABLE_OUT_TTY
+#   if ENABLE_OUT_TTY
 
     case EL_TTY_DEV:
     {
@@ -292,15 +292,15 @@ static int el_vooption
         return el_tty_open(options, value_str, speed);
     }
 
-    #endif /* ENABLE_OUT_TTY */
+#   endif /* ENABLE_OUT_TTY */
 
-    #if ENABLE_OUT_CUSTOM
+#   if ENABLE_OUT_CUSTOM
 
     case EL_CUSTOM_PUTS:
         options->custom_puts = va_arg(ap, el_custom_puts);
         return 0;
 
-    #endif /* ENABLE_OUT_CUSTOM */
+#   endif /* ENABLE_OUT_CUSTOM */
 
     default:
         /*
