@@ -107,10 +107,10 @@ int el_oputs
     }
 #endif
 
-#if 0 /* TODO */
+#if ENABLE_OUT_SYSLOG
     if (options->outputs & EL_OUT_SYSLOG)
     {
-        el_puts_syslog(s);
+        syslog(options->level, s);
     }
 #endif
 
@@ -131,7 +131,7 @@ int el_oputs
 #if ENABLE_OUT_TTY
     if (options->outputs & EL_OUT_TTY)
     {
-        el_tty_puts(options, s);
+        rv |= el_tty_puts(options, s);
     }
 #endif
 
