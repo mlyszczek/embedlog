@@ -60,7 +60,6 @@ int el_tty_open
 )
 {
     struct termios      tty;      /* serial port settings */
-    int                 sfd;      /* serial port file descriptor */
     int                 e;        /* holder for errno */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -132,6 +131,8 @@ error:
     return -1;
 
 #else
+    (void)tty;
+    (void)e;
     return 0;
 #endif
 }
