@@ -26,9 +26,10 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sys/types.h>
-#include <termios.h>
 #include <unistd.h>
-
+#if HAVE_TERMIOS_H
+#include <termios.h>
+#endif
 
 /* ==========================================================================
                                         __     __ _
@@ -72,12 +73,32 @@ int el_tty_open
 
     el_tty_close(options);
 
-    if ((sfd = open(dev, O_WRONLY | O_NOCTTY | O_SYNC)) < 0)
+    if ((options->serial_fd = open(dev, O_WRONLY | O_NOCTTY | O_SYNC)) < 0)
     {
         return -1;
     }
 
-    if (tcgetattr(sfd, &tty) != 0)
+#if HAVE_TERMIOS_H
+    /*
+     * if termios is not available, simply open device without reconfiguring
+     * it.  Some embedded OSes might configure tty  during  compilation  and
+     * have termios disabled to save memory.
+     */
+
+    if (speed == B0)
+    {
+        /*
+         * normally with B0 we should terminate  transmission,  it  is  used
+         * with modem lines, but since we do not use  modem  lines,  and  in
+         * logger terminating connection does not make  any  sense,  we  use
+         * this to tell embedlog *not* to change any settings but only  open
+         * serial
+         */
+
+        return 0;
+    }
+
+    if (tcgetattr(options->serial_fd, &tty) != 0)
     {
         goto error;
     }
@@ -96,19 +117,23 @@ int el_tty_open
     tty.c_cflag &= ~CREAD;  /* disable receiver - we only send data */
     tty.c_oflag |= OPOST | ONLCR;   /* enable output post-processing by OS */
 
-    if (tcsetattr(sfd, TCSANOW, &tty) != 0)
+    if (tcsetattr(options->serial_fd, TCSANOW, &tty) != 0)
     {
         goto error;
     }
 
-    options->serial_fd = sfd;
     return 0;
 
 error:
     e = errno;
-    close(sfd);
+    close(options->serial_fd);
+    options->serial_fd = -1;
     errno = e;
     return -1;
+
+#else
+    return 0;
+#endif
 }
 
 

@@ -479,6 +479,12 @@ Logger uses only transmit pin (TX) and will translate all
 .B LF
 into
 .BR CR-LF .
+If
+.I speed
+is configured to
+.BR B0,
+serial port settings will not be altered, library will simply open port and
+will happily work on current serial settings.
 .   PP
 .   B ERRORS
 .   RS
