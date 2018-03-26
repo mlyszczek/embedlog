@@ -93,8 +93,8 @@ enum el_option_timestamp
 
 enum el_option_timestamp_timer
 {
-    EL_TS_TM_CLOCK,
     EL_TS_TM_TIME,
+    EL_TS_TM_CLOCK,
     EL_TS_TM_REALTIME,
     EL_TS_TM_MONOTONIC,
 

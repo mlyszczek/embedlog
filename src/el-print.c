@@ -165,6 +165,8 @@ static size_t el_color
 
 #if ENABLE_TIMESTAMP
 
+#if ENABLE_CLOCK
+
 static void el_ts_clock
 (
     time_t   *s,   /* seconds will be stored here */
@@ -181,6 +183,7 @@ static void el_ts_clock
     *us *= 1000000 / CLOCKS_PER_SEC;
 }
 
+#endif /* ENABLE_CLOCK */
 
 /* ==========================================================================
     returns seconds and microseconds calculated from time() function.
@@ -281,9 +284,13 @@ static size_t el_timestamp
         el_ts_time(&s, &us);
         break;
 
+#if ENABLE_CLOCK
+
     case EL_TS_TM_CLOCK:
         el_ts_clock(&s, &us);
         break;
+
+#endif
 
     default:
         /*

@@ -215,6 +215,10 @@ static int el_vooption
         VALID(ENODEV, value_int != EL_TS_TM_MONOTONIC);
 #endif
 
+    #if ENABLE_CLOCK == 0
+        VALID(ENODEV, value_int != EL_TS_TM_CLOCK);
+    #endif
+
         options->timestamp_timer = value_int;
         return 0;
 

@@ -97,7 +97,7 @@ static void options_init(void)
     default_options.level           = EL_INFO;
     default_options.colors          = 0;
     default_options.timestamp       = EL_TS_OFF;
-    default_options.timestamp_timer = EL_TS_TM_CLOCK;
+    default_options.timestamp_timer = EL_TS_TM_TIME;
     default_options.print_log_level = 1;
     default_options.custom_puts     = NULL;
     default_options.serial_fd       = -1;
@@ -341,6 +341,14 @@ static void options_opt_timestamp_timer(void)
         }
 #   endif
 
+#   if ENABLE_CLOCK == 0
+        if (i == EL_TS_TM_CLOCK)
+        {
+            mt_ferr(el_option(EL_TS_TM, i), ENODEV);
+            continue;
+        }
+#   endif
+
         mt_fok(el_option(EL_TS_TM, i));
         mt_fail(g_options.timestamp_timer == i);
 #else
@@ -367,10 +375,10 @@ static void options_ooption_test(void)
 
 
 #if ENABLE_TIMESTAMP
-    el_ooption(&opts, EL_TS_TM, EL_TS_TM_CLOCK);
-    mt_fail(opts.timestamp_timer == EL_TS_TM_CLOCK);
+    el_ooption(&opts, EL_TS_TM, EL_TS_TM_TIME);
+    mt_fail(opts.timestamp_timer == EL_TS_TM_TIME);
 #else
-    mt_ferr(el_ooption(&opts, EL_TS_TM, EL_TS_TM_CLOCK), ENOSYS);
+    mt_ferr(el_ooption(&opts, EL_TS_TM, EL_TS_TM_TIME), ENOSYS);
 #endif
 }
 
