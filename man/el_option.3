@@ -428,7 +428,7 @@ will be renamed to
 .   I log.2
 will be renamed to
 .   I log.1
-and so on.
+and so on).
 .   PP
 User can also pass 1 here, but if file reaches its size limit, it will be
 deleted and printing will continue from the empty file
@@ -461,6 +461,29 @@ such small value.
 .       B EINVAL
 .       RS
 Value is less than 1
+.       RE
+.   RE
+.RE
+.PP
+.BI "EL_FILE_SYNC_EVERY (" long " size)"
+.RS
+Simply writing data to file descriptor is not enough, metadata also has to be
+synced or you are facing data loose on unexpected power loose.
+Yes, data will be on block device, but entry to it in file system will not be
+updated, thus system will think file did not change.
+To prevent that one must sync data and metadata periodically.
+Data will be synced every
+.I size
+of bytes written.
+It basically translates to 'how much data am I ready to loose?'.
+Set this too high and you may loose a significant ammout of data on power lose.
+Set this too low and your performance goes out of the window.
+.   PP
+.   B ERRORS
+.   RS
+.       B EINVAL
+.       RS
+Value is less than 0
 .       RE
 .   RE
 .RE
