@@ -108,6 +108,7 @@ static void options_init(void)
     default_options.frotate_size    = 0;
     default_options.fpos            = 0;
     default_options.file            = NULL;
+    default_options.file_sync_every = 32768;
     default_options.fname           = NULL;
 
     mt_fail(el_oinit(&options) == 0);

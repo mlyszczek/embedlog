@@ -469,12 +469,76 @@ int el_file_puts
         return -1;
     }
 
-    if (fflush(options->file) != 0)
+    options->fpos += sl;
+    options->written_after_sync += sl;
+
+    if (options->written_after_sync >= options->file_sync_every)
     {
-        return -1;
+        /*
+         * file store operation has particular issue.  You can  like,  write
+         * hundreds of megabytes into disk and that data  indeed  will  land
+         * into your block device *but* metadata will not!  That is if power
+         * lose occurs (even after those hundreds of  megs),  file  metadata
+         * might not be updated and we will  lose  whole,  I  say  it  again
+         * *whole* file.  To prevent data lose on power down we try to  sync
+         * file and  its  metadata  to  block  device.   We  do  this  every
+         * configures "sync_every" field since syncing  every  single  write
+         * would simply kill performance - its up to user to decide how much
+         * data he is willing to lose.  It is also possible that altough  we
+         * sync our file  and  metadata,  parent  directory  might  not  get
+         * flushed and there will not be entry for our file -  meaning  file
+         * will be lost too, but such situations are ultra  rare  and  there
+         *  isn't  really  much  we  can  do  about  it  here  but   prying.
+         */
+
+#if HAVE_FSYNC && HAVE_FILENO
+        int fd;  /* systems file descriptor for options->file */
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#endif
+
+        /*
+         * first flush data from stdio library buffers into kernel
+         */
+
+        if (fflush(options->file) != 0)
+        {
+            return -1;
+        }
+
+#if HAVE_FSYNC && HAVE_FILENO
+        /*
+         * and then sync data into block device
+         */
+
+        if ((fd = fileno(options->file)) < 0)
+        {
+            return -1;
+        }
+
+        if (fsync(fd) != 0)
+        {
+            return -1;
+        }
+#else
+        /*
+         * if system does not implement fileno and fsync our only hope  lies
+         * int closing (which should sync file to  block  device)  and  then
+         * opening file again.  Yup, performance will  suck,  but  hey,  its
+         * about data safety!
+         */
+
+        fclose(options->file);
+
+        if ((options->file = fopen(current_log, "a")) == NULL)
+        {
+            errno = EBADF;
+            return -1;
+        }
+#endif
+
+        options->written_after_sync = 0;
     }
 
-    options->fpos += sl;
     return 0;
 }
 

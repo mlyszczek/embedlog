@@ -276,6 +276,12 @@ static int el_vooption
         options->frotate_size = value_long;
         return 0;
 
+    case EL_FILE_SYNC_EVERY:
+        value_long = va_arg(ap, long);
+        VALID(EINVAL, value_long >= 0);
+        options->file_sync_every = value_long;
+        return 0;
+
 #   endif  /* ENABLE_OUT_FILE */
 
 #   if ENABLE_OUT_TTY
@@ -367,6 +373,7 @@ int el_oinit
     options->print_log_level = 1;
     options->level = EL_INFO;
     options->serial_fd = -1;
+    options->file_sync_every = 32768;
     return 0;
 }
 

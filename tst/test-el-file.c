@@ -107,7 +107,7 @@ static void test_prepare(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FNAME, WORKDIR"/log");
-
+    el_option(EL_FILE_SYNC_EVERY, 0);
 }
 
 
@@ -191,6 +191,7 @@ static void file_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log", s9 s8));
@@ -211,6 +212,7 @@ static void file_reopen_different_file(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FNAME, WORKDIR"/log-another");
+    el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log", s9));
@@ -290,6 +292,7 @@ static void file_print_after_cleanup(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FILE_SYNC_EVERY, 0);
     el_cleanup();
     mt_ferr(el_puts("whatev"), ENODEV);
 }
@@ -305,6 +308,7 @@ static void file_print_without_setting_file(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
+    el_option(EL_FILE_SYNC_EVERY, 0);
     mt_ferr(el_puts("no file set"), EBADF);
     el_cleanup();
 }
@@ -394,6 +398,7 @@ static void file_rotate_1_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 1);
     el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s5 s8));
@@ -536,6 +541,7 @@ static void file_rotate_2_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 2);
     el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s9));
@@ -717,6 +723,7 @@ static void file_rotate_5_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 5);
     el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s9);
     el_puts(s8);

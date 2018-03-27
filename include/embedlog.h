@@ -78,6 +78,7 @@ enum el_option
     EL_FNAME,
     EL_FROTATE_NUMBER,
     EL_FROTATE_SIZE,
+    EL_FILE_SYNC_EVERY,
 
     EL_OPT_ERROR /* internal use only */
 };
@@ -117,6 +118,8 @@ struct el_options
     int             frotate_number;
     int             fcurrent_rotate;
     long            frotate_size;
+    long            file_sync_every;
+    long            written_after_sync;
     long            fpos;
     FILE           *file;
     const char     *fname;
