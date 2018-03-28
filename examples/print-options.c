@@ -54,5 +54,12 @@ int main(void)
     el_print(ELA, "glance into");
     el_print(ELF, "log file");
 
+    el_option(EL_PREFIX, "embedlog: ");
+    el_print(ELI, "you can also use prefixes");
+    el_print(ELI, "to every message you send");
+
+    el_option(EL_PREFIX, NULL);
+    el_print(ELI, "set prefix to null to disable it");
+
     el_cleanup();
 }

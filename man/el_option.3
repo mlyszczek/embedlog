@@ -184,6 +184,32 @@ is not implemented on current system (support was not compiled into library)
 .   RE
 .RE
 .PP
+.BI "EL_PREFIX (" const " " char " " * "prefix)"
+.RS
+You can configure logger to add
+.   I prefix
+to every message you print.
+.   I prefix
+will be printed between log level info "i/" and you message.
+No spaces are added.
+If you set your
+.   I prefix
+to simple
+.   BR PREFIX ,
+printed message will be
+.   BR "i/PREFIXmy log message" ,
+so you might want to add space there.
+If
+.   I prefix
+is bigger than
+.   B EL_PREFIX_LEN
+prefix will be truncated.
+To disable prefixing, simply set
+.   I prefix
+to
+.   BR NULL .
+.RE
+.PP
 .BI "EL_COLORS (" int " colors)"
 .RS
 If this is set to 1, output will be enriched with ANSI colors depending on the

@@ -74,6 +74,7 @@ enum el_option
     EL_FINFO,
     EL_CUSTOM_PUTS,
     EL_TTY_DEV,
+    EL_PREFIX,
 
     EL_FNAME,
     EL_FROTATE_NUMBER,
@@ -123,6 +124,7 @@ struct el_options
     long            fpos;
     FILE           *file;
     const char     *fname;
+    const char     *prefix;
     el_custom_puts  custom_puts;
 };
 

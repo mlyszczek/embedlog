@@ -223,6 +223,23 @@ AS_IF([test "x$enable_clock" = "xyes"],
 
 
 ###
+# --enable-prefix
+#
+
+
+AC_ARG_ENABLE([prefix],
+    AS_HELP_STRING([--enable-prefix], [Enable printing prefix to each message]),
+    [], [enable_prefix="yes"])
+
+AS_IF([test "x$enable_prefix" = "xyes"],
+[
+    AC_DEFINE([ENABLE_PREFIX], [1], [Enable printing prefix to each message])
+    AC_CHECK_FUNCS([strncat strlen],,
+        AC_MSG_ERROR(not found, needed by --enable-prefix))
+])
+
+
+###
 # --enable-finfo
 #
 
@@ -276,6 +293,15 @@ AS_IF([test "x$enable_reentrant" = "xyes"],
 ###
 # VARIABLES=value options
 #
+
+###
+# EL_PREFIX_MAX_LEN
+#
+
+
+AC_ARG_VAR([EL_PREFIX_MAX_LEN], [Maximum size of prefix])
+AS_IF([test "x$EL_PREFIX_MAX_LEN" = x], [EL_PREFIX_MAX_LEN="128"])
+AC_DEFINE_UNQUOTED([EL_PREFIX_MAX_LEN], [$EL_PREFIX_MAX_LEN], [Maximum size of prefix])
 
 
 ###
@@ -343,10 +369,12 @@ echo "print timestamp enabled..... : $enable_timestamp"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "clock() timestamp........... : $enable_clock"
+echo "print prefix with each msg.. : $enable_prefix"
 echo "print file info with log.... : $enable_finfo"
 echo "force portable snprintf......: $enable_portable_snprintf"
 echo "colorize output............. : $enable_colors"
 echo "reentrant functions......... : $enable_reentrant"
+echo "maximum prefix length....... : $EL_PREFIX_MAX_LEN"
 echo "maximum file length......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
 echo "maximum path length......... : $MAX_PATH"

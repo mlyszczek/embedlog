@@ -568,6 +568,7 @@ int el_ovprint
      * add preamble and colors to log line buf
      */
 
+    buf[0] = '\0';
     w  = el_color(options, buf, level);
     w += el_timestamp(options, buf + w);
     w += el_finfo(options, buf + w, file, num);
@@ -587,6 +588,31 @@ int el_ovprint
     {
         w += sprintf(buf + w, "%c/", char_level[level]);
     }
+
+#if ENABLE_PREFIX
+    if (options->prefix)
+    {
+        /*
+         * there is a case where buf[w] will point to something different
+         * than '\0'. This is not wrong but will confuse strncat function
+         * and logs will be printed incorectly.
+         */
+
+        buf[w] = '\0';
+        strncat(buf + w, options->prefix, EL_PREFIX_LEN);
+
+        if ((flen = strlen(options->prefix)) > EL_PREFIX_LEN)
+        {
+            /*
+             * dodge a bullet - overflow would have occured
+             */
+
+            flen = EL_PREFIX_LEN;
+        }
+
+        w += flen;
+    }
+#endif
 
     /*
      * add requested log from format, we add + 1 to include null termination

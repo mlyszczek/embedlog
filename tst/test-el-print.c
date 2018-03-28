@@ -315,8 +315,8 @@ static int print_check(void)
              g_options.timestamp != EL_TS_OFF)
         {
             /*
-             * file info or timestamp information is enabled, in that case
-             * we check for additional space between info and log message
+             * prefix or timestamp information  is  enabled,  in  that  case
+             * we check for additional space between info  and  log  message
              */
 
             if (*msg++ != ' ')
@@ -340,6 +340,27 @@ static int print_check(void)
             {
                 return -1;
             }
+        }
+
+        /*
+         * check for prefix
+         */
+
+        if (g_options.prefix)
+        {
+            char expected_prefix[EL_PREFIX_LEN + 1] = {0};
+            size_t expected_prefix_len;
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+            strncat(expected_prefix, g_options.prefix, EL_PREFIX_LEN);
+            expected_prefix_len = strlen(expected_prefix);
+
+            if (strncmp(expected_prefix, msg, expected_prefix_len) != 0)
+            {
+                return -1;
+            }
+
+            msg += expected_prefix_len;
         }
 
         msglen = strlen(expected.msg);
@@ -607,6 +628,7 @@ static void print_mix_of_everything(void)
     int printlevel;
     int finfo;
     int colors;
+    int prefix;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -615,6 +637,7 @@ static void print_mix_of_everything(void)
     for (printlevel = 0;            printlevel <= 1;              ++printlevel)
     for (finfo = 0;                 finfo <= 1;                   ++finfo)
     for (colors = 0;                colors <= 1;                  ++colors)
+    for (prefix = 0;                prefix <= 1;                  ++prefix)
     {
         test_prepare();
         el_option(EL_LEVEL, level);
@@ -622,6 +645,7 @@ static void print_mix_of_everything(void)
         el_option(EL_PRINT_LEVEL, printlevel);
         el_option(EL_FINFO, finfo);
         el_option(EL_COLORS, colors);
+        el_option(EL_PREFIX, prefix ? "prefix" : NULL);
 
         add_log(ELF, "fatal message");
         add_log(ELA, "alert message");
@@ -631,6 +655,7 @@ static void print_mix_of_everything(void)
         add_log(ELN, "notice message");
         add_log(ELI, "info message");
         add_log(ELD, "debug message");
+
         mt_fok(print_check());
 
         test_cleanup();
@@ -781,6 +806,59 @@ static void print_null(void)
     mt_ferr(el_print(ELA, NULL), EINVAL);
 }
 
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_prefix(void)
+{
+    el_option(EL_PREFIX, "prefix");
+    add_log(ELI, "message with prefix");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_prefix_full(void)
+{
+    char p[EL_PREFIX_LEN + 1] = {0};
+    int i;
+
+    for (i = 0; i != EL_PREFIX_LEN; ++i)
+    {
+        p[i] = '0' + (i % 32);
+    }
+
+    el_option(EL_PREFIX, p);
+    add_log(ELI, "message with fill prefix");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_prefix_overflow(void)
+{
+    char p[EL_PREFIX_LEN + 10] = {0};
+    int i;
+
+    for (i = 0; i != sizeof(p) - 1; ++i)
+    {
+        p[i] = '0' + (i % 32);
+    }
+
+    el_option(EL_PREFIX, p);
+    add_log(ELI, "message with overflown prefix");
+    mt_fok(print_check());
+}
+
+
 /* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
@@ -815,4 +893,7 @@ void el_print_test_group(void)
     mt_run(print_finfo_path);
     mt_run(print_nofinfo);
     mt_run(print_null);
+    mt_run(print_prefix);
+    mt_run(print_prefix_full);
+    mt_run(print_prefix_overflow);
 }

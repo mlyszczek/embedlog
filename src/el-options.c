@@ -179,6 +179,15 @@ static int el_vooption
         options->print_log_level = value_int;
         return 0;
 
+#   if ENABLE_PREFIX
+
+    case EL_PREFIX:
+        value_str = va_arg(ap, const char *);
+        options->prefix = value_str;
+        return 0;
+
+#   endif /* ENABLE_PREFIX */
+
 #   if ENABLE_COLORS
 
     case EL_COLORS:

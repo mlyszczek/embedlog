@@ -388,6 +388,24 @@ static void options_ooption_test(void)
    ========================================================================== */
 
 
+static void options_prefix(void)
+{
+    el_option(EL_PREFIX, "prefix");
+#if ENABLE_PREFIX
+    mt_fok(strcmp("prefix", g_options.prefix));
+#else
+    mt_fail(g_options.prefix == NULL);
+#endif
+
+    el_option(EL_PREFIX, NULL);
+    mt_fail(g_options.prefix == NULL);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void options_einval(void)
 {
     mt_ferr(el_option(10000, 5), EINVAL);
@@ -421,4 +439,5 @@ void el_options_test_group(void)
     mt_run(options_opt_timestamp_timer);
     mt_run(options_ooption_test);
     mt_run(options_einval);
+    mt_run(options_prefix);
 }

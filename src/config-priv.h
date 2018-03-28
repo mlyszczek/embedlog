@@ -144,11 +144,18 @@
 /* ==========================================================================
     maximum length of preamble which may look like this
 
-        [2017-05-24 14:43:10.123456][source-file.c:12345] e/
+        [2017-05-24 14:43:10.123456][source-file.c:12345] e/prefix
    ========================================================================== */
 
 
-#define EL_PRE_LEN (EL_PRE_TS_LONG_LEN + EL_PRE_FINFO_LEN + EL_PRE_LEVEL_LEN)
+#if ENABLE_PREFIX
+#   define EL_PREFIX_LEN EL_PREFIX_MAX_LEN
+#else
+#   define EL_PREFIX_LEN 0
+#endif
+
+#define EL_PRE_LEN (EL_PRE_TS_LONG_LEN + EL_PRE_FINFO_LEN + EL_PREFIX_LEN + \
+    EL_PRE_LEVEL_LEN)
 
 
 /* ==========================================================================
