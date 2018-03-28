@@ -149,7 +149,7 @@
 
 
 #if ENABLE_PREFIX
-#   define EL_PREFIX_LEN EL_PREFIX_MAX_LEN
+#   define EL_PREFIX_LEN EL_PREFIX_MAX
 #else
 #   define EL_PREFIX_LEN 0
 #endif

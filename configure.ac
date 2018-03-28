@@ -295,13 +295,13 @@ AS_IF([test "x$enable_reentrant" = "xyes"],
 #
 
 ###
-# EL_PREFIX_MAX_LEN
+# EL_PREFIX_MAX
 #
 
 
-AC_ARG_VAR([EL_PREFIX_MAX_LEN], [Maximum size of prefix])
-AS_IF([test "x$EL_PREFIX_MAX_LEN" = x], [EL_PREFIX_MAX_LEN="128"])
-AC_DEFINE_UNQUOTED([EL_PREFIX_MAX_LEN], [$EL_PREFIX_MAX_LEN], [Maximum size of prefix])
+AC_ARG_VAR([EL_PREFIX_MAX], [Maximum size of prefix])
+AS_IF([test "x$EL_PREFIX_MAX" = x], [EL_PREFIX_MAX="128"])
+AC_DEFINE_UNQUOTED([EL_PREFIX_MAX], [$EL_PREFIX_MAX], [Maximum size of prefix])
 
 
 ###
@@ -374,7 +374,7 @@ echo "print file info with log.... : $enable_finfo"
 echo "force portable snprintf......: $enable_portable_snprintf"
 echo "colorize output............. : $enable_colors"
 echo "reentrant functions......... : $enable_reentrant"
-echo "maximum prefix length....... : $EL_PREFIX_MAX_LEN"
+echo "maximum prefix length....... : $EL_PREFIX_MAX"
 echo "maximum file length......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
 echo "maximum path length......... : $MAX_PATH"
