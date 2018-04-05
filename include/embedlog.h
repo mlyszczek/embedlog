@@ -11,6 +11,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef NOFINFO
 #   define ELF NULL, 0, EL_FATAL
 #   define ELA NULL, 0, EL_ALERT
@@ -155,5 +159,8 @@ int el_opmemory(const char *file, size_t line, enum el_level level,
 int el_operror(const char *file, size_t line, enum el_level level,
         struct el_options *options, const char *fmt, ...);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
