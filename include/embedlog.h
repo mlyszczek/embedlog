@@ -24,6 +24,15 @@ extern "C" {
 #   define ELN NULL, 0, EL_NOTICE
 #   define ELI NULL, 0, EL_INFO
 #   define ELD NULL, 0, EL_DBG
+
+#   define OELF NULL, 0, EL_FATAL, EL_OPTIONS_OBJECT
+#   define OELA NULL, 0, EL_ALERT, EL_OPTIONS_OBJECT
+#   define OELC NULL, 0, EL_CRIT, EL_OPTIONS_OBJECT
+#   define OELE NULL, 0, EL_ERROR, EL_OPTIONS_OBJECT
+#   define OELW NULL, 0, EL_WARN, EL_OPTIONS_OBJECT
+#   define OELN NULL, 0, EL_NOTICE, EL_OPTIONS_OBJECT
+#   define OELI NULL, 0, EL_INFO, EL_OPTIONS_OBJECT
+#   define OELD NULL, 0, EL_DBG, EL_OPTIONS_OBJECT
 #else
 #   define ELF __FILE__, __LINE__, EL_FATAL
 #   define ELA __FILE__, __LINE__, EL_ALERT
@@ -33,6 +42,15 @@ extern "C" {
 #   define ELN __FILE__, __LINE__, EL_NOTICE
 #   define ELI __FILE__, __LINE__, EL_INFO
 #   define ELD __FILE__, __LINE__, EL_DBG
+
+#   define OELF __FILE__, __LINE__, EL_FATAL, EL_OPTIONS_OBJECT
+#   define OELA __FILE__, __LINE__, EL_ALERT, EL_OPTIONS_OBJECT
+#   define OELC __FILE__, __LINE__, EL_CRIT, EL_OPTIONS_OBJECT
+#   define OELE __FILE__, __LINE__, EL_ERROR, EL_OPTIONS_OBJECT
+#   define OELW __FILE__, __LINE__, EL_WARN, EL_OPTIONS_OBJECT
+#   define OELN __FILE__, __LINE__, EL_NOTICE, EL_OPTIONS_OBJECT
+#   define OELI __FILE__, __LINE__, EL_INFO, EL_OPTIONS_OBJECT
+#   define OELD __FILE__, __LINE__, EL_DBG, EL_OPTIONS_OBJECT
 #endif
 
 #if (__STDC_VERSION__ >= 199901L)

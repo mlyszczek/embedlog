@@ -5,8 +5,12 @@
 
 #include "embedlog.h"
 
+#define EL_OPTIONS_OBJECT &opts
+
 int main(void)
 {
+    struct el_options  opts;
+
     el_init();
     el_option(EL_OUT, EL_OUT_STDERR);
 
@@ -62,4 +66,14 @@ int main(void)
     el_print(ELI, "set prefix to null to disable it");
 
     el_cleanup();
+
+
+    el_oinit(&opts);
+    el_ooption(&opts, EL_OUT, EL_OUT_STDERR);
+    el_oprint(ELI, &opts, "you can do same thing as about with custom");
+    el_oprint(ELI, &opts, "options object for two or more logger.");
+    el_oprint(OELE, "and if you define EL_OPTIONS_OBJECT you will be");
+    el_oprint(OELF, "able to print messages without passing options");
+    el_oprint(OELW, "each time to print functions");
+    el_ocleanup(&opts);
 }
