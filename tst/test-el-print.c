@@ -122,6 +122,7 @@ static int print_check(void)
     int                 i;
     int                 slevel;
     size_t              msglen;
+#if ENABLE_COLORS_EXTENDED
     static const char  *color[] =
     {
         "\e[91m",  /* fatal             light red */
@@ -134,6 +135,20 @@ static int print_check(void)
         "\e[34m",  /* debug             blue */
         "\e[0m"    /* remove all formats */
     };
+#else
+    static const char  *color[] =
+    {
+        "\e[31m",  /* fatal             light red */
+        "\e[31m",  /* alert             red */
+        "\e[35m",  /* critical          light magenta */
+        "\e[35m",  /* error             magenta */
+        "\e[33m",  /* warning           light yellow */
+        "\e[32m",  /* notice            light green */
+        "\e[32m",  /* information       green */
+        "\e[34m",  /* debug             blue */
+        "\e[0m"    /* remove all formats */
+    };
+#endif
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     msg = logbuf;
