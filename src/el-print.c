@@ -89,6 +89,13 @@ static const char char_level[8] = { 'f', 'a', 'c', 'e', 'w', 'n', 'i', 'd' };
  * colors indexes are synced with log level
  */
 
+#if ENABLE_COLORS_EXTENDED
+
+/*
+ * for those that like more colors, there are definitions with more colors!
+ * this will enable light version of some levels, but this is not supported
+ * on all terminal! You have been warned!
+ */
 
 static const char *color[] =
 {
@@ -103,7 +110,30 @@ static const char *color[] =
     "\e[0m"    /* remove all formats */
 };
 
-#endif
+#else
+
+/*
+ * not all terminal can support extended colors with light version of them,
+ * for those who want to be more standard compliant there is this shortened
+ * version of colors. On downside is that some level will have same colors.
+ */
+
+static const char *color[] =
+{
+    "\e[31m",  /* fatal             red */
+    "\e[31m",  /* alert             red */
+    "\e[35m",  /* critical          magenta */
+    "\e[35m",  /* error             magenta */
+    "\e[33m",  /* warning           yellow */
+    "\e[32m",  /* notice            green */
+    "\e[32m",  /* information       green */
+    "\e[34m",  /* debug             blue */
+    "\e[0m"    /* remove all formats */
+};
+
+#endif /* COLORS_EXTENDED */
+
+#endif /* ENABLE_COLORS */
 
 
 /* ==========================================================================

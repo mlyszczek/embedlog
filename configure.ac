@@ -274,6 +274,21 @@ AS_IF([test "x$enable_colors" = "xyes"],
 
 
 ###
+# --enable-colors-extended
+#
+
+
+AC_ARG_ENABLE([colors-extended],
+    AS_HELP_STRING([--enable-colors-extended], [Enable more colors in logs]),
+    [], [enable_colors_extended="no"])
+
+AS_IF([test "x$enable_colors_extended" = "xyes"],
+[
+    AC_DEFINE([ENABLE_COLORS_EXTENDED], [1], [Enable more colors in logs])
+])
+
+
+###
 # --enable-reentrant
 #
 
@@ -373,6 +388,7 @@ echo "print prefix with each msg.. : $enable_prefix"
 echo "print file info with log.... : $enable_finfo"
 echo "force portable snprintf......: $enable_portable_snprintf"
 echo "colorize output............. : $enable_colors"
+echo "extended colors............. : $enable_colors_extended"
 echo "reentrant functions......... : $enable_reentrant"
 echo "maximum prefix length....... : $EL_PREFIX_MAX"
 echo "maximum file length......... : $EL_FLEN_MAX"
