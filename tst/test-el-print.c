@@ -211,29 +211,46 @@ static int print_check(void)
             IS_CHAR(':');
             IS_DIGIT();
             IS_DIGIT();
-            IS_CHAR('.');
 
-            for (i = 0; i != 6; ++i)
+            if (g_options.timestamp_useconds)
             {
-                IS_DIGIT();
+                IS_CHAR('.');
+
+                for (i = 0; i != 6; ++i)
+                {
+                    IS_DIGIT();
+                }
             }
+
             IS_CHAR(']');
 
         }
         else if (g_options.timestamp == EL_TS_SHORT)
         {
             IS_CHAR('[');
-            while (*msg != '.' )
+
+            if (g_options.timestamp_useconds)
             {
-                IS_DIGIT();
+                while (*msg != '.')
+                {
+                    IS_DIGIT();
+                }
+
+                ++msg; /* skip the '.' character */
+
+                for (i = 0; i != 6; ++i)
+                {
+                    IS_DIGIT();
+                }
+            }
+            else
+            {
+                while (*msg != ']')
+                {
+                    IS_DIGIT();
+                }
             }
 
-            ++msg; /* skip the '.' character */
-
-            for (i = 0; i != 6; ++i)
-            {
-                IS_DIGIT();
-            }
             IS_CHAR(']');
         }
         else if (g_options.timestamp == EL_TS_OFF)
@@ -601,6 +618,34 @@ static void print_timestamp_long(void)
    ========================================================================== */
 
 
+static void print_timestamp_short_no_useconds(void)
+{
+    el_option(EL_TS_USEC, 0);
+    el_option(EL_TS, EL_TS_SHORT);
+    add_log(ELF, "long timestamp without usec first");
+    add_log(ELF, "long timestamp without usec second");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_long_no_useconds(void)
+{
+    el_option(EL_TS_USEC, 0);
+    el_option(EL_TS, EL_TS_LONG);
+    add_log(ELF, "long timestamp without usec first");
+    add_log(ELF, "long timestamp without usec second");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void print_finfo(void)
 {
     el_option(EL_FINFO, 1);
@@ -644,6 +689,7 @@ static void print_mix_of_everything(void)
     int finfo;
     int colors;
     int prefix;
+    int usec;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -653,6 +699,7 @@ static void print_mix_of_everything(void)
     for (finfo = 0;                 finfo <= 1;                   ++finfo)
     for (colors = 0;                colors <= 1;                  ++colors)
     for (prefix = 0;                prefix <= 1;                  ++prefix)
+    for (usec = 0;                  usec <= 1;                    ++usec);
     {
         test_prepare();
         el_option(EL_LEVEL, level);
@@ -899,6 +946,8 @@ void el_print_test_group(void)
     mt_run(print_custom_log_level);
     mt_run(print_timestamp_short);
     mt_run(print_timestamp_long);
+    mt_run(print_timestamp_short_no_useconds);
+    mt_run(print_timestamp_long_no_useconds);
     mt_run(print_finfo);
     mt_run(print_too_long_print_truncate);
     mt_run(print_truncate_with_date);

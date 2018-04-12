@@ -32,11 +32,15 @@ int main(void)
     el_print(ELF, "if higher precision is needed we can use CLOCK_REALTIME");
     el_option(EL_TS, EL_TS_SHORT);
     el_print(ELF, "we can also mix REALTIME with short format");
+    el_option(EL_TS_USEC, 0);
+    el_print(ELF, "and iff you don't need high resolution");
+    el_print(ELF, "you can simply disable microseconds to save space!");
     el_option(EL_TS, EL_TS_LONG);
     el_option(EL_TS_TM, EL_TS_TM_CLOCK);
     el_print(ELF, "or long with clock() if you desire");
     el_option(EL_TS, EL_TS_OFF);
     el_print(ELF, "no time information, if your heart desire it");
+    el_option(EL_TS_USEC, 1);
 
     el_option(EL_FINFO, 1);
     el_print(ELF, "log location is very usefull for debuging");

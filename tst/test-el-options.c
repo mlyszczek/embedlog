@@ -93,23 +93,24 @@ static void options_init(void)
 
 
     memset(&default_options, 0, sizeof(default_options));
-    default_options.outputs         = 0;
-    default_options.level           = EL_INFO;
-    default_options.colors          = 0;
-    default_options.timestamp       = EL_TS_OFF;
-    default_options.timestamp_timer = EL_TS_TM_TIME;
-    default_options.print_log_level = 1;
-    default_options.custom_puts     = NULL;
-    default_options.serial_fd       = -1;
+    default_options.outputs             = 0;
+    default_options.level               = EL_INFO;
+    default_options.colors              = 0;
+    default_options.timestamp           = EL_TS_OFF;
+    default_options.timestamp_timer     = EL_TS_TM_TIME;
+    default_options.timestamp_useconds  = 1;
+    default_options.print_log_level     = 1;
+    default_options.custom_puts         = NULL;
+    default_options.serial_fd           = -1;
 
-    default_options.finfo           = 0;
-    default_options.frotate_number  = 0;
-    default_options.fcurrent_rotate = 0;
-    default_options.frotate_size    = 0;
-    default_options.fpos            = 0;
-    default_options.file            = NULL;
-    default_options.file_sync_every = 32768;
-    default_options.fname           = NULL;
+    default_options.finfo               = 0;
+    default_options.frotate_number      = 0;
+    default_options.fcurrent_rotate     = 0;
+    default_options.frotate_size        = 0;
+    default_options.fpos                = 0;
+    default_options.file                = NULL;
+    default_options.file_sync_every     = 32768;
+    default_options.fname               = NULL;
 
     mt_fail(el_oinit(&options) == 0);
     mt_fail(memcmp(&options, &default_options, sizeof(options)) == 0);

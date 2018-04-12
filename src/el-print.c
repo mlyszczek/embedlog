@@ -363,7 +363,19 @@ static size_t el_timestamp
 #endif
     }
 
-    tl += sprintf(buf + tl, ".%06ld]", us);
+    if (options->timestamp_useconds)
+    {
+        tl += sprintf(buf + tl, ".%06ld]", us);
+    }
+    else
+    {
+        /*
+         * if micro seconds are not printed we simply add ending ']'
+         */
+
+        buf[tl] = ']';
+        tl++;
+    }
 
     return tl;
 

@@ -212,9 +212,14 @@ static int el_vooption
         options->timestamp = value_int;
         return 0;
 
+    case EL_TS_USEC:
+        value_int = va_arg(ap, int);
+        options->timestamp_useconds = value_int;
+
     case EL_TS_TM:
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_TM_ERROR);
+
 
 #   if ENABLE_REALTIME == 0
         VALID(ENODEV, value_int != EL_TS_TM_REALTIME);
@@ -380,6 +385,7 @@ int el_oinit
 
     memset(options, 0, sizeof(struct el_options));
     options->print_log_level = 1;
+    options->timestamp_useconds = 1;
     options->level = EL_INFO;
     options->serial_fd = -1;
     options->file_sync_every = 32768;

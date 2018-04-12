@@ -92,6 +92,7 @@ enum el_option
     EL_COLORS,
     EL_TS,
     EL_TS_TM,
+    EL_TS_USEC,
     EL_PRINT_LEVEL,
     EL_FINFO,
     EL_CUSTOM_PUTS,
@@ -134,6 +135,7 @@ struct el_options
     int             colors;
     int             timestamp;
     int             timestamp_timer;
+    int             timestamp_useconds;
     int             print_log_level;
 
     int             serial_fd;
