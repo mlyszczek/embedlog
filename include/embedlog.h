@@ -131,17 +131,17 @@ typedef int (*el_custom_puts)(const char *s);
 
 struct el_options
 {
-    int             outputs;
-    int             level;
-    int             colors;
-    int             timestamp;
-    int             timestamp_timer;
-    int             timestamp_useconds;
-    int             print_log_level;
-    int             print_newline;
+    unsigned int    outputs:6;
+    unsigned int    colors:1;
+    unsigned int    timestamp:2;
+    unsigned int    timestamp_timer:3;
+    unsigned int    timestamp_useconds:1;
+    unsigned int    print_log_level:1;
+    unsigned int    print_newline:1;
+    unsigned int    finfo:1;
 
+    int             level;
     int             serial_fd;
-    int             finfo;
     int             frotate_number;
     int             fcurrent_rotate;
     long            frotate_size;

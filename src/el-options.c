@@ -221,7 +221,10 @@ static int el_vooption
 
     case EL_TS_USEC:
         value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
         options->timestamp_useconds = value_int;
+        return 0;
 
     case EL_TS_TM:
         value_int = va_arg(ap, int);
