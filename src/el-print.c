@@ -584,6 +584,7 @@ int el_ovprint
     char                buf[EL_BUF_MAX + 2];  /* buffer for message to print */
     size_t              w;                    /* bytes written to buf */
     size_t              flen;                 /* length of the fmt output */
+    size_t              fmtlen;               /* length of fmt string */
     int                 e;                    /* error code */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -682,11 +683,15 @@ int el_ovprint
 
     w += el_color(options, buf + w, 8 /* reset colors */);
 
-    /*
-     * make sure buf is always null terminated and contains new line character
-     */
+    if (options->print_newline)
+    {
+        /*
+         * add new line to log
+         */
 
-    buf[w++] = '\n';
+        buf[w++] = '\n';
+    }
+
     buf[w++] = '\0';
 
     if (el_oputs(options, buf) != 0)

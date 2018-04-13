@@ -179,6 +179,13 @@ static int el_vooption
         options->print_log_level = value_int;
         return 0;
 
+    case EL_PRINT_NL:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
+        options->print_newline = value_int;
+        return 0;
+
 #   if ENABLE_PREFIX
 
     case EL_PREFIX:
@@ -385,6 +392,7 @@ int el_oinit
 
     memset(options, 0, sizeof(struct el_options));
     options->print_log_level = 1;
+    options->print_newline = 1;
     options->timestamp_useconds = 1;
     options->level = EL_INFO;
     options->serial_fd = -1;

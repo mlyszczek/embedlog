@@ -94,6 +94,7 @@ enum el_option
     EL_TS_TM,
     EL_TS_USEC,
     EL_PRINT_LEVEL,
+    EL_PRINT_NL,
     EL_FINFO,
     EL_CUSTOM_PUTS,
     EL_TTY_DEV,
@@ -137,6 +138,7 @@ struct el_options
     int             timestamp_timer;
     int             timestamp_useconds;
     int             print_log_level;
+    int             print_newline;
 
     int             serial_fd;
     int             finfo;

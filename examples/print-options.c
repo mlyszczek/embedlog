@@ -15,7 +15,7 @@ int main(void)
     el_option(EL_OUT, EL_OUT_STDERR);
 
     el_option(EL_PRINT_LEVEL, 0);
-    el_print(ELI, "We can disable information about log level");
+    el_print(ELI, "We can disable information about log level\b");
     el_print(ELF, "message still will be filtered by log level");
     el_print(ELA, "but there is no way to tell what level message is");
     el_print(ELD, "like this message will not be printed");
@@ -50,6 +50,12 @@ int main(void)
     el_option(EL_PRINT_LEVEL, 1);
     el_print(ELF, "Different scenarios need different options");
     el_print(ELA, "So we can mix options however we want");
+
+    el_option(EL_PRINT_NL, 0);
+    el_print(ELF, "you can also remove printing new line ");
+    el_puts("to join el_print and el_puts in a single ");
+    el_puts("long line as needed\n");
+    el_option(EL_PRINT_NL, 1);
 
     el_option(EL_COLORS, 1);
     el_option(EL_LEVEL, EL_DBG);

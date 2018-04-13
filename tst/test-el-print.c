@@ -422,20 +422,25 @@ static int print_check(void)
             msg += 4;
         }
 
-        if (*msg != '\n')
+        if (g_options.print_newline)
         {
+            if (*msg != '\n')
+            {
+                /*
+                 * when new line is enabled, log should end with new line
+                 */
+
+                return -1;
+            }
+
             /*
-             * all logs should be ended with new line
+             * set msg to point to next message, there is no  need  to  move
+             * msg pointer if newline is not printed as msg  already  points
+             * to next message
              */
 
-            return -1;
+            ++msg;
         }
-
-        /*
-         * set msg to point to next message
-         */
-
-        ++msg;
     }
 
     return 0;
@@ -514,6 +519,19 @@ static void test_cleanup(void)
 static void print_simple_message(void)
 {
     add_log(ELF, "print_simple_message");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_simple_message_no_newline(void)
+{
+    el_option(EL_PRINT_NL, 0);
+    add_log(ELF, "print simple no newline");
+    add_log(ELF, "print simple no newline second");
     mt_fok(print_check());
 }
 
@@ -690,6 +708,7 @@ static void print_mix_of_everything(void)
     int colors;
     int prefix;
     int usec;
+    int nl;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -699,12 +718,14 @@ static void print_mix_of_everything(void)
     for (finfo = 0;                 finfo <= 1;                   ++finfo)
     for (colors = 0;                colors <= 1;                  ++colors)
     for (prefix = 0;                prefix <= 1;                  ++prefix)
-    for (usec = 0;                  usec <= 1;                    ++usec);
+    for (usec = 0;                  usec <= 1;                    ++usec)
+    for (nl = 0;                    nl <= 1;                      ++nl)
     {
         test_prepare();
         el_option(EL_LEVEL, level);
         el_option(EL_TS, timestamp);
         el_option(EL_PRINT_LEVEL, printlevel);
+        el_option(EL_PRINT_NL, nl);
         el_option(EL_FINFO, finfo);
         el_option(EL_COLORS, colors);
         el_option(EL_PREFIX, prefix ? "prefix" : NULL);
@@ -740,7 +761,41 @@ static void print_too_long_print_truncate(void)
     msg[sizeof(msg) - 2] = '3';
     msg[sizeof(msg) - 3] = '2';
     msg[sizeof(msg) - 4] = '1';
-    msg[sizeof(msg) - 4] = '0';
+    msg[sizeof(msg) - 5] = '0';
+
+    add_log(ELI, "not truncated");
+    add_log(ELI, msg);
+
+    /*
+     * while el_print will make copy of msg, our test  print_check  function
+     * will just use pointer to our msg here, and since we expect message to
+     * be truncated, we truncate it here  and  print_check  will  take  this
+     * truncated message as expected one.
+     */
+
+    msg[sizeof(msg) - 3] = '\0';
+
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_too_long_print_truncate_no_newline(void)
+{
+    char  msg[EL_LOG_MAX + 3];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_option(EL_PRINT_NL, 0);
+    memset(msg, 'a', sizeof(msg));
+    msg[sizeof(msg) - 1] = '\0';
+    msg[sizeof(msg) - 2] = '3';
+    msg[sizeof(msg) - 3] = '2';
+    msg[sizeof(msg) - 4] = '1';
+    msg[sizeof(msg) - 5] = '0';
 
     add_log(ELI, "not truncated");
     add_log(ELI, msg);
@@ -940,6 +995,7 @@ void el_print_test_group(void)
     mt_cleanup_test = &test_cleanup;
 
     mt_run(print_simple_message);
+    mt_run(print_simple_message_no_newline);
     mt_run(print_simple_multiple_message);
     mt_run(print_log_level);
     mt_run(print_colorful_output);
@@ -950,6 +1006,7 @@ void el_print_test_group(void)
     mt_run(print_timestamp_long_no_useconds);
     mt_run(print_finfo);
     mt_run(print_too_long_print_truncate);
+    mt_run(print_too_long_print_truncate_no_newline);
     mt_run(print_truncate_with_date);
     mt_run(print_truncate_with_all_options);
     mt_run(print_with_no_output_available);
