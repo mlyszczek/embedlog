@@ -39,14 +39,20 @@
    ========================================================================== */
 
 #if HAVE_CONFIG_H
-#include "config.h"
+#   include "config.h"
 #endif
 
 #include "el-options.h"
 
 #if HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #endif
+
+#if HAVE_STAT
+#   include <sys/types.h>
+#   include <sys/stat.h>
+#endif
+
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
@@ -315,6 +321,86 @@ int el_file_open
                 return -1;
             }
 
+#if HAVE_ACCESS && HAVE_STAT
+
+            if (i != 0)
+            {
+                struct stat  st;
+                /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+                /*
+                 * if i is 0, then this is last file to check (there are  no
+                 * logs from embed log in directory) and there is no need to
+                 * check if file exists or not - we open it unconditionally,
+                 * thus this path is not taken in such case.
+                 */
+
+                if (el_file_exists(options->current_log) == 0)
+                {
+                    /*
+                     * current log file does not exist, this is not the file
+                     * you are looking for
+                     */
+
+                    continue;
+                }
+
+                if (stat(options->current_log, &st) != 0)
+                {
+                    /*
+                     * error while stating file, probably don't have  access
+                     * to that file, or directory,  or  whatever,  something
+                     * bad has happend and we don't  want  to  pursue  this,
+                     * exit with error from stat.
+                     */
+
+                    options->current_log[0] = '\0';
+                    return -1;
+                }
+
+                if (st.st_size == 0)
+                {
+                    /*
+                     * there is an empty file, maybe we created it and  then
+                     * crashed?  Or maybe someone is trying to pull our legs
+                     * and drops bombs under our feets.  Either way, this is
+                     * definitely not oldest file.  We also remove it so  it
+                     * doesn't botter us later
+                     */
+
+                    remove(options->current_log);
+                    continue;
+                }
+            }
+
+            /*
+             * we got our file, let's open it for writing and let's call  it
+             * a day
+             */
+
+            if ((f = fopen(options->current_log, "a")) == NULL)
+            {
+                /*
+                 * well not so fast!  while file exists, and we were able to
+                 * read it (stat) it looks like we cannot write to it, tough
+                 * luck, that means error and no logging to file
+                 */
+
+                options->current_log[0] = '\0';
+                return -1;
+            }
+
+            /*
+             * we need to check for currently opened file size  once  again,
+             * as if i equal 0 here, we never called stat() on our file  and
+             * we don't know the size of it
+             */
+
+            fseek(f, 0, SEEK_END);
+            fsize = ftell(f);
+
+#else /* HAVE_ACCESS && HAVE_STAT */
+
             if ((f = fopen(options->current_log, "a")) == NULL)
             {
                 /*
@@ -362,6 +448,8 @@ int el_file_open
                 remove(options->current_log);
                 continue;
             }
+
+#endif /* HAVE_ACCESS && HAVE_STAT */
 
             /*
              * oldest file found, file is already opened so we simply return
