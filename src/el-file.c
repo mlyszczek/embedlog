@@ -257,7 +257,7 @@ int el_file_open
         /*
          * to prevent any memory leak in  case  of  double  open,  we  first
          * close already opened file Such situation may happen when  library
-         * user changes file name using EL_FNAME option,
+         * user changes file name using EL_FPATH option,
          */
 
         fclose(options->file);

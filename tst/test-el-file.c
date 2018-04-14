@@ -106,7 +106,7 @@ static void test_prepare(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
-    el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FILE_SYNC_EVERY, 0);
 }
 
@@ -190,7 +190,7 @@ static void file_reopen(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
-    el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s8);
@@ -211,7 +211,7 @@ static void file_reopen_different_file(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
-    el_option(EL_FNAME, WORKDIR"/log-another");
+    el_option(EL_FPATH, WORKDIR"/log-another");
     el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s8);
@@ -245,7 +245,7 @@ static void file_filename_too_long(void)
 
     memset(path, 'a', sizeof(path));
     path[sizeof(path) - 1] = '\0';
-    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
+    mt_ferr(el_option(EL_FPATH, path), ENAMETOOLONG);
 }
 
 
@@ -267,7 +267,7 @@ static void file_path_too_long(void)
     path[sizeof(path) - 3] = 'l';
     path[sizeof(path) - 2] = 'e';
     path[sizeof(path) - 1] = '\0';
-    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
+    mt_ferr(el_option(EL_FPATH, path), ENAMETOOLONG);
 }
 
 
@@ -291,7 +291,7 @@ static void file_print_after_cleanup(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
-    el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FILE_SYNC_EVERY, 0);
     el_cleanup();
     mt_ferr(el_puts("whatev"), ENODEV);
@@ -397,7 +397,7 @@ static void file_rotate_1_reopen(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 1);
-    el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s8);
@@ -540,7 +540,7 @@ static void file_rotate_2_reopen(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 2);
-    el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s5);
@@ -722,7 +722,7 @@ static void file_rotate_5_reopen(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 5);
-    el_option(EL_FNAME, WORKDIR"/log");
+    el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FILE_SYNC_EVERY, 0);
 
     el_puts(s9);
@@ -811,7 +811,7 @@ static void file_rotate_5_rename_file_halfway(void)
     el_puts("rfv");
     el_puts("tgb");
 
-    el_option(EL_FNAME, WORKDIR"/log-another");
+    el_option(EL_FPATH, WORKDIR"/log-another");
 
     el_puts("123");
     el_puts("456");
@@ -839,7 +839,7 @@ static void file_rotate_5_rename_file_halfway(void)
 
 static void file_no_dir_for_logs(void)
 {
-    mt_ferr(el_option(EL_FNAME, "/tmp/i-dont/exist"), ENOENT);
+    mt_ferr(el_option(EL_FPATH, "/tmp/i-dont/exist"), ENOENT);
     mt_ferr(el_puts("whatever"), EBADF);
 }
 
@@ -872,13 +872,13 @@ static void file_dir_no_access(void)
          * root just doesn't give a fuck about no-write-permissions
          */
 
-        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s3));
         mt_fok(file_check("/tmp/embedlog-no-write/log", s3));
     }
     else
     {
-        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts(s3), EBADF);
     }
     unlink("/tmp/embedlog-no-write/log");
@@ -902,13 +902,13 @@ static void file_no_access_to_file(void)
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s5));
         mt_fok(file_check("/tmp/embedlog-no-write/log", s5));
     }
     else
     {
-        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts("whatever"), EBADF);
     }
     unlink("/tmp/embedlog-no-write/log");
@@ -923,7 +923,7 @@ static void file_no_access_to_file(void)
 static void file_rotate_no_dir_for_logs(void)
 {
     el_option(EL_FROTATE_NUMBER, 5);
-    mt_ferr(el_option(EL_FNAME, "/tmp/i-dont/exist"), ENOENT);
+    mt_ferr(el_option(EL_FPATH, "/tmp/i-dont/exist"), ENOENT);
     mt_ferr(el_puts("whatever"), EBADF);
 }
 
@@ -987,13 +987,13 @@ static void file_rotate_dir_no_access(void)
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s3));
         mt_fok(file_check("/tmp/embedlog-no-write/log.0", s3));
     }
     else
     {
-        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts(s3), EBADF);
     }
 
@@ -1019,13 +1019,13 @@ static void file_rotate_no_access_to_file(void)
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
         mt_fok(el_puts(s8));
         mt_fok(file_check("/tmp/embedlog-no-write/log.0", s8));
     }
     else
     {
-        mt_ferr(el_option(EL_FNAME, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts("whatever"), EBADF);
     }
 
@@ -1047,7 +1047,7 @@ static void file_rotate_filename_too_long(void)
     memset(path, 'a', sizeof(path));
     path[sizeof(path) - 1] = '\0';
     el_option(EL_FROTATE_NUMBER, 5);
-    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
+    mt_ferr(el_option(EL_FPATH, path), ENAMETOOLONG);
 }
 
 
@@ -1070,7 +1070,7 @@ static void file_rotate_path_too_long(void)
     path[sizeof(path) - 2] = 'e';
     path[sizeof(path) - 1] = '\0';
     el_option(EL_FROTATE_NUMBER, 5);
-    mt_ferr(el_option(EL_FNAME, path), ENAMETOOLONG);
+    mt_ferr(el_option(EL_FPATH, path), ENAMETOOLONG);
 }
 
 

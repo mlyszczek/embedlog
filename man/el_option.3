@@ -119,7 +119,7 @@ POSIX.1-2001 and any syslog daemon
 .   RS
 Messages will be printed to file.
 To work user should set output file with
-.       BR EL_FNAME .
+.       BR EL_FPATH .
 Log rotation can be configured with
 .       B EL_FROTATE_NUMBER
 and
@@ -395,7 +395,7 @@ It is still mandatory to enable custom printing with
 .   BR el_option (3)
 .RE
 .PP
-.BI "EL_FNAME (" const " " char " " * "path)"
+.BI "EL_FPATH (" const " " char " " * "path)"
 .RS
 Sets the
 .I path
@@ -433,7 +433,7 @@ specified file without size limit.
 The only size limit is the one presented by the filesystem and architecture.
 .   PP
 If this value is bigger than 0, file rotation will be enabled. All files will
-have suffixes added to name set in EL_FNAME. For example,
+have suffixes added to name set in EL_FPATH. For example,
 .   IR program.log.0 .
 Files are enumareted from
 .   I .0

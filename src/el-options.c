@@ -261,7 +261,7 @@ static int el_vooption
 
 #   if ENABLE_OUT_FILE
 
-    case EL_FNAME:
+    case EL_FPATH:
         value_str = va_arg(ap, const char *);
         VALID(EINVAL, value_str);
         options->fname = value_str;

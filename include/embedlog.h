@@ -100,7 +100,7 @@ enum el_option
     EL_TTY_DEV,
     EL_PREFIX,
 
-    EL_FNAME,
+    EL_FPATH,
     EL_FROTATE_NUMBER,
     EL_FROTATE_SIZE,
     EL_FILE_SYNC_EVERY,
