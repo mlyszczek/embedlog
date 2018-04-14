@@ -78,7 +78,6 @@ AC_ARG_ENABLE([out-stderr],
 AS_IF([test "x$enable_out_stderr" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr])
-    AC_CHECK_FUNCS(access)
     AC_CHECK_FUNCS([fputs],,
         AC_MSG_ERROR(not found, needed by --enable-out-stderr))
 ])
@@ -97,6 +96,7 @@ AM_CONDITIONAL([ENABLE_OUT_FILE], [test "x$enable_out_file" = "xyes"])
 AS_IF([test "x$enable_out_file" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_FILE], [1], [Enable printing to file])
+    AC_CHECK_FUNCS(access)
     AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
         AC_MSG_ERROR(not found, needed by --enable-out-file))
 ])
