@@ -51,6 +51,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -80,8 +81,6 @@
 
 #endif
 
-static char  current_log[PATH_MAX + 1];  /* full path to current log file */
-
 
 /* ==========================================================================
                                    _                __
@@ -101,15 +100,15 @@ static char  current_log[PATH_MAX + 1];  /* full path to current log file */
 
 static int el_file_exists
 (
-    void
+    const char  *path  /* file to check */
 )
 {
 #if HAVE_ACCESS
-    return access(current_log, F_OK) == 0;
+    return access(path, F_OK) == 0;
 #else
     FILE *f;
 
-    if ((f = fopen(current_log, "r")) == NULL)
+    if ((f = fopen(path, "r")) == NULL)
     {
         return 0;
     }
@@ -212,9 +211,10 @@ skip_rotate:
      * passes there, it will pass here as well
      */
 
-    sprintf(current_log, "%s.%d", options->fname, options->fcurrent_rotate);
+    sprintf(options->current_log, "%s.%d",
+        options->fname, options->fcurrent_rotate);
 
-    if ((options->file = fopen(current_log, "w")) == NULL)
+    if ((options->file = fopen(options->current_log, "w")) == NULL)
     {
         options->fcurrent_rotate--;
         return -1;
@@ -252,6 +252,23 @@ int el_file_open
     struct el_options  *options  /* options with file information */
 )
 {
+    if (options->current_log == NULL)
+    {
+        /*
+         * yes, we need to dynamically allocate memory here. It's because we
+         * need to keep current log privately in each of el_options  objects
+         * or there will be problems  in  embedded  systems  that  use  flat
+         * memory.  Since when working with files, OS will always make  some
+         * dynamic allocation, we will be doing one too.
+         */
+
+        if ((options->current_log = malloc(PATH_MAX + 1)) == NULL)
+        {
+            errno = ENOMEM;
+            return -1;
+        }
+    }
+
     if (options->file)
     {
         /*
@@ -282,7 +299,7 @@ int el_file_open
 
         for (i = options->frotate_number - 1; i >= 0; --i)
         {
-            pathl = snprintf(current_log, PATH_MAX + 1, "%s.%d",
+            pathl = snprintf(options->current_log, PATH_MAX + 1, "%s.%d",
                 options->fname, i);
 
             if (pathl > PATH_MAX)
@@ -293,12 +310,12 @@ int el_file_open
                  * could result in some data lose on the disk.
                  */
 
-                current_log[0] = '\0';
+                options->current_log[0] = '\0';
                 errno = ENAMETOOLONG;
                 return -1;
             }
 
-            if ((f = fopen(current_log, "a")) == NULL)
+            if ((f = fopen(options->current_log, "a")) == NULL)
             {
                 /*
                  * if we cannot open file, that means there is some kind  of
@@ -306,7 +323,7 @@ int el_file_open
                  * it's pointless to continue
                  */
 
-                current_log[0] = '\0';
+                options->current_log[0] = '\0';
                 return -1;
             }
 
@@ -342,7 +359,7 @@ int el_file_open
                  */
 
                 fclose(f);
-                remove(current_log);
+                remove(options->current_log);
                 continue;
             }
 
@@ -364,16 +381,16 @@ int el_file_open
 
     if (strlen(options->fname) > PATH_MAX)
     {
-        current_log[0] = '\0';
+        options->current_log[0] = '\0';
         errno = ENAMETOOLONG;
         return -1;
     }
 
-    strcpy(current_log, options->fname);
+    strcpy(options->current_log, options->fname);
 
-    if ((options->file = fopen(current_log, "a")) == NULL)
+    if ((options->file = fopen(options->current_log, "a")) == NULL)
     {
-        current_log[0] = '\0';
+        options->current_log[0] = '\0';
         return -1;
     }
 
@@ -397,7 +414,7 @@ int el_file_puts
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    if (current_log[0] == '\0')
+    if (options->current_log && options->current_log[0] == '\0')
     {
         /*
          * file has not been opened, prevent segfault
@@ -439,7 +456,7 @@ int el_file_puts
         }
     }
 
-    if (el_file_exists() == 0)
+    if (el_file_exists(options->current_log) == 0)
     {
         /*
          * file doesn't exist, it may happen when someone unlinks  currently
@@ -455,7 +472,7 @@ int el_file_puts
             fclose(options->file);
         }
 
-        if ((options->file = fopen(current_log, "a")) == NULL)
+        if ((options->file = fopen(options->current_log, "a")) == NULL)
         {
             errno = EBADF;
             return -1;
@@ -529,7 +546,7 @@ int el_file_puts
 
         fclose(options->file);
 
-        if ((options->file = fopen(current_log, "a")) == NULL)
+        if ((options->file = fopen(options->current_log, "a")) == NULL)
         {
             errno = EBADF;
             return -1;
@@ -559,5 +576,11 @@ void el_file_cleanup
     }
 
     options->file = NULL;
-    current_log[0] = '\0';
+
+    if (options->current_log)
+    {
+        options->current_log[0] = '\0';
+        free(options->current_log);
+        options->current_log = NULL;
+    }
 }

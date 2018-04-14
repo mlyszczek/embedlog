@@ -149,6 +149,7 @@ struct el_options
     long            written_after_sync;
     long            fpos;
     FILE           *file;
+    char           *current_log;
     const char     *fname;
     const char     *prefix;
     el_custom_puts  custom_puts;
