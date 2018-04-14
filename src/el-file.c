@@ -110,8 +110,33 @@ static int el_file_exists
 )
 {
 #if HAVE_ACCESS
+    /*
+     * access is the fastest
+     */
+
     return access(path, F_OK) == 0;
+
+#elif HAVE_STAT
+    /*
+     * but if we don't have access (some embedded systems like  nuttx  don't
+     * have users and will always return OK when access is called -  wrongly
+     */
+
+    struct stat st;
+    /*
+     * if stat return 0 we are sure file exists, -1 is returned for when
+     * file doesn't exist or there is other error, in any case we assume
+     * file doesn't exist
+     */
+
+    return stat(path, &st) == 0;
+
 #else
+    /*
+     * slowest, worst but  highly  portable  solution,  for  when  there  is
+     * nothing left but you still want to work
+     */
+
     FILE *f;
 
     if ((f = fopen(path, "r")) == NULL)
@@ -321,7 +346,7 @@ int el_file_open
                 return -1;
             }
 
-#if HAVE_ACCESS && HAVE_STAT
+#if HAVE_STAT
 
             if (i != 0)
             {
@@ -399,7 +424,7 @@ int el_file_open
             fseek(f, 0, SEEK_END);
             fsize = ftell(f);
 
-#else /* HAVE_ACCESS && HAVE_STAT */
+#else /* HAVE_STAT */
 
             if ((f = fopen(options->current_log, "a")) == NULL)
             {
@@ -449,7 +474,7 @@ int el_file_open
                 continue;
             }
 
-#endif /* HAVE_ACCESS && HAVE_STAT */
+#endif /* HAVE_STAT */
 
             /*
              * oldest file found, file is already opened so we simply return
