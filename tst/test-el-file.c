@@ -30,6 +30,29 @@
 
 
 /* ==========================================================================
+                               __        __            __
+                       ____ _ / /____   / /_   ____ _ / /
+                      / __ `// // __ \ / __ \ / __ `// /
+                     / /_/ // // /_/ // /_/ // /_/ // /
+                     \__, //_/ \____//_.___/ \__,_//_/
+                    /____/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
+
+
+/*
+ * variable is set in el-file.c when we successfully executed fsync path of
+ * the code
+ */
+int file_synced;
+
+
+/* ==========================================================================
                                    _                __
                      ____   _____ (_)_   __ ____ _ / /_ ___
                     / __ \ / ___// /| | / // __ `// __// _ \
@@ -50,6 +73,7 @@
 #define s8 "qwertyui"
 #define s5 "qwert"
 #define s3 "asd"
+#define s1 "a"
 mt_defs_ext();
 
 
@@ -108,6 +132,7 @@ static void test_prepare(void)
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FILE_SYNC_EVERY, 0);
+    file_synced = 0;
 }
 
 
@@ -1095,6 +1120,96 @@ static void file_rotate_fail(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+static void file_sync_always(void)
+{
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    mt_fok(el_puts(s8));
+    mt_fail(file_synced == 1);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_sync_periodic(void)
+{
+    el_option(EL_FILE_SYNC_EVERY, 8);
+    mt_fok(el_puts(s5));
+    mt_fail(file_synced == 0);
+    mt_fok(el_puts(s3));
+    mt_fail(file_synced == 1);
+    file_synced = 0;
+
+    mt_fok(el_puts(s5));
+    mt_fail(file_synced == 0);
+    mt_fok(el_puts(s8));
+    mt_fail(file_synced == 1);
+    file_synced = 0;
+
+    mt_fok(el_puts(s5));
+    mt_fail(file_synced == 0);
+    mt_fok(el_puts(s5));
+    mt_fail(file_synced == 1);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_sync_level(void)
+{
+    el_option(EL_FILE_SYNC_EVERY, 1024);
+    el_option(EL_FILE_SYNC_LEVEL, EL_ERROR);
+    el_option(EL_LEVEL, EL_DBG);
+    mt_fok(el_print(ELW, s8));
+    mt_fail(file_synced == 0);
+    mt_fok(el_print(ELW, s8));
+    mt_fail(file_synced == 0);
+    mt_fok(el_puts(s5));
+    mt_fail(file_synced == 0);
+
+    mt_fok(el_print(ELE, s1));
+    mt_fail(file_synced == 1);
+    file_synced = 0;
+
+    mt_fok(el_print(ELC, s1));
+    mt_fail(file_synced == 1);
+    file_synced = 0;
+
+    mt_fok(el_print(ELA, s1));
+    mt_fail(file_synced == 1);
+    file_synced = 0;
+
+    mt_fok(el_print(ELF, s1));
+    mt_fail(file_synced == 1);
+    file_synced = 0;
+
+    mt_fok(el_print(ELW, s1));
+    mt_fail(file_synced == 0);
+
+    mt_fok(el_print(ELN, s1));
+    mt_fail(file_synced == 0);
+
+    mt_fok(el_print(ELI, s1));
+    mt_fail(file_synced == 0);
+
+    mt_fok(el_print(ELD, s1));
+    mt_fail(file_synced == 0);
+
+    mt_fok(el_pmemory(ELI, s8, sizeof(s8)));
+    mt_fail(file_synced == 0);
+
+    mt_fok(el_pmemory(ELF, s8, sizeof(s8)));
+    mt_fail(file_synced == 1);
+}
+
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -1161,6 +1276,9 @@ void el_file_test_group(void)
     mt_run(file_rotate_filename_too_long);
     mt_run(file_rotate_path_too_long);
     mt_run(file_rotate_fail);
+    mt_run(file_sync_always);
+    mt_run(file_sync_periodic);
+    mt_run(file_sync_level);
 
     rmdir(WORKDIR);
 #endif

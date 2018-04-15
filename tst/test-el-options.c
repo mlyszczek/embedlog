@@ -95,6 +95,8 @@ static void options_init(void)
     memset(&default_options, 0, sizeof(default_options));
     default_options.outputs             = 0;
     default_options.level               = EL_INFO;
+    default_options.file_sync_level     = EL_FATAL;
+    default_options.level_current_msg   = EL_DBG;
     default_options.colors              = 0;
     default_options.timestamp           = EL_TS_OFF;
     default_options.timestamp_timer     = EL_TS_TM_TIME;
@@ -156,6 +158,32 @@ static void options_level_set(void)
         {
             mt_ferr(el_option(EL_LEVEL, i), EINVAL);
             mt_fail(g_options.level == EL_DBG);
+        }
+    }
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void options_file_sync_level_set(void)
+{
+    int i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    for (i = 0; i != 16; ++i)
+    {
+        if (i <= EL_DBG)
+        {
+            mt_fail(el_option(EL_FILE_SYNC_LEVEL, i) == 0);
+            mt_fail(g_options.file_sync_level == i);
+        }
+        else
+        {
+            mt_ferr(el_option(EL_FILE_SYNC_LEVEL, i), EINVAL);
+            mt_fail(g_options.file_sync_level == EL_DBG);
         }
     }
 }
@@ -441,6 +469,7 @@ void el_options_test_group(void)
     mt_cleanup_test = &test_cleanup;
 
     mt_run(options_level_set);
+    mt_run(options_file_sync_level_set);
     mt_run(options_output);
     mt_run(options_log_allowed);
     mt_run(options_opt_print_level);

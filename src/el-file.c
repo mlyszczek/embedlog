@@ -62,6 +62,34 @@
 
 
 /* ==========================================================================
+                               __        __            __
+                       ____ _ / /____   / /_   ____ _ / /
+                      / __ `// // __ \ / __ \ / __ `// /
+                     / /_/ // // /_/ // /_/ // /_/ // /
+                     \__, //_/ \____//_.___/ \__,_//_/
+                    /____/
+                                   _         __     __
+              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
+             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
+             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
+             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+
+   ========================================================================== */
+
+
+#ifdef RUN_TESTS
+
+/*
+ * there is no easy way to check if file has been fsynced to disk or not,
+ * so we introduce this helper variable to know if we executed syncing
+ * code or not
+ */
+extern int file_synced;
+
+#endif
+
+
+/* ==========================================================================
                                    _                __
                      ____   _____ (_)_   __ ____ _ / /_ ___
                     / __ \ / ___// /| | / // __ `// __// _ \
@@ -602,7 +630,8 @@ int el_file_puts
     options->fpos += sl;
     options->written_after_sync += sl;
 
-    if (options->written_after_sync >= options->file_sync_every)
+    if (options->written_after_sync >= options->file_sync_every ||
+        options->level_current_msg <= options->file_sync_level)
     {
         /*
          * file store operation has particular issue.  You can  like,  write
@@ -624,7 +653,7 @@ int el_file_puts
 #if HAVE_FSYNC && HAVE_FILENO
         int fd;  /* systems file descriptor for options->file */
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif
+#endif /* HAVE_FSYNC && HAVE_FILENO */
 
         /*
          * first flush data from stdio library buffers into kernel
@@ -649,7 +678,7 @@ int el_file_puts
         {
             return -1;
         }
-#else
+#else /* HAVE_FSYNC && HAVE_FILENO */
         /*
          * if system does not implement fileno and fsync our only hope  lies
          * int closing (which should sync file to  block  device)  and  then
@@ -664,7 +693,11 @@ int el_file_puts
             errno = EBADF;
             return -1;
         }
-#endif
+
+#ifdef RUN_TESTS
+        file_synced = 1;
+#endif /* RUN_TESTS */
+#endif /* HAVE_FSYNC && HAVE_FILENO */
 
         options->written_after_sync = 0;
     }

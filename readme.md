@@ -11,8 +11,10 @@ systems, it is general **c/c++** logger that can be used in any application.
 Implemented features are:
 
 * printing to different outputs (simultaneously) like:
+    * syslog
+    * directly to serial device (like /dev/ttyS0)
     * standard error (stderr)
-    * file (with optional log rotate)
+    * file (with optional log rotate, and syncing to prevent data loss)
     * custom routine - can be anything **embedlog** just calls custom function
       with string to print
 * appending timestamp to every message

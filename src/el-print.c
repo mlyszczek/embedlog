@@ -694,10 +694,30 @@ int el_ovprint
 
     buf[w++] = '\0';
 
+    /*
+     * some modules (like el-file) needs to know level of message  they  are
+     * printing, and such information may not be available from string, thus
+     * we set it here in a 'object global' variable
+     */
+
+    options->level_current_msg = level;
+
     if (el_oputs(options, buf) != 0)
     {
+        options->level_current_msg = EL_DBG;
         return -1;
     }
+
+    /*
+     * after message is printed set current messasge level to debug, as next
+     * call might be using el_puts, which does not contain log level, and we
+     * thread all el_puts messages as they were debug.  Note,  it  does  not
+     * apply to log filtering, el_puts does not filter messages, but modules
+     * like el-file, will need this information to determin  wheter  fsync()
+     * data to file or not.
+     */
+
+    options->level_current_msg = EL_DBG;
 
     if (e)
     {

@@ -104,6 +104,7 @@ enum el_option
     EL_FROTATE_NUMBER,
     EL_FROTATE_SIZE,
     EL_FILE_SYNC_EVERY,
+    EL_FILE_SYNC_LEVEL,
 
     EL_OPT_ERROR /* internal use only */
 };
@@ -140,6 +141,8 @@ struct el_options
     unsigned int    print_newline:1;
     unsigned int    finfo:1;
     unsigned int    level:3;
+    unsigned int    level_current_msg:3;
+    unsigned int    file_sync_level:3;
 
     int             serial_fd;
     int             frotate_number;

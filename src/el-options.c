@@ -166,6 +166,12 @@ static int el_vooption
         options->level = value_int;
         return 0;
 
+    case EL_FILE_SYNC_LEVEL:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, value_int <= 7);
+        options->file_sync_level = value_int;
+        return 0;
+
     case EL_OUT:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~EL_OUT_ALL) == 0x00);
@@ -399,6 +405,8 @@ int el_oinit
     options->print_newline = 1;
     options->timestamp_useconds = 1;
     options->level = EL_INFO;
+    options->level_current_msg = EL_DBG;
+    options->file_sync_level = EL_FATAL;
     options->serial_fd = -1;
     options->file_sync_every = 32768;
     return 0;
