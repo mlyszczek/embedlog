@@ -576,7 +576,7 @@ static void print_log_level(void)
 static void print_colorful_output(void)
 {
     el_option(EL_COLORS, 1);
-    el_option(EL_LEVEL, EL_DBG + 2);
+    el_option(EL_LEVEL, EL_DBG);
     add_log(ELF, "print_colorful_output fatal message");
     add_log(ELA, "print_colorful_output alert message");
     add_log(ELC, "print_colorful_output critical message");
@@ -598,7 +598,7 @@ static void print_colorful_output(void)
 static void print_custom_log_level(void)
 {
     el_option(EL_PRINT_LEVEL, 1);
-    el_option(EL_LEVEL, EL_DBG + 5);
+    el_option(EL_LEVEL, EL_DBG);
     add_log(ELD + 4, "print_custom_log_level custom debug 4");
     add_log(ELD + 5, "print_custom_log_level custom debug 5");
     add_log(ELD + 6, "print_custom_log_level custom debug 6");

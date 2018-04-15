@@ -29,7 +29,7 @@ Value inside parenthesis determines argument types of variadic arguments
 sets what the current logging level shall be.
 Altough it accepts
 .   B enum el_level
-type, this can be whatever number from range <0, INT_MAX>.
+type, this can be whatever number from range <0, 7>.
 The higher the level, the lower priority of the message.
 All messages that have lower priority (higher number) then currently set
 .   I level
@@ -54,34 +54,14 @@ There are 8 predefined levels, sorted by priority (highest first):
 .       B EL_DBG
 .   RE
 .   PP
-If 8 print levels are not enough, one can define new levels, knowing that
-.   B EL_FATAL
-has int value of 0, and
-.   B EL_DBG
-has int value of 7.
-User can also use debug level and add an integer like:
-.   B EL_DBG
-+
-.   I n
-- where
-.   I n
-can be any number from range <0, INT_MAX - 8>.
-.   PP
-If messages are printed with lower priority than
-.   B EL_DBG
-they all will be treated as messages printed with level
-.   BR EL_DBG ,
-that means message printed with level
-.   B EL_DBG
-and
-.   BR "EL_DBG + 3" ,
-will be printed exactly the same, so same color (if colors are enabled) and if
-log level printig is enabled, such messages will have same 'd/' prefix no matter
-the level.
-.   PP
 .   B ERRORS
 .   RS
-Setting log level cannot fail
+.       B EINVAL
+.       RS
+specified
+.       I level
+is invalid (bigger than EL_DBG).
+.       RE
 .   RE
 .RE
 .PP

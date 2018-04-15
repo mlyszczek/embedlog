@@ -21,7 +21,7 @@ Implemented features are:
     * CLOCK_REALTIME (requires POSIX)
     * CLOCK_MONOTONIC (requires POSIX)
 * print location of printed log (file and line)
-* 8 predefinied log levels and (sizeof(int) - 8) custom log levels ;-)
+* 8 predefinied log levels (total rip off from syslog(2))
 * colorful output (ansi colors) for easy error spotting
 * print memory block in wireshark-like output
 

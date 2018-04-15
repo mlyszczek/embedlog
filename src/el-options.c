@@ -162,6 +162,7 @@ static int el_vooption
     {
     case EL_LEVEL:
         value_int = va_arg(ap, int);
+        VALID(EINVAL, value_int <= 7);
         options->level = value_int;
         return 0;
 

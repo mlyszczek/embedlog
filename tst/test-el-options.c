@@ -145,10 +145,18 @@ static void options_level_set(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (i = 0; i != 32; ++i)
+    for (i = 0; i != 16; ++i)
     {
-        mt_fail(el_option(EL_LEVEL, i) == 0);
-        mt_fail(g_options.level == i);
+        if (i <= EL_DBG)
+        {
+            mt_fail(el_option(EL_LEVEL, i) == 0);
+            mt_fail(g_options.level == i);
+        }
+        else
+        {
+            mt_ferr(el_option(EL_LEVEL, i), EINVAL);
+            mt_fail(g_options.level == EL_DBG);
+        }
     }
 }
 

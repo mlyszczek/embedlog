@@ -139,8 +139,8 @@ struct el_options
     unsigned int    print_log_level:1;
     unsigned int    print_newline:1;
     unsigned int    finfo:1;
+    unsigned int    level:3;
 
-    int             level;
     int             serial_fd;
     int             frotate_number;
     int             fcurrent_rotate;
