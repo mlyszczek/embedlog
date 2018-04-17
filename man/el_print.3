@@ -13,6 +13,8 @@
 .PP
 .BI "int el_puts(const char *" message ")"
 .br
+.BI "int el_putb(const void *" memory ", size_t " mlen ")"
+.br
 .BI "int el_print(const char *" file ", size_t " line ", \
 enum el_level " level ", const char *" fmt ", " ... ")"
 .br
@@ -24,8 +26,14 @@ enum el_level " level ", const char *" fmt ", " ... ")"
 .br
 .BI "int el_pmemory(const char *" file ", size_t " line ", \
 enum el_level " level ", const void *" memory ", size_t " mlen ")
+.br
+.BI "int el_pbinary(enum el_level " level ", const void *" memory", \
+size_t " mlen ")
 .PP
 .BI "int el_oputs(struct el_options *" options ", const char *" message ")"
+.br
+.BI "int el_putb(struct el_options *" options ", const void *" memory ", \
+size_t " mlen ")"
 .br
 .BI "int el_oprint(const char *" file ", size_t " line ", \
 enum el_level " level ", struct el_options *" options ", \
@@ -41,6 +49,9 @@ const char *" fmt ", " ... ")"
 .br
 .BI "int el_pmemory(const char *" file ", size_t " line ", \
 enum el_level " level ", struct el_options *" options ", \
+const void *" memory ", size_t " mlen ")"
+.br
+.BI "int el_pbinary(enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .PP
 .BI "#define ELF " __FILE__ ", " __LINE__ ", " EL_FATAL
@@ -70,7 +81,7 @@ __ISOC99_SOURCE
 .SH DESCRIPTION
 .PP
 Functions print log into configured outputs.
-
+.PP
 .BR el_puts (3)
 function prints
 .I message
@@ -80,6 +91,23 @@ is not altered in anyway - that means no automatic log levels, location of the
 log nor timestamp is printed - even if they are enabled.
 Logs printed with this functions are not filtered by log level, and will always
 be printed. Prints can still be suppressed by disabling output.
+.PP
+.BR el_putb (3)
+function works same as
+.BR el_puts (3)
+but binary data can be passed.
+That binary data will not be printed in ASCII like it it with
+.BR el_pmemory (3).
+If
+.I memory
+contains
+.B NULL
+characters, they will be stored to file.
+If
+.I memory
+is for example
+.B char buf[] = { 0xb0, 0xfc, 0x13, 0x37 }
+then exactly these bytes will be stored into file.
 .PP
 .BR el_print (3)
 function behaves similar to standard
@@ -152,6 +180,95 @@ values.
     0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
     ------  -----------------------------------------------  ----------------
 .EE
+.PP
+.BR el_pbinary (3)
+is used to log binary data into block device.
+Both metadata and data itself are treated as binary data.
+Such files cannot be read with text tools like
+.BR less ,
+but rather needs special program that will parse the file.
+This may be usefull when you need, for example to log every message on CAN bus.
+If there are a lot of messages, it may be better to store them in binary format
+as this may save *a lot* of space.
+.PP
+.BR el_pbinary (3)
+uses specific format to store metadata to save as much space as possible.
+All numerical values in metadata are variadic in size. Order of fields are as
+follows:
+.PP
+.EX
+    +-------+------------+--------------+-------------+------+
+    | flags | ts_seconds | ts_fractions | data_length | data |
+    +-------+------------+--------------+-------------+------+
+.EE
+.PP
+The only mandatory fields are
+.BR flags ", " data_length " and " data .
+.B flags
+determin what fields are present.
+.B flags
+field is always 1 byte in size and its format is
+.PP
+.EX
+    +------+-------+-----------------------------------------------------------+
+    | bits | value | description                                               |
+    +------+-------+-----------------------------------------------------------+
+    |    0 |   0   | both ts_seconds and ts_fraction will not appear           |
+    |      +-------+-----------------------------------------------------------+
+    |      |   1   | at least ts_seconds will appear, ts_fraction appearance   |
+    |      |       | depends on 1..2 bits values                               |
+    +------+-------+-----------------------------------------------------------+
+    | 1..2 |   0   | ts_fractions will not appear                              |
+    |      +-------+-----------------------------------------------------------+
+    |      |   1   | ts_fractions will hold milliseconds value                 |
+    |      +-------+-----------------------------------------------------------+
+    |      |   2   | ts_fractions will hold microseconds value                 |
+    |      +-------+-----------------------------------------------------------+
+    |      |   3   | ts_fractions will hold nanoseconds value                  |
+    +------+-------+-----------------------------------------------------------+
+    | 3..5 |  0..7 | severity of the log, 0 is the highest and 7 is the lowest |
+    +------+-------+-----------------------------------------------------------+
+    | 6..7 |  0..3 | reserved                                                  |
+    +------+-------+-----------------------------------------------------------+
+.EE
+.PP
+.BR ts_seconds ", " ts_fractions " and " data_length
+are numerical values with dynamic size.
+Each byte of a numerical value can hold number up to 127 and oldest bit is used
+as continuation bit, if that bit is set, program should treat next byte as next
+part of the same numerical value.
+Below is table with example decimal values and it's encoded counterpart.
+.PP
+.EX
+    +---------------+--------------------------+
+    | decimal value | encoded hex value        |
+    +---------------+--------------------------+
+    |             0 | 0x00                     |
+    |             1 | 0x01                     |
+    |             2 | 0x02                     |
+    |           127 | 0x7f                     |
+    |           128 | 0x80 0x81                |
+    |           129 | 0x81 0x01                |
+    |           255 | 0xff 0x01                |
+    |           256 | 0x80 0x02                |
+    |           257 | 0x81 0x02                |
+    |         16383 | 0xff 0x7f                |
+    |         16384 | 0x80 0x80 0x01           |
+    |         16385 | 0x81 0x80 0x01           |
+    |     438478374 | 0xa6 0xcc 0x8a 0xd1 0x01 |
+    |    2147483647 | 0xff 0xff 0xff 0xff 0x07 |
+    |    4294967295 | 0xff 0xff 0xff 0xff 0x0f |
+    +---------------+--------------------------+
+.EE
+.PP
+Encoded number are always
+.BR little-endian ,
+that is first byte is always the least significant byte.
+.PP
+.B data
+is be whatever you want of any size.
+.BR el_pbinary (3)
+uses only timestamp and log level, rest of the options are simply ignores.
 .PP
 .BR el_print (3),
 .BR el_vprint (3),

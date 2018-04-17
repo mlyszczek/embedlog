@@ -9,6 +9,7 @@ test_SOURCES += main.c \
 	test-el-file.c \
 	test-el-perror.c \
 	test-el-pmemory.c \
+	test-el-pbinary.c \
 	mtest.h \
 	test-group-list.h
 

@@ -34,20 +34,11 @@
 #include "config.h"
 #endif
 
+#include "el-private.h"
+
 #include <errno.h>
 #include <stdio.h>
 
-#include "el-options.h"
-#include "embedlog.h"
-#include "valid.h"
-
-#if ENABLE_OUT_FILE
-#include "el-file.h"
-#endif
-
-#if ENABLE_OUT_TTY
-#include "el-tty.h"
-#endif
 
 /* ==========================================================================
                                         __     __ _
@@ -141,6 +132,70 @@ int el_oputs
         rv |= options->custom_puts(s);
     }
 #endif
+
+    return rv;
+}
+
+
+/* ==========================================================================
+    puts memory 'mem'  to  all  supported  output  facilities  specified  by
+    default options. Not all outputs support printing binary data
+   ========================================================================== */
+
+
+int el_putb
+(
+    const void         *mem,  /* memory location to 'print' */
+    size_t              mlen  /* size of the mem buffer */
+)
+{
+    return el_oputb(&g_options, mem, mlen);
+}
+
+
+/* ==========================================================================
+    Puts binary data 'mem' of size 'mlen' to enabled output facilities
+    specified by 'options'. No all outputs support printing binary data
+   ========================================================================== */
+
+
+int el_oputb
+(
+    struct el_options  *options,   /* options defining printing style */
+    const void         *mem,       /* memory location to 'print' */
+    size_t              mlen       /* size of the mem buffer */
+)
+{
+    int                 rv;        /* return value from function */
+    int                 called;    /* at least one output was called */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    VALID(EINVAL, options);
+    VALID(EINVAL, mem);
+    VALID(EINVAL, mlen);
+    VALID(ENODEV, options->outputs != 0);
+
+    rv = 0;
+    called = 0;
+
+#if ENABLE_OUT_FILE
+    if (options->outputs & EL_OUT_FILE)
+    {
+        called = 1;
+        rv |= el_file_putb(options, mem, mlen);
+    }
+#endif
+
+    if (called == 0)
+    {
+        /*
+         * couldn't find any supported output for binary logging
+         */
+
+        errno = ENODEV;
+        return -1;
+    }
 
     return rv;
 }

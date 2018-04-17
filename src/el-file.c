@@ -42,7 +42,7 @@
 #   include "config.h"
 #endif
 
-#include "el-options.h"
+#include "el-private.h"
 
 #if HAVE_UNISTD_H
 #   include <unistd.h>
@@ -545,16 +545,14 @@ int el_file_open
    ========================================================================== */
 
 
-int el_file_puts
+int el_file_putb
 (
-    struct el_options  *options,  /* printing options */
-    const char         *s         /* string to 'put' into file */
+    struct el_options    *options,  /* printing options */
+    const void           *mem,      /* memory to 'put' into file */
+    size_t                mlen      /* size of buffer 'mlen' */
+
 )
 {
-    int  sl;  /* size of the s message */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
     if (options->current_log && options->current_log[0] == '\0')
     {
         /*
@@ -565,11 +563,9 @@ int el_file_puts
         return -1;
     }
 
-    sl = strlen(s);
-
     if (options->frotate_number)
     {
-        if (options->fpos != 0 &&  options->fpos + sl > options->frotate_size)
+        if (options->fpos != 0 &&  options->fpos + mlen > options->frotate_size)
         {
             /*
              * we get here only when frotate  is  enabled,  and  writing  to
@@ -585,7 +581,7 @@ int el_file_puts
             }
         }
 
-        if (sl > options->frotate_size)
+        if (mlen > options->frotate_size)
         {
             /*
              * we can't fit message even in an empty file, in such  case  we
@@ -593,7 +589,7 @@ int el_file_puts
              * configured frotate_size
              */
 
-            sl = options->frotate_size;
+            mlen = options->frotate_size;
         }
     }
 
@@ -622,13 +618,13 @@ int el_file_puts
         options->fpos = 0;
     }
 
-    if (fwrite(s, sl, 1, options->file) != 1)
+    if (fwrite(mem, mlen, 1, options->file) != 1)
     {
         return -1;
     }
 
-    options->fpos += sl;
-    options->written_after_sync += sl;
+    options->fpos += mlen;
+    options->written_after_sync += mlen;
 
     if (options->written_after_sync >= options->file_sync_every ||
         options->level_current_msg <= options->file_sync_level)
@@ -647,7 +643,7 @@ int el_file_puts
          * sync our file  and  metadata,  parent  directory  might  not  get
          * flushed and there will not be entry for our file -  meaning  file
          * will be lost too, but such situations are ultra  rare  and  there
-         *  isn't  really  much  we  can  do  about  it  here  but   prying.
+         * isn't really much we can do about it here but praying.
          */
 
 #if HAVE_FSYNC && HAVE_FILENO
@@ -681,7 +677,7 @@ int el_file_puts
 #else /* HAVE_FSYNC && HAVE_FILENO */
         /*
          * if system does not implement fileno and fsync our only hope  lies
-         * int closing (which should sync file to  block  device)  and  then
+         * in closing (which should sync file  to  block  device)  and  then
          * opening file again.  Yup, performance will  suck,  but  hey,  its
          * about data safety!
          */
@@ -693,16 +689,36 @@ int el_file_puts
             errno = EBADF;
             return -1;
         }
+#endif /* HAVE_FSYNC && HAVE_FILENO */
 
 #ifdef RUN_TESTS
         file_synced = 1;
 #endif /* RUN_TESTS */
-#endif /* HAVE_FSYNC && HAVE_FILENO */
 
         options->written_after_sync = 0;
     }
 
     return 0;
+}
+
+
+/* ==========================================================================
+    Puts string 's' into file if needed rotates file
+   ========================================================================== */
+
+
+int el_file_puts
+(
+    struct el_options  *options,  /* printing options */
+    const char         *s         /* string to 'put' into file */
+)
+{
+    size_t              slen;     /* size of string 's' */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    slen = strlen(s);
+    return el_file_putb(options, (unsigned char *)s, slen);
 }
 
 

@@ -18,9 +18,7 @@
 #include "config.h"
 #endif
 
-#include "el-options.h"
-#include "el-tty.h"
-#include "valid.h"
+#include "el-private.h"
 
 #include <errno.h>
 #include <fcntl.h>

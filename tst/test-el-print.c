@@ -24,8 +24,7 @@
 #include "stdlib.h"
 #include "embedlog.h"
 
-#include "config-priv.h"
-#include "el-options.h"
+#include "el-private.h"
 
 
 /* ==========================================================================

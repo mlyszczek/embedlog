@@ -223,6 +223,24 @@ AS_IF([test "x$enable_clock" = "xyes"],
 
 
 ###
+# --enable-binary
+#
+
+
+AC_ARG_ENABLE([binary-logs],
+    AS_HELP_STRING([--enable-binary-logs], [Enable printing binary logs]),
+    [], [enable_binary_logs="no"])
+
+AM_CONDITIONAL([ENABLE_BINARY_LOGS], [test "x$enable_binary_logs" = "xyes"])
+AS_IF([test "x$enable_binary_logs" = "xyes"],
+[
+    AC_DEFINE([ENABLE_PREFIX], [1], [Enable printing binary logs])
+    AC_CHECK_FUNCS([memcpy],,
+        AC_MSG_ERROR(not found, needed by --enable-binary-logs))
+])
+
+
+###
 # --enable-prefix
 #
 
@@ -387,6 +405,7 @@ echo "clock() timestamp........... : $enable_clock"
 echo "print prefix with each msg.. : $enable_prefix"
 echo "print file info with log.... : $enable_finfo"
 echo "force portable snprintf......: $enable_portable_snprintf"
+echo "binary logs..................: $enable_binary_logs"
 echo "colorize output............. : $enable_colors"
 echo "extended colors............. : $enable_colors_extended"
 echo "reentrant functions......... : $enable_reentrant"

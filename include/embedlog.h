@@ -170,7 +170,8 @@ int el_pmemory(const char *file, size_t line, enum el_level level,
         const void *memory, size_t mlen);
 int el_perror(const char *file, size_t line, enum el_level level,
         const char *fmt, ...);
-
+int el_putb(const void *memory, size_t mlen);
+int el_pbinary(enum el_level level, const void *memory, size_t mlen);
 
 int el_oinit(struct el_options *options);
 int el_ocleanup(struct el_options *options);
@@ -184,6 +185,9 @@ int el_opmemory(const char *file, size_t line, enum el_level level,
         struct el_options *options, const void *memory, size_t mlen);
 int el_operror(const char *file, size_t line, enum el_level level,
         struct el_options *options, const char *fmt, ...);
+int el_oputb(struct el_options *options, const void *memory, size_t mlen);
+int el_opbinary(enum el_level level, struct el_options *options,
+        const void *memory, size_t mlen);
 
 #ifdef __cplusplus
 }

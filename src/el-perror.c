@@ -28,8 +28,7 @@
 #include "config.h"
 #endif
 
-#include "el-options.h"
-#include "embedlog.h"
+#include "el-private.h"
 
 #include <errno.h>
 #include <stdarg.h>
