@@ -410,7 +410,7 @@ static void options_opt_timestamp_fraction(void)
 
     for (i = EL_TS_FRACT_OFF; i != EL_TS_FRACT_ERROR; ++i)
     {
-#if ENABLE_FRACTIONS
+#if ENABLE_FRACTIONS && ENABLE_TIMESTAMP
         mt_fok(el_option(EL_TS_FRACT, i));
         mt_fail(g_options.timestamp_fractions == i);
 #else
@@ -418,7 +418,7 @@ static void options_opt_timestamp_fraction(void)
 #endif
     }
 
-#if ENABLE_FRACTIONS
+#if ENABLE_FRACTIONS && ENABLE_TIMESTAMP
     mt_ferr(el_option(EL_TS_FRACT, i), EINVAL);
 #else
     mt_ferr(el_option(EL_TS_FRACT, i), ENOSYS);
