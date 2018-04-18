@@ -92,7 +92,7 @@ enum el_option
     EL_COLORS,
     EL_TS,
     EL_TS_TM,
-    EL_TS_USEC,
+    EL_TS_FRACT,
     EL_PRINT_LEVEL,
     EL_PRINT_NL,
     EL_FINFO,
@@ -128,6 +128,16 @@ enum el_option_timestamp_timer
     EL_TS_TM_ERROR /* internal use only */
 };
 
+enum el_option_timestamp_fractions
+{
+    EL_TS_FRACT_OFF,
+    EL_TS_FRACT_MS,
+    EL_TS_FRACT_US,
+    EL_TS_FRACT_NS,
+
+    EL_TS_FRACT_ERROR /* internal use onsly */
+};
+
 typedef int (*el_custom_puts)(const char *s);
 
 struct el_options
@@ -136,7 +146,7 @@ struct el_options
     unsigned int    colors:1;
     unsigned int    timestamp:2;
     unsigned int    timestamp_timer:3;
-    unsigned int    timestamp_useconds:1;
+    unsigned int    timestamp_fractions:2;
     unsigned int    print_log_level:1;
     unsigned int    print_newline:1;
     unsigned int    finfo:1;

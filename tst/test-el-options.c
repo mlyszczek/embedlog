@@ -99,7 +99,7 @@ static void options_init(void)
     default_options.colors              = 0;
     default_options.timestamp           = EL_TS_OFF;
     default_options.timestamp_timer     = EL_TS_TM_TIME;
-    default_options.timestamp_useconds  = 1;
+    default_options.timestamp_fractions = EL_TS_FRACT_OFF;
     default_options.print_log_level     = 1;
     default_options.print_newline       = 1;
     default_options.custom_puts         = NULL;
@@ -402,6 +402,29 @@ static void options_opt_timestamp_timer(void)
 }
 
 
+static void options_opt_timestamp_fraction(void)
+{
+    int i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    for (i = EL_TS_FRACT_OFF; i != EL_TS_FRACT_ERROR; ++i)
+    {
+#if ENABLE_FRACTIONS
+        mt_fok(el_option(EL_TS_FRACT, i));
+        mt_fail(g_options.timestamp_fractions == i);
+#else
+        mt_ferr(el_option(EL_TS_FRACT, i), ENOSYS);
+#endif
+    }
+
+#if ENABLE_FRACTIONS
+    mt_ferr(el_option(EL_TS_FRACT, i), EINVAL);
+#else
+    mt_ferr(el_option(EL_TS_FRACT, i), ENOSYS);
+#endif
+}
+
 /* ==========================================================================
    ========================================================================== */
 
@@ -475,6 +498,7 @@ void el_options_test_group(void)
     mt_run(options_opt_colors);
     mt_run(options_opt_timestamp);
     mt_run(options_opt_timestamp_timer);
+    mt_run(options_opt_timestamp_fraction);
     mt_run(options_ooption_test);
     mt_run(options_einval);
     mt_run(options_prefix);

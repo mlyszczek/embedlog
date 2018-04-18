@@ -316,6 +316,26 @@ Specified timer source was not compiled in and is not available
 .   RE
 .RE
 .PP
+.BI "EL_TS_FRACT (" enum " " el_option_timestamp_fraction " fraction)
+.RS
+This options controls how to display fractions of seconds.
+If high resolution is not needed or not supported, it's best to set this to
+lowest resolution possible.
+Table will show exacly what this is about.
+Example uses long timestamp, interesting part is after date after dot '.'.
+.PP
+.EX
+    +-----------------+-------------------------------+
+    |      value      |  resulting timestamp string   |
+    +-----------------+-------------------------------+
+    | EL_TS_FRACT_OFF | 2018-04-17 22:02:57           |
+    | EL_TS_FRACT_MS  | 2018-04-17 22:02:57.070       |
+    | EL_TS_FRACT_US  | 2018-04-17 22:02:57.070518    |
+    | EL_TS_FRACT_NS  | 2018-04-17 22:02:57.070518782 |
+    +-----------------+-------------------------------+
+.EE
+.RE
+.PP
 .BI "EL_PRINT_LEVEL (" int " print)"
 .RS
 If this is set to 1, each log will have log level information prefix in format

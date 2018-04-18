@@ -189,7 +189,7 @@ static int pbinary_check(void)
              * fraction of seconds checks makes sense only when ts is set
              */
 
-            if (g_options.timestamp_useconds)
+            if (g_options.timestamp_fractions)
             {
                 unsigned long long usec;
                 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -371,7 +371,7 @@ static void test_prepare(void)
     el_option(EL_PREFIX, NULL);
     el_option(EL_COLORS, 0);
     el_option(EL_TS, EL_TS_OFF);
-    el_option(EL_TS_USEC, 0);
+    el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
     el_option(EL_PRINT_LEVEL, 0);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FILE_SYNC_EVERY, 1024);
@@ -431,7 +431,52 @@ static void pbinary_simple_multiple_message(void)
 
 static void pbinary_ts_without_fractions(void)
 {
-    el_option(EL_TS_USEC, 1);
+    el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
+    add_log(EL_FATAL, d1, 1);
+    add_log(EL_FATAL, d2, 2);
+    add_log(EL_FATAL, d5, 5);
+    add_log(EL_FATAL, d8, 8);
+    mt_fok(pbinary_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void pbinary_ts_fractions_ms(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_MS);
+    add_log(EL_FATAL, d1, 1);
+    add_log(EL_FATAL, d2, 2);
+    add_log(EL_FATAL, d5, 5);
+    add_log(EL_FATAL, d8, 8);
+    mt_fok(pbinary_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void pbinary_ts_fractions_us(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_US);
+    add_log(EL_FATAL, d1, 1);
+    add_log(EL_FATAL, d2, 2);
+    add_log(EL_FATAL, d5, 5);
+    add_log(EL_FATAL, d8, 8);
+    mt_fok(pbinary_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void pbinary_ts_fractions_ns(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
     add_log(EL_FATAL, d1, 1);
     add_log(EL_FATAL, d2, 2);
     add_log(EL_FATAL, d5, 5);
@@ -472,9 +517,9 @@ static void pbinary_timestamp_long(void)
    ========================================================================== */
 
 
-static void pbinary_timestamp_short_no_useconds(void)
+static void pbinary_timestamp_short_no_fractions(void)
 {
-    el_option(EL_TS_USEC, 0);
+    el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
     el_option(EL_TS, EL_TS_SHORT);
     add_log(EL_FATAL, d2, 2);
     add_log(EL_FATAL, d5, 5);
@@ -487,9 +532,9 @@ static void pbinary_timestamp_short_no_useconds(void)
    ========================================================================== */
 
 
-static void pbinary_timestamp_long_no_useconds(void)
+static void pbinary_timestamp_long_no_fractions(void)
 {
-    el_option(EL_TS_USEC, 0);
+    el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
     el_option(EL_TS, EL_TS_LONG);
     add_log(EL_FATAL, d2, 2);
     add_log(EL_FATAL, d5, 5);
@@ -533,18 +578,18 @@ static void pbinary_mix_of_everything(void)
     int finfo;
     int colors;
     int prefix;
-    int usec;
+    int fract;
     int nl;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+    for (fract = EL_TS_FRACT_OFF;   fract != EL_TS_FRACT_ERROR;   ++fract)
     for (level = EL_FATAL;          level <= EL_DBG;              ++level)
     for (timestamp = EL_TS_OFF;     timestamp != EL_TS_ERROR;     ++timestamp)
     for (printlevel = 0;            printlevel <= 1;              ++printlevel)
     for (finfo = 0;                 finfo <= 1;                   ++finfo)
     for (colors = 0;                colors <= 1;                  ++colors)
     for (prefix = 0;                prefix <= 1;                  ++prefix)
-    for (usec = 0;                  usec <= 1;                    ++usec)
     for (nl = 0;                    nl <= 1;                      ++nl)
     {
         test_prepare();
@@ -555,6 +600,7 @@ static void pbinary_mix_of_everything(void)
         el_option(EL_FINFO, finfo);
         el_option(EL_COLORS, colors);
         el_option(EL_PREFIX, prefix ? "prefix" : NULL);
+        el_option(EL_TS_FRACT, fract);
 
         add_log(EL_FATAL,  d1, 1);
         add_log(EL_ALERT,  d1, 1);
@@ -627,7 +673,7 @@ static void pbinary_truncate(void)
     }
 
     el_option(EL_TS, EL_TS_LONG);
-    el_option(EL_TS_USEC, 1);
+    el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
     add_log(EL_INFO, msg, sizeof(msg));
 
     /*
@@ -650,6 +696,7 @@ static void pbinary_truncate(void)
 
 void el_pbinary_test_group(void)
 {
+#if ENABLE_BINARY_LOGS
     mt_run(pbinary_different_clocks);
     mt_run(pbinary_mix_of_everything);
 
@@ -661,10 +708,14 @@ void el_pbinary_test_group(void)
     mt_run(pbinary_ts_without_fractions);
     mt_run(pbinary_timestamp_short);
     mt_run(pbinary_timestamp_long);
-    mt_run(pbinary_timestamp_short_no_useconds);
-    mt_run(pbinary_timestamp_long_no_useconds);
+    mt_run(pbinary_ts_fractions_ms);
+    mt_run(pbinary_ts_fractions_us);
+    mt_run(pbinary_ts_fractions_ns);
+    mt_run(pbinary_timestamp_short_no_fractions);
+    mt_run(pbinary_timestamp_long_no_fractions);
     mt_run(pbinary_with_no_output_available);
     mt_run(pbinary_level_not_high_enough);
     mt_run(pbinary_null);
     mt_run(pbinary_truncate);
+#endif
 }

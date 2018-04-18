@@ -104,30 +104,52 @@ extern struct el_options g_options;
 /* ==========================================================================
     length of long timestamp in a single log. Timestamp format is
 
-        [yyyy-mm-dd hh:mm:ss.uuuuuu]
+        [yyyy-mm-dd hh:mm:ss]
 
-    which is 28 bytes long
+    which is 21 bytes long
    ========================================================================== */
 
 
-#if ENABLE_TIMESTAMP
-#   define EL_PRE_TS_LONG_LEN 28
-#else
-#   define EL_PRE_TS_LONG_LEN 0
-#endif
+#define EL_PRE_TS_LONG_LEN 21
 
 
 /* ==========================================================================
     length of short timestamp in a single log. Timestamp format is
 
-        [ssssssssss.uuuuuu]
+        [ssssssssss]
 
-    which is 19 bytes long. This is maximum value for short timestamp, as it
+    which is 12 bytes long. This is maximum value for short timestamp, as it
     can be shorter.
    ========================================================================== */
 
 
-#define EL_PRE_TS_SHORT_LEN 19
+#define EL_PRE_TS_SHORT_LEN 12
+
+
+/* ==========================================================================
+    Size of the fractions of seconds, that is part after seconds like:
+
+    [ssssssssss.fffffffff]
+
+    or
+
+    [yyyy-mm-dd hh:mm:ss.fffffffff]
+   ========================================================================== */
+
+
+#define EL_PRE_TS_FRACT_LEN 10
+
+
+/* ==========================================================================
+    Calculate what is the minimum needed length to hold longest timestamp
+   ========================================================================== */
+
+
+#if ENABLE_TIMESTAMP
+#   define EL_PRE_TS_MAX (EL_PRE_TS_LONG_LEN + EL_PRE_TS_FRACT_LEN)
+#else
+#   define EL_PRE_TS_MAX 0
+#endif
 
 
 /* ==========================================================================
@@ -183,7 +205,7 @@ extern struct el_options g_options;
 #   define EL_PREFIX_LEN 0
 #endif
 
-#define EL_PRE_LEN (EL_PRE_TS_LONG_LEN + EL_PRE_FINFO_LEN + EL_PREFIX_LEN + \
+#define EL_PRE_LEN (EL_PRE_TS_MAX + EL_PRE_FINFO_LEN + EL_PREFIX_LEN + \
     EL_PRE_LEVEL_LEN)
 
 

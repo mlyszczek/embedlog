@@ -24,7 +24,7 @@
 
 
 /* ==========================================================================
-    returns seconds and microseconds calculated from clock() function
+    returns seconds and nanoseconds calculated from clock() function
    ========================================================================== */
 
 
@@ -33,7 +33,7 @@
 static void el_ts_clock
 (
     time_t   *s,   /* seconds will be stored here */
-    long     *us   /* microseconds will be stored here */
+    long     *ns   /* nanoseconds will be stored here */
 )
 {
     clock_t  clk;  /* clock value */
@@ -42,14 +42,15 @@ static void el_ts_clock
     clk = clock();
 
     *s   = clk / CLOCKS_PER_SEC;
-    *us  = clk % CLOCKS_PER_SEC;
-    *us *= 1000000 / CLOCKS_PER_SEC;
+    *ns  = clk % CLOCKS_PER_SEC;        /* [cps] */
+    *ns *= (1000000L / CLOCKS_PER_SEC); /* [ms] */
+    *ns *= 1000L;                       /* [ns] */
 }
 #endif /* ENABLE_CLOCK */
 #endif /* ENABLE_TIMESTAMP */
 
 /* ==========================================================================
-    returns seconds and microseconds calculated from time() function.
+    returns seconds and nanoseconds calculated from time() function.
    ========================================================================== */
 
 
@@ -57,16 +58,16 @@ static void el_ts_clock
 static void el_ts_time
 (
     time_t  *s,  /* seconds will be stored here */
-    long    *us  /* microseconds will be stored here */
+    long    *ns  /* nanoseconds will be stored here */
 )
 {
-    *s = (long)time(NULL);
-    *us = 0;
+    *s = time(NULL);
+    *ns = 0;
 }
 #endif /* ENABLE_TIMESTAMP */
 
 /* ==========================================================================
-    returns seconds and microseconds calculated from clock_gettime function
+    returns seconds and nanoseconds calculated from clock_gettime function
    ========================================================================== */
 
 
@@ -75,7 +76,7 @@ static void el_ts_time
 static void el_ts_clock_gettime
 (
     time_t         *s,     /* seconds will be stored here */
-    long           *us,    /* microseconds will be stored here */
+    long           *ns,    /* nanoseconds will be stored here */
     clockid_t       clkid  /* clock id */
 )
 {
@@ -85,7 +86,7 @@ static void el_ts_clock_gettime
     clock_gettime(clkid, &tp);
 
     *s  = tp.tv_sec;
-    *us = tp.tv_nsec / 1000;
+    *ns = tp.tv_nsec;
 }
 #endif /* ENABLE_REALTIME || ENABLE_MONOTONIC */
 #endif /* ENABLE_TIMESTAMP */
@@ -107,9 +108,9 @@ size_t el_timestamp
 )
 {
 #if ENABLE_TIMESTAMP
-    time_t           s;        /* timestamp seconds */
-    long             us;       /* timestamp microseconds */
-    size_t           tl;       /* timestamp length */
+    time_t              s;        /* timestamp seconds */
+    long                ns;       /* timestamp nanoseconds */
+    size_t              tl;       /* timestamp length */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     if (options->timestamp == EL_TS_OFF)
@@ -122,7 +123,7 @@ size_t el_timestamp
     }
 
     /*
-     * first we get seconds and microseconds from proper timer
+     * first we get seconds and nanoseconds from proper timer
      */
 
     switch (options->timestamp_timer)
@@ -130,7 +131,7 @@ size_t el_timestamp
 #   if ENABLE_REALTIME
 
     case EL_TS_TM_REALTIME:
-        el_ts_clock_gettime(&s, &us, CLOCK_REALTIME);
+        el_ts_clock_gettime(&s, &ns, CLOCK_REALTIME);
         break;
 
 #   endif
@@ -138,19 +139,19 @@ size_t el_timestamp
 #   if ENABLE_MONOTONIC
 
     case EL_TS_TM_MONOTONIC:
-        el_ts_clock_gettime(&s, &us, CLOCK_MONOTONIC);
+        el_ts_clock_gettime(&s, &ns, CLOCK_MONOTONIC);
         break;
 
 #   endif
 
     case EL_TS_TM_TIME:
-        el_ts_time(&s, &us);
+        el_ts_time(&s, &ns);
         break;
 
 #   if ENABLE_CLOCK
 
     case EL_TS_TM_CLOCK:
-        el_ts_clock(&s, &us);
+        el_ts_clock(&s, &ns);
         break;
 
 #   endif
@@ -178,17 +179,41 @@ size_t el_timestamp
         /*
          * put encoded nano/micro/milli seconds in buf if enabled
          */
+#   if ENABLE_FRACTIONS
 
-        if (options->timestamp_useconds)
+        switch (options->timestamp_fractions)
         {
-#   ifdef LLONG_MAX
-            tl += el_encode_number((unsigned long long)us, buf + tl);
-#   else
-            tl += el_encode_number((unsigned long)us, buf + tl);
-#   endif
-        }
+        case EL_TS_FRACT_OFF:
+            /*
+             * we don't add  fractions,  so  simply  return  what  has  been
+             * already stored (only seconds)
+             */
 
+            return tl;
+
+        case EL_TS_FRACT_MS:
+            tl += el_encode_number(ns / 1000000, buf + tl);
+            return tl;
+
+        case EL_TS_FRACT_US:
+            tl += el_encode_number(ns / 1000, buf + tl);
+            return tl;
+
+        case EL_TS_FRACT_NS:
+            tl += el_encode_number(ns, buf + tl);
+            return tl;
+
+        default:
+            /*
+             * something  went  somehere  seriously  wrong,  act  like   no
+             * timestamp has been configured
+             */
+
+            return 0;
+        }
+#else  /* ENABLE_FRACTIONS */
         return tl;
+#endif /* ENABLE_FRACTIONS */
     }
     else
     {
@@ -226,24 +251,47 @@ size_t el_timestamp
 #   endif
         }
 
-        if (options->timestamp_useconds)
+        /*
+         * if requested, add proper fractions of seconds
+         */
+#   if ENABLE_FRACTIONS
+        switch (options->timestamp_fractions)
         {
-            tl += sprintf(buf + tl, ".%06ld]", us);
-        }
-        else
-        {
+        case EL_TS_FRACT_OFF:
             /*
-             * if micro seconds are not printed we simply add ending ']'
+             * we don't add fractions, so simply close opening bracker '['
              */
 
-            buf[tl] = ']';
-            tl++;
-        }
+            buf[tl++] = ']';
+            return tl;
 
+        case EL_TS_FRACT_MS:
+            tl += sprintf(buf + tl, ".%03ld]", ns / 1000000);
+            return tl;
+
+        case EL_TS_FRACT_US:
+            tl += sprintf(buf + tl, ".%06ld]", ns / 1000);
+            return tl;
+
+        case EL_TS_FRACT_NS:
+            tl += sprintf(buf + tl, ".%09ld]", ns);
+            return tl;
+
+        default:
+            /*
+             *  something  went  somehere  seriously  wrong,  act  like   no
+             *  timestamp has been configured
+             */
+
+            return 0;
+        }
+#   else  /* ENABLE_FRACTIONS */
+        buf[tl++] = ']';
         return tl;
+#   endif /* ENABLE_FRACTIONS */
     }
 
-#else /* ENABLE_TIMESTAMP */
+#else  /* ENABLE_TIMESTAMP */
     return 0;
 #endif /* ENABLE_TIMESTAMP */
 }

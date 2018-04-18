@@ -217,12 +217,16 @@ static int el_vooption
         options->timestamp = value_int;
         return 0;
 
-    case EL_TS_USEC:
-        value_int = va_arg(ap, int);
-        VALID(EINVAL, (value_int & ~1) == 0);
+#       if ENABLE_FRACTIONS
 
-        options->timestamp_useconds = value_int;
+    case EL_TS_FRACT:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, 0 <= value_int && value_int < EL_TS_FRACT_ERROR);
+
+        options->timestamp_fractions = value_int;
         return 0;
+
+#       endif /* ENABLE_FRACTIONS */
 
     case EL_TS_TM:
         value_int = va_arg(ap, int);
@@ -394,7 +398,6 @@ int el_oinit
     memset(options, 0, sizeof(struct el_options));
     options->print_log_level = 1;
     options->print_newline = 1;
-    options->timestamp_useconds = 1;
     options->level = EL_INFO;
     options->level_current_msg = EL_DBG;
     options->file_sync_level = EL_FATAL;

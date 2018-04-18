@@ -102,19 +102,20 @@ static size_t el_flags
 {
     *buf = 0;
 
+#if ENABLE_TIMESTAMP
     if (options->timestamp != EL_TS_OFF)
     {
         *buf |= FLAG_TS;
 
+#   if ENABLE_FRACTIONS
         /*
          * fraction of seconds can be printed only when timestamp is on
          */
 
-        if (options->timestamp_useconds)
-        {
-            *buf |= FLAG_TS_FRACT_USEC << FLAG_TS_FRACT_SHIFT;
-        }
+        *buf |= options->timestamp_fractions << FLAG_TS_FRACT_SHIFT;
+#   endif
     }
+#endif
 
     *buf |= level << FLAG_LEVEL_SHIFT;
 

@@ -151,8 +151,25 @@ AC_ARG_ENABLE([timestamp],
 AS_IF([test "x$enable_timestamp" = "xyes"],
 [
     AC_DEFINE([ENABLE_TIMESTAMP], [1], [Enable printing timestamp with log])
-    AC_CHECK_FUNCS([clock time],,
+    AC_CHECK_FUNCS([clock time sprintf],,
         AC_MSG_ERROR(not found, needed by --enable-timestamp))
+])
+
+
+###
+# --enable-fractions
+#
+
+
+AC_ARG_ENABLE([fractions],
+    AS_HELP_STRING([--enable-fractions], [Enable printing fractions with log]),
+    [], [enable_fractions="yes"])
+
+AS_IF([test "x$enable_fractions" = "xyes"],
+[
+    AC_DEFINE([ENABLE_FRACTIONS], [1], [Enable printing fractions with log])
+    AC_CHECK_FUNCS([sprintf],,
+        AC_MSG_ERROR(not found, needed by --enable-fractions))
 ])
 
 
@@ -234,7 +251,7 @@ AC_ARG_ENABLE([binary-logs],
 AM_CONDITIONAL([ENABLE_BINARY_LOGS], [test "x$enable_binary_logs" = "xyes"])
 AS_IF([test "x$enable_binary_logs" = "xyes"],
 [
-    AC_DEFINE([ENABLE_PREFIX], [1], [Enable printing binary logs])
+    AC_DEFINE([ENABLE_BINARY_LOGS], [1], [Enable printing binary logs])
     AC_CHECK_FUNCS([memcpy],,
         AC_MSG_ERROR(not found, needed by --enable-binary-logs))
 ])
@@ -399,6 +416,7 @@ echo "print to file............... : $enable_out_file"
 echo "print to tty................ : $enable_out_tty"
 echo "print to custom routine..... : $enable_out_custom"
 echo "print timestamp enabled..... : $enable_timestamp"
+echo "print fractions of seconds.. : $enable_fractions"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "clock() timestamp........... : $enable_clock"
