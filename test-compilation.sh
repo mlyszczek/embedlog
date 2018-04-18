@@ -4,10 +4,14 @@ options=(--disable-out-file \
          --disable-out-stderr \
          --disable-out-tty \
          --disable-timestamp \
+         --disable-fractions \
          --disable-realtime \
          --disable-monotonic \
          --disable-finfo \
-         --disable-colors)
+         --disable-colors \
+         --disable-prefix \
+         --disable-reentrant \
+         --enable-binary-logs)
 
 iterations=$((2**${#options[@]} - 1))
 for i in `seq 0 1 $iterations`
