@@ -149,6 +149,11 @@ only information about errno will be printed.
 It is similar to
 .BR perror ()
 function.
+It is guaranteed that
+.BR el_perror (3)
+functions will not modify
+.B errno
+value.
 .PP
 .BR el_pmemory (3)
 is designed to print memory location in a nice hex+ascii format.

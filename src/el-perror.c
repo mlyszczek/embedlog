@@ -88,6 +88,12 @@ static int el_ovperror
     rc |= el_oprint(file, num, level, options,
         "errno num: %lu, strerror: %s", e, strerror(e));
 
+    /*
+     * in case errno has been modified return it to value from before this
+     * call
+     */
+
+    errno = e;
     return rc;
 }
 
