@@ -192,7 +192,7 @@ static int el_file_rotate
     struct el_options  *options
 )
 {
-    int                 i;       /* simple iterator for loop */
+    unsigned int        i;       /* simple iterator for loop */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -562,7 +562,7 @@ int el_file_putb
 
     if (options->frotate_number)
     {
-        if (options->fpos != 0 &&  options->fpos + mlen > options->frotate_size)
+        if (options->fpos != 0 && options->fpos + mlen > options->frotate_size)
         {
             /*
              * we get here only when frotate  is  enabled,  and  writing  to

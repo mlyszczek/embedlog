@@ -267,7 +267,7 @@ int el_tty_close(struct el_options *options);
 #endif
 
 int el_log_allowed(struct el_options *options, enum el_level level);
-size_t el_timestamp(struct el_options *options, char *buf, int binary);
+size_t el_timestamp(struct el_options *options, void *buf, int binary);
 
 #if LLONG_MAX
 size_t el_encode_number(unsigned long long number, void *out);

@@ -380,7 +380,6 @@ int el_ovprint
     char                buf[EL_BUF_MAX + 2];  /* buffer for message to print */
     size_t              w;                    /* bytes written to buf */
     size_t              flen;                 /* length of the fmt output */
-    size_t              fmtlen;               /* length of fmt string */
     int                 e;                    /* error code */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

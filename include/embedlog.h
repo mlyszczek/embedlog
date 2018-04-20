@@ -155,12 +155,12 @@ struct el_options
     unsigned int    file_sync_level:3;
 
     int             serial_fd;
-    int             frotate_number;
-    int             fcurrent_rotate;
-    long            frotate_size;
-    long            file_sync_every;
-    long            written_after_sync;
-    long            fpos;
+    unsigned int    frotate_number;
+    unsigned int    fcurrent_rotate;
+    unsigned long   frotate_size;
+    unsigned long   file_sync_every;
+    unsigned long   written_after_sync;
+    unsigned long   fpos;
     FILE           *file;
     char           *current_log;
     const char     *fname;

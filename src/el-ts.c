@@ -103,7 +103,7 @@ static void el_ts_clock_gettime
 size_t el_timestamp
 (
     struct el_options  *options,  /* options defining printing style */
-    char               *buf,      /* buffer where timestamp will be stored */
+    void               *b,        /* buffer where timestamp will be stored */
     int                 binary    /* 1 if timestamp should be binary */
 )
 {
@@ -111,6 +111,7 @@ size_t el_timestamp
     time_t              s;        /* timestamp seconds */
     long                ns;       /* timestamp nanoseconds */
     size_t              tl;       /* timestamp length */
+    char               *buf;      /* b threated as known type */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     if (options->timestamp == EL_TS_OFF)
@@ -121,6 +122,8 @@ size_t el_timestamp
 
         return 0;
     }
+
+    buf = b;
 
     /*
      * first we get seconds and nanoseconds from proper timer
@@ -171,9 +174,9 @@ size_t el_timestamp
          */
 
 #   ifdef LLONG_MAX
-        tl = el_encode_number((unsigned long long)s, buf);
+        tl = el_encode_number((unsigned long long)s, (unsigned char *)buf);
 #   else
-        tl = el_encode_number((unsigned long)s, buf);
+        tl = el_encode_number((unsigned long)s, (unsigned char*)buf);
 #   endif
 
         /*
