@@ -553,15 +553,12 @@ int el_file_putb
 
 )
 {
-    if (options->current_log && options->current_log[0] == '\0')
-    {
-        /*
-         * file has not been opened, prevent segfault
-         */
+    VALID(EINVAL, mem);
+    VALID(EINVAL, mlen);
+    VALID(EINVAL, options);
+    VALID(EBADF, options->current_log);
+    VALID(EBADF, options->current_log[0] != '\0');
 
-        errno = EBADF;
-        return -1;
-    }
 
     if (options->frotate_number)
     {
