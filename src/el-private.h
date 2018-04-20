@@ -19,14 +19,14 @@
 
    ========================================================================== */
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #   include "config.h"
 #endif
 
 #include "embedlog.h"
 #include "valid.h"
 
-#ifdef HAVE_TERMIOS_H
+#if HAVE_TERMIOS_H
 #   include <termios.h>
 #endif
 
@@ -252,7 +252,7 @@ extern struct el_options g_options;
    ========================================================================== */
 
 
-#ifdef ENABLE_OUT_FILE
+#if ENABLE_OUT_FILE
 int el_file_open(struct el_options *options);
 int el_file_puts(struct el_options *options, const char *s);
 int el_file_putb(struct el_options *options, const void *mem, size_t mlen);
@@ -260,7 +260,7 @@ void el_file_cleanup(struct el_options *options);
 #endif
 
 
-#ifdef ENABLE_OUT_TTY
+#if ENABLE_OUT_TTY
 int el_tty_open(struct el_options *options, const char *dev, speed_t speed);
 int el_tty_puts(struct el_options *options, const char *s);
 int el_tty_close(struct el_options *options);
@@ -269,7 +269,7 @@ int el_tty_close(struct el_options *options);
 int el_log_allowed(struct el_options *options, enum el_level level);
 size_t el_timestamp(struct el_options *options, char *buf, int binary);
 
-#ifdef LLONG_MAX
+#if LLONG_MAX
 size_t el_encode_number(unsigned long long number, void *out);
 size_t el_decode_number(const void *number, unsigned long long *out);
 #else
