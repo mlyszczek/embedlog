@@ -69,11 +69,6 @@ int file_synced;
 #define s5 "qwert"
 #define s3 "asd"
 #define s1 "a"
-static unsigned char  d1[] = { 0x01 };
-static unsigned char  d2[] = { 0x53, 0x10 };
-static unsigned char  d3[] = { 0x00, 0x10, 0x12 };
-static unsigned char  d5[] = {  'f',  'o',  'o', 0x00,  'b' };
-static unsigned char  d8[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
 mt_defs_ext();
 
 
@@ -299,7 +294,7 @@ static void file_and_directory_reapear(void)
     rmdir(WORKDIR);
     mt_ferr(el_puts(s9), EBADF);
     mkdir(WORKDIR, 0755);
-    system("echo test > \""WORKDIR"/log\"");
+    mt_fok(system("echo test > \""WORKDIR"/log\""));
     mt_fok(el_puts(s9));
     mt_fok(file_check(WORKDIR"/log", "test\n"s9));
 }

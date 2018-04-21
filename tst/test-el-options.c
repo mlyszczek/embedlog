@@ -194,11 +194,8 @@ static void options_file_sync_level_set(void)
 
 static void options_output(void)
 {
-    int current_outputs;
     int i;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    current_outputs = 0;
 
     for (i = 0; i != EL_OUT_ALL; ++i)
     {
