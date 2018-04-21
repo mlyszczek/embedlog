@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -254,6 +255,53 @@ static void file_unexpected_third_party_delete(void)
     unlink(WORKDIR"/log");
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log", s8));
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_directory_deleted(void)
+{
+    el_puts(s9);
+    unlink(WORKDIR"/log");
+    rmdir(WORKDIR);
+    mt_ferr(el_puts(s9), EBADF);
+    mkdir(WORKDIR, 0755);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_directory_reappear_after_delete(void)
+{
+    el_puts(s9);
+    unlink(WORKDIR"/log");
+    rmdir(WORKDIR);
+    mt_ferr(el_puts(s9), EBADF);
+    mkdir(WORKDIR, 0755);
+    mt_fok(el_puts(s9));
+    mt_fok(file_check(WORKDIR"/log", s9));
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_and_directory_reapear(void)
+{
+    el_puts(s9);
+    unlink(WORKDIR"/log");
+    rmdir(WORKDIR);
+    mt_ferr(el_puts(s9), EBADF);
+    mkdir(WORKDIR, 0755);
+    system("echo test > \""WORKDIR"/log\"");
+    mt_fok(el_puts(s9));
+    mt_fok(file_check(WORKDIR"/log", "test\n"s9));
 }
 
 
@@ -1235,6 +1283,9 @@ void el_file_test_group(void)
     mt_run(file_reopen);
     mt_run(file_reopen_different_file);
     mt_run(file_unexpected_third_party_delete);
+    mt_run(file_directory_deleted);
+    mt_run(file_directory_reappear_after_delete);
+    mt_run(file_and_directory_reapear);
     mt_run(file_filename_too_long);
     mt_run(file_path_too_long);
     mt_run(file_rotate_1_no_rotate);

@@ -615,6 +615,25 @@ int el_file_putb
         options->fpos = 0;
     }
 
+    /*
+     * there is situation where we options->file is  NULL  here,  it's  when
+     * logs are on externally (like SD card)  mounted  directory,  and  this
+     * directory gets unmounted (or whatever, it dissapear), when we try  to
+     * write to such directory we will fail and options->current_log will be
+     * set to NULL.  Now when that directory reappear with previous content,
+     * we skip el_file_exists check (because file does exist)  and  we  land
+     * here with NULL stream which on some systems may result  in  segfault.
+     * This check prevents it
+     */
+
+    if (options->file == NULL)
+    {
+        if ((options->file = fopen(options->current_log, "a")) == NULL)
+        {
+            return -1;
+        }
+    }
+
     if (fwrite(mem, mlen, 1, options->file) != 1)
     {
         return -1;
