@@ -284,6 +284,7 @@ skip_rotate:
     return 0;
 }
 
+
 /* ==========================================================================
                                         __     __ _
                          ____   __  __ / /_   / /(_)_____
@@ -540,6 +541,7 @@ int el_file_open
         return -1;
     }
 
+    fseek(options->file, 0, SEEK_END);
     options->fpos = ftell(options->file);
     return 0;
 }
@@ -564,6 +566,19 @@ int el_file_putb
     VALID(EBADF, options->current_log);
     VALID(EBADF, options->current_log[0] != '\0');
 
+
+    /*
+     * we need to reopen our file if it wasn't opened yet,  or  was  removed
+     * due to error or deliberate acion of user
+     */
+
+    if (el_file_exists(options->current_log) == 0 || options->file == NULL)
+    {
+        if (el_file_open(options) != 0)
+        {
+            return -1;
+        }
+    }
 
     if (options->frotate_number)
     {
@@ -592,49 +607,6 @@ int el_file_putb
              */
 
             mlen = options->frotate_size;
-        }
-    }
-
-    if (el_file_exists(options->current_log) == 0)
-    {
-        /*
-         * file doesn't exist, it may happen when someone unlinks  currently
-         * opened file. Even tough user unlinked our log file, we still have
-         * file opened, so this file exists in the system, but  not  in  the
-         * file system tree and  as  such,  every  write  to  such  file  is
-         * effectively writing to /dev/null.  To prevent that, we close  and
-         * reopen our current log file
-         */
-
-        if (options->file)
-        {
-            fclose(options->file);
-        }
-
-        if ((options->file = fopen(options->current_log, "a")) == NULL)
-        {
-            return -1;
-        }
-
-        options->fpos = 0;
-    }
-
-    /*
-     * there is situation where we options->file is  NULL  here,  it's  when
-     * logs are on externally (like SD card)  mounted  directory,  and  this
-     * directory gets unmounted (or whatever, it dissapear), when we try  to
-     * write to such directory we will fail and options->current_log will be
-     * set to NULL.  Now when that directory reappear with previous content,
-     * we skip el_file_exists check (because file does exist)  and  we  land
-     * here with NULL stream which on some systems may result  in  segfault.
-     * This check prevents it
-     */
-
-    if (options->file == NULL)
-    {
-        if ((options->file = fopen(options->current_log, "a")) == NULL)
-        {
-            return -1;
         }
     }
 
@@ -709,6 +681,9 @@ int el_file_putb
             errno = EBADF;
             return -1;
         }
+
+        fseek(options->file, 0, SEEK_END);
+        options->fpos = ftell(options->file);
 #endif /* HAVE_FSYNC && HAVE_FILENO */
 
 #ifdef RUN_TESTS

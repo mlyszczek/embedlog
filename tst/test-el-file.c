@@ -880,20 +880,22 @@ static void file_rotate_5_hole_in_log_rotate(void)
     el_puts("123");
 
     mt_fok(file_check(WORKDIR"/log.0", "qaz"));
-    mt_fok(file_check(WORKDIR"/log.1", "edc"));
-    mt_fok(file_check(WORKDIR"/log.2", "rfv"));
+    mt_fok(file_check(WORKDIR"/log.2", "edc"));
+    mt_fok(file_check(WORKDIR"/log.3", "rfv"));
     mt_fok(file_check(WORKDIR"/log.4", "123"));
 
     el_puts("456");
 
-    mt_fok(file_check(WORKDIR"/log.0", "edc"));
-    mt_fok(file_check(WORKDIR"/log.1", "rfv"));
+    mt_fok(file_check(WORKDIR"/log.0", "qaz"));
+    mt_fok(file_check(WORKDIR"/log.1", "edc"));
+    mt_fok(file_check(WORKDIR"/log.2", "rfv"));
     mt_fok(file_check(WORKDIR"/log.3", "123"));
     mt_fok(file_check(WORKDIR"/log.4", "456"));
 
     el_puts("789");
 
-    mt_fok(file_check(WORKDIR"/log.0", "rfv"));
+    mt_fok(file_check(WORKDIR"/log.0", "edc"));
+    mt_fok(file_check(WORKDIR"/log.1", "rfv"));
     mt_fok(file_check(WORKDIR"/log.2", "123"));
     mt_fok(file_check(WORKDIR"/log.3", "456"));
     mt_fok(file_check(WORKDIR"/log.4", "789"));
@@ -949,6 +951,309 @@ static void file_rotate_5_rename_file_halfway(void)
     mt_fok(file_check(WORKDIR"/log-another.2", "789"));
     mt_fok(file_check(WORKDIR"/log-another.3", "qwe"));
     mt_fok(file_check(WORKDIR"/log-another.4", "asd"));
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_directory_deleted(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+    mt_fok(el_option(EL_FPATH, WORKDIR"/log"));
+
+    el_puts("qaz");
+    el_puts("wsx");
+    el_puts("edc");
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    rmdir(WORKDIR);
+    mt_ferr(el_puts("rfv"), ENOENT);
+
+    mkdir(WORKDIR, 0755);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_directory_reappear_after_delete(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+    mt_fok(el_option(EL_FPATH, WORKDIR"/log"));
+
+    el_puts("qaz");
+    el_puts("wsx");
+    el_puts("edc");
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    rmdir(WORKDIR);
+    mt_ferr(el_puts("rfv"), ENOENT);
+
+    mkdir(WORKDIR, 0755);
+
+    mt_fok(el_puts("rfv"));
+    mt_fok(el_puts("tgb"));
+    mt_fok(el_puts("yhn"));
+    mt_fok(el_puts("ujm"));
+    mt_fok(file_check(WORKDIR"/log.0", "rfv"));
+    mt_fok(file_check(WORKDIR"/log.1", "tgb"));
+    mt_fok(file_check(WORKDIR"/log.2", "yhn"));
+    mt_fok(file_check(WORKDIR"/log.3", "ujm"));
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log.3");
+    unlink(WORKDIR"/log.4");
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_write_after_failed_open(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+
+    rmdir(WORKDIR);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(el_puts("qaz"));
+    mt_fok(file_check(WORKDIR"/log.0", "qaz"));
+
+    unlink(WORKDIR"/log.0");
+    el_cleanup();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_write_after_failed_open_to_existing_file(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+
+    rmdir(WORKDIR);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(system("echo -n qaz > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo -n ws > \""WORKDIR"/log.1\""));
+    mt_fok(el_puts("edc"));
+    mt_fok(file_check(WORKDIR"/log.0", "qaz"));
+    mt_fok(file_check(WORKDIR"/log.1", "ws"));
+    mt_fok(file_check(WORKDIR"/log.2", "edc"));
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    el_cleanup();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_write_after_failed_open_to_existing_file_with_holes(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+
+    rmdir(WORKDIR);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(system("echo -n qaz > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo -n ws > \""WORKDIR"/log.2\""));
+    mt_fok(system("echo -n e > \""WORKDIR"/log.4\""));
+    mt_fok(el_puts("123"));
+    mt_fok(el_puts("456"));
+
+    mt_fok(file_check(WORKDIR"/log.0", "ws"));
+    mt_fok(file_check(WORKDIR"/log.2", "e"));
+    mt_fok(file_check(WORKDIR"/log.3", "123"));
+    mt_fok(file_check(WORKDIR"/log.4", "456"));
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log.3");
+    unlink(WORKDIR"/log.4");
+    el_cleanup();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_write_after_failed_open_to_existing_file_with_holes2(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+
+    rmdir(WORKDIR);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(system("echo -n qaz > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo -n ws > \""WORKDIR"/log.3\""));
+    mt_fok(system("echo -n e > \""WORKDIR"/log.4\""));
+    mt_fok(el_puts("123"));
+    mt_fok(el_puts("456"));
+
+    mt_fok(file_check(WORKDIR"/log.0", "qaz"));
+    mt_fok(file_check(WORKDIR"/log.1", "ws"));
+    mt_fok(file_check(WORKDIR"/log.2", "e"));
+    mt_fok(file_check(WORKDIR"/log.3", "123"));
+    mt_fok(file_check(WORKDIR"/log.4", "456"));
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log.3");
+    unlink(WORKDIR"/log.4");
+    el_cleanup();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_write_after_failed_open_to_existing_file_with_holes3(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+
+    rmdir(WORKDIR);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(system("echo -n qaz > \""WORKDIR"/log.1\""));
+    mt_fok(system("echo -n ws > \""WORKDIR"/log.3\""));
+    mt_fok(system("echo -n e > \""WORKDIR"/log.4\""));
+    mt_fok(el_puts("123"));
+    mt_fok(el_puts("456"));
+    mt_fok(el_puts("789"));
+    mt_fok(file_check(WORKDIR"/log.0", "ws"));
+    mt_fok(file_check(WORKDIR"/log.1", "e"));
+    mt_fok(file_check(WORKDIR"/log.2", "123"));
+    mt_fok(file_check(WORKDIR"/log.3", "456"));
+    mt_fok(file_check(WORKDIR"/log.4", "789"));
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log.3");
+    unlink(WORKDIR"/log.4");
+    el_cleanup();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_rotate_and_directory_reappear(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FROTATE_SIZE, 3);
+    el_option(EL_FROTATE_NUMBER, 5);
+    mt_fok(el_option(EL_FPATH, WORKDIR"/log"));
+
+    mt_fok(el_puts("123"));
+    mt_fok(el_puts("456"));
+    mt_fok(el_puts("789"));
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+
+    rmdir(WORKDIR);
+    mt_ferr(el_puts(s9), ENOENT);
+    mkdir(WORKDIR, 0755);
+
+    mt_fok(system("echo -n 123 > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo -n 456 > \""WORKDIR"/log.1\""));
+    mt_fok(system("echo -n 789 > \""WORKDIR"/log.2\""));
+
+    mt_fok(el_puts("qaz"));
+    mt_fok(file_check(WORKDIR"/log.0", "123"));
+    mt_fok(file_check(WORKDIR"/log.1", "456"));
+    mt_fok(file_check(WORKDIR"/log.2", "789"));
+    mt_fok(file_check(WORKDIR"/log.3", "qaz"));
+
+    unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log.1");
+    unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log.3");
+    unlink(WORKDIR"/log.4");
+    el_cleanup();
 }
 
 
@@ -1069,29 +1374,29 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s5));
 
-    mt_fok(file_check(WORKDIR"/log.2", s8 s5));
+    mt_fok(file_check(WORKDIR"/log.0", s8 s5));
 
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s3));
     mt_fok(el_puts(s5));
 
-    mt_fok(file_check(WORKDIR"/log.2", s8 s5));
-    mt_fok(file_check(WORKDIR"/log.3", s8 s3 s5));
+    mt_fok(file_check(WORKDIR"/log.0", s8 s5));
+    mt_fok(file_check(WORKDIR"/log.1", s8 s3 s5));
 
     mt_fok(el_puts(s9));
     mt_fok(el_puts(s5));
 
-    mt_fok(file_check(WORKDIR"/log.2", s8 s5));
-    mt_fok(file_check(WORKDIR"/log.3", s8 s3 s5));
-    mt_fok(file_check(WORKDIR"/log.4", s9 s5));
+    mt_fok(file_check(WORKDIR"/log.0", s8 s5));
+    mt_fok(file_check(WORKDIR"/log.1", s8 s3 s5));
+    mt_fok(file_check(WORKDIR"/log.2", s9 s5));
 
     mt_fok(el_puts(s3));
     mt_fok(el_puts(s8));
 
-    mt_fok(file_check(WORKDIR"/log.1", s8 s5));
-    mt_fok(file_check(WORKDIR"/log.2", s8 s3 s5));
-    mt_fok(file_check(WORKDIR"/log.3", s9 s5));
-    mt_fok(file_check(WORKDIR"/log.4", s3 s8));
+    mt_fok(file_check(WORKDIR"/log.0", s8 s5));
+    mt_fok(file_check(WORKDIR"/log.1", s8 s3 s5));
+    mt_fok(file_check(WORKDIR"/log.2", s9 s5));
+    mt_fok(file_check(WORKDIR"/log.3", s3 s8));
 }
 
 
@@ -1209,7 +1514,7 @@ static void file_rotate_fail(void)
     mkdir(WORKDIR, 0755);
     mt_fok(el_puts(s8));
 
-    mt_fok(file_check(WORKDIR"/log.1", s8));
+    mt_fok(file_check(WORKDIR"/log.0", s8));
 }
 
 
@@ -1323,6 +1628,14 @@ void el_file_test_group(void)
     mt_run(file_print_without_setting_file);
     mt_run(file_write_after_failed_open);
     mt_run(file_write_after_failed_open_to_existing_file);
+    mt_run(file_rotate_directory_deleted);
+    mt_run(file_rotate_directory_reappear_after_delete);
+    mt_run(file_rotate_write_after_failed_open);
+    mt_run(file_rotate_write_after_failed_open_to_existing_file);
+    mt_run(file_rotate_write_after_failed_open_to_existing_file_with_holes);
+    mt_run(file_rotate_write_after_failed_open_to_existing_file_with_holes2);
+    mt_run(file_rotate_write_after_failed_open_to_existing_file_with_holes3);
+    mt_run(file_rotate_and_directory_reappear);
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
