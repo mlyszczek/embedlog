@@ -27,7 +27,7 @@ int main(void)
      * 8N1 by default. Baudrate should be taken from termios (3).
      */
 
-    if (el_option(EL_TTY_DEV, "/dev/ttyUSB1", B115200) != 0)
+    if (el_option(EL_TTY_DEV, "/dev/ttyUSB1", B9600) != 0)
     {
         perror("tty set failed");
         return 1;
