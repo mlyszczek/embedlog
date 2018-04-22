@@ -54,6 +54,10 @@ To run unit tests, you also need [librb](http://librb.kurwinet.pl)
 Test results
 ============
 
+NOTE: these represent test results from *master* branch and may from time to
+time show failures. Tagged versions *always* pass all tests on all
+architectures. No exceptions.
+
 operating system tests
 ----------------------
 
