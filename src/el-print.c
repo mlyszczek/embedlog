@@ -48,14 +48,7 @@
 #include "config.h"
 #endif
 
-#include "config-priv.h"
-#include "el-options.h"
-#include "embedlog.h"
-#include "valid.h"
-
-#if ENABLE_TIMESTAMP
-#include <time.h>
-#endif
+#include "el-private.h"
 
 #include <errno.h>
 #include <stdarg.h>
@@ -89,6 +82,13 @@ static const char char_level[8] = { 'f', 'a', 'c', 'e', 'w', 'n', 'i', 'd' };
  * colors indexes are synced with log level
  */
 
+#if ENABLE_COLORS_EXTENDED
+
+/*
+ * for those that like more colors, there are definitions with more colors!
+ * this will enable light version of some levels, but this is not supported
+ * on all terminal! You have been warned!
+ */
 
 static const char *color[] =
 {
@@ -103,7 +103,30 @@ static const char *color[] =
     "\e[0m"    /* remove all formats */
 };
 
-#endif
+#else
+
+/*
+ * not all terminal can support extended colors with light version of them,
+ * for those who want to be more standard compliant there is this shortened
+ * version of colors. On downside is that some level will have same colors.
+ */
+
+static const char *color[] =
+{
+    "\e[31m",  /* fatal             red */
+    "\e[31m",  /* alert             red */
+    "\e[35m",  /* critical          magenta */
+    "\e[35m",  /* error             magenta */
+    "\e[33m",  /* warning           yellow */
+    "\e[32m",  /* notice            green */
+    "\e[32m",  /* information       green */
+    "\e[34m",  /* debug             blue */
+    "\e[0m"    /* remove all formats */
+};
+
+#endif /* COLORS_EXTENDED */
+
+#endif /* ENABLE_COLORS */
 
 
 /* ==========================================================================
@@ -155,184 +178,6 @@ static size_t el_color
 #else
     return 0;
 #endif
-}
-
-
-/* ==========================================================================
-    returns seconds and microseconds calculated from clock() function
-   ========================================================================== */
-
-
-#if ENABLE_TIMESTAMP
-
-static void el_ts_clock
-(
-    time_t   *s,   /* seconds will be stored here */
-    long     *us   /* microseconds will be stored here */
-)
-{
-    clock_t  clk;  /* clock value */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    clk = clock();
-
-    *s   = clk / CLOCKS_PER_SEC;
-    *us  = clk % CLOCKS_PER_SEC;
-    *us *= 1000000 / CLOCKS_PER_SEC;
-}
-
-
-/* ==========================================================================
-    returns seconds and microseconds calculated from time() function.
-   ========================================================================== */
-
-
-static void el_ts_time
-(
-    time_t  *s,  /* seconds will be stored here */
-    long    *us  /* microseconds will be stored here */
-)
-{
-    *s = (long)time(NULL);
-    *us = 0;
-}
-
-
-/* ==========================================================================
-    returns seconds and microseconds calculated from clock_gettime function
-   ========================================================================== */
-
-
-#if ENABLE_REALTIME || ENABLE_MONOTONIC
-
-static void el_ts_clock_gettime
-(
-    time_t         *s,     /* seconds will be stored here */
-    long           *us,    /* microseconds will be stored here */
-    clockid_t       clkid  /* clock id */
-)
-{
-    struct timespec tp;    /* clock value */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    clock_gettime(clkid, &tp);
-
-    *s  = tp.tv_sec;
-    *us = tp.tv_nsec / 1000;
-}
-
-#endif
-
-#endif /* ENABLE_TIMESTAMP */
-
-
-/* ==========================================================================
-    returns current  timestamp  in  'buf'  location.   Depending  on  global
-    settings timestamp can be in long or short format.  Function will return
-    number of bytes copied to 'buf'.  If timestamp has been disabled  during
-    compilation time or in runtime during settings, function will return  0.
-   ========================================================================== */
-
-
-static size_t el_timestamp
-(
-    struct el_options  *options,  /* options defining printing style */
-    char               *buf       /* buffer where timestamp will be stored */
-)
-{
-#if ENABLE_TIMESTAMP
-    time_t           s;        /* timestamp seconds */
-    long             us;       /* timestamp microseconds */
-    size_t           tl;       /* timestamp length */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    if (options->timestamp == EL_TS_OFF)
-    {
-        /*
-         * user doesn't want us to print timestamp, that's fine
-         */
-
-        return 0;
-    }
-
-    /*
-     * first we get seconds and microseconds from proper timer
-     */
-
-    switch (options->timestamp_timer)
-    {
-#if ENABLE_REALTIME
-
-    case EL_TS_TM_REALTIME:
-        el_ts_clock_gettime(&s, &us, CLOCK_REALTIME);
-        break;
-
-#endif
-
-#if ENABLE_MONOTONIC
-
-    case EL_TS_TM_MONOTONIC:
-        el_ts_clock_gettime(&s, &us, CLOCK_MONOTONIC);
-        break;
-
-#endif
-
-    case EL_TS_TM_TIME:
-        el_ts_time(&s, &us);
-        break;
-
-    case EL_TS_TM_CLOCK:
-        el_ts_clock(&s, &us);
-        break;
-
-    default:
-        /*
-         * bad timer means no timer
-         */
-
-        return 0;
-    }
-
-    /*
-     * then convert retrieved time into string timestamp
-     */
-
-    if (options->timestamp == EL_TS_LONG)
-    {
-        struct tm   tm;   /* timestamp splitted */
-        struct tm  *tmp;  /* timestamp splitted pointer */
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    #if ENABLE_REENTRANT
-        tmp = gmtime_r(&s, &tm);
-    #else
-        tmp = gmtime(&s);
-    #endif
-
-        tl = strftime(buf, 21, "[%Y-%m-%d %H:%M:%S", tmp);
-    }
-    else
-    {
-#ifdef LLONG_MAX
-        tl = sprintf(buf, "[%lld", (long long)s);
-#else
-        /*
-         * if long long is not available, code may be suscible to 2038  bug.
-         * If you are sure your compiler does support long  long  type,  but
-         * doesn't define LLONG_MAX, define this value  yourself  to  enable
-         * long long.
-         */
-        tl = sprintf(buf, "[%ld", (long)s);
-#endif
-    }
-
-    tl += sprintf(buf + tl, ".%06ld]", us);
-
-    return tl;
-
-#else
-    return 0;
-#endif /* ENABLE_TIMESTAMP */
 }
 
 
@@ -561,8 +406,9 @@ int el_ovprint
      * add preamble and colors to log line buf
      */
 
+    buf[0] = '\0';
     w  = el_color(options, buf, level);
-    w += el_timestamp(options, buf + w);
+    w += el_timestamp(options, buf + w, TS_STRING);
     w += el_finfo(options, buf + w, file, num);
 
     if (w != 0 && buf[w - 1] == ']')
@@ -580,6 +426,31 @@ int el_ovprint
     {
         w += sprintf(buf + w, "%c/", char_level[level]);
     }
+
+#if ENABLE_PREFIX
+    if (options->prefix)
+    {
+        /*
+         * there is a case where buf[w] will point to something different
+         * than '\0'. This is not wrong but will confuse strncat function
+         * and logs will be printed incorectly.
+         */
+
+        buf[w] = '\0';
+        strncat(buf + w, options->prefix, EL_PREFIX_LEN);
+
+        if ((flen = strlen(options->prefix)) > EL_PREFIX_LEN)
+        {
+            /*
+             * dodge a bullet - overflow would have occured
+             */
+
+            flen = EL_PREFIX_LEN;
+        }
+
+        w += flen;
+    }
+#endif
 
     /*
      * add requested log from format, we add + 1 to include null termination
@@ -607,17 +478,41 @@ int el_ovprint
 
     w += el_color(options, buf + w, 8 /* reset colors */);
 
+    if (options->print_newline)
+    {
+        /*
+         * add new line to log
+         */
+
+        buf[w++] = '\n';
+    }
+
+    buf[w++] = '\0';
+
     /*
-     * make sure buf is always null terminated and contains new line character
+     * some modules (like el-file) needs to know level of message  they  are
+     * printing, and such information may not be available from string, thus
+     * we set it here in a 'object global' variable
      */
 
-    buf[w++] = '\n';
-    buf[w++] = '\0';
+    options->level_current_msg = level;
 
     if (el_oputs(options, buf) != 0)
     {
+        options->level_current_msg = EL_DBG;
         return -1;
     }
+
+    /*
+     * after message is printed set current messasge level to debug, as next
+     * call might be using el_puts, which does not contain log level, and we
+     * thread all el_puts messages as they were debug.  Note,  it  does  not
+     * apply to log filtering, el_puts does not filter messages, but modules
+     * like el-file, will need this information to determin  wheter  fsync()
+     * data to file or not.
+     */
+
+    options->level_current_msg = EL_DBG;
 
     if (e)
     {
@@ -627,3 +522,4 @@ int el_ovprint
 
     return 0;
 }
+

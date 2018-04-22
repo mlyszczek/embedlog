@@ -8,6 +8,7 @@
 
 void el_options_test_group(void);
 void el_print_test_group(void);
+void el_pbinary_test_group(void);
 void el_file_test_group(void);
 void el_perror_test_group(void);
 void el_pmemory_test_group(void);

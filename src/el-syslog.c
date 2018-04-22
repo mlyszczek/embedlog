@@ -15,7 +15,7 @@
 
 
 #if HAVE_CONFIG_H
-#include "config.h"
+#   include "config.h"
 #endif
 
 #include "el-private.h"
@@ -26,8 +26,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #if HAVE_TERMIOS_H
-#include <termios.h>
+#   include <termios.h>
 #endif
+
 
 /* ==========================================================================
                                         __     __ _

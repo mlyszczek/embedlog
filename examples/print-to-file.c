@@ -26,7 +26,7 @@ int main(void)
         goto error;
     }
 
-    if (el_option(EL_FNAME, WORKDIR"/log") != 0)
+    if (el_option(EL_FPATH, WORKDIR"/log") != 0)
     {
         /*
          * embedlog will try to open file now, this may fail for various  of

@@ -42,10 +42,7 @@
 #include "config.h"
 #endif
 
-#include "config-priv.h"
-#include "el-options.h"
-#include "embedlog.h"
-#include "valid.h"
+#include "el-private.h"
 
 #include <ctype.h>
 #include <stdio.h>

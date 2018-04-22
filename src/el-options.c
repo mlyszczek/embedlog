@@ -39,20 +39,11 @@
 #include "config.h"
 #endif
 
-#include "el-options.h"
-#include "embedlog.h"
-#include "valid.h"
+#include "el-private.h"
 
 #include <errno.h>
 #include <string.h>
 
-#if ENABLE_OUT_FILE
-#include "el-file.h"
-#endif
-
-#if ENABLE_OUT_TTY
-#include "el-tty.h"
-#endif
 
 /* ==========================================================================
                                __        __            __
@@ -162,7 +153,14 @@ static int el_vooption
     {
     case EL_LEVEL:
         value_int = va_arg(ap, int);
+        VALID(EINVAL, value_int <= 7);
         options->level = value_int;
+        return 0;
+
+    case EL_FILE_SYNC_LEVEL:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, value_int <= 7);
+        options->file_sync_level = value_int;
         return 0;
 
     case EL_OUT:
@@ -179,7 +177,23 @@ static int el_vooption
         options->print_log_level = value_int;
         return 0;
 
-    #if ENABLE_COLORS
+    case EL_PRINT_NL:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
+        options->print_newline = value_int;
+        return 0;
+
+#   if ENABLE_PREFIX
+
+    case EL_PREFIX:
+        value_str = va_arg(ap, const char *);
+        options->prefix = value_str;
+        return 0;
+
+#   endif /* ENABLE_PREFIX */
+
+#   if ENABLE_COLORS
 
     case EL_COLORS:
         /*
@@ -192,9 +206,9 @@ static int el_vooption
         options->colors = value_int;
         return 0;
 
-    #endif /* ENABLE_COLORS */
+#   endif /* ENABLE_COLORS */
 
-    #if ENABLE_TIMESTAMP
+#   if ENABLE_TIMESTAMP
 
     case EL_TS:
         value_int = va_arg(ap, int);
@@ -203,24 +217,40 @@ static int el_vooption
         options->timestamp = value_int;
         return 0;
 
+#       if ENABLE_FRACTIONS
+
+    case EL_TS_FRACT:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, 0 <= value_int && value_int < EL_TS_FRACT_ERROR);
+
+        options->timestamp_fractions = value_int;
+        return 0;
+
+#       endif /* ENABLE_FRACTIONS */
+
     case EL_TS_TM:
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_TM_ERROR);
 
-#ifndef ENABLE_REALTIME
-        VALID(ENODEV, value_int != EL_TS_TM_REALTIME);
-#endif
 
-#ifndef ENABLE_MONOTONIC
+#   if ENABLE_REALTIME == 0
+        VALID(ENODEV, value_int != EL_TS_TM_REALTIME);
+#   endif
+
+#   if ENABLE_MONOTONIC == 0
         VALID(ENODEV, value_int != EL_TS_TM_MONOTONIC);
-#endif
+#   endif
+
+#   if ENABLE_CLOCK == 0
+        VALID(ENODEV, value_int != EL_TS_TM_CLOCK);
+#   endif
 
         options->timestamp_timer = value_int;
         return 0;
 
-    #endif /* ENABLE_TIMESTAMP */
+#   endif /* ENABLE_TIMESTAMP */
 
-    #if ENABLE_FINFO
+#   if ENABLE_FINFO
 
     case EL_FINFO:
         value_int = va_arg(ap, int);
@@ -229,11 +259,11 @@ static int el_vooption
         options->finfo = value_int;
         return 0;
 
-    #endif /* ENABLE_FINFO */
+#   endif /* ENABLE_FINFO */
 
-    #if ENABLE_OUT_FILE
+#   if ENABLE_OUT_FILE
 
-    case EL_FNAME:
+    case EL_FPATH:
         value_str = va_arg(ap, const char *);
         VALID(EINVAL, value_str);
         options->fname = value_str;
@@ -272,9 +302,15 @@ static int el_vooption
         options->frotate_size = value_long;
         return 0;
 
-    #endif  /* ENABLE_OUT_FILE */
+    case EL_FILE_SYNC_EVERY:
+        value_long = va_arg(ap, long);
+        VALID(EINVAL, value_long >= 0);
+        options->file_sync_every = value_long;
+        return 0;
 
-    #if ENABLE_OUT_TTY
+#   endif  /* ENABLE_OUT_FILE */
+
+#   if ENABLE_OUT_TTY
 
     case EL_TTY_DEV:
     {
@@ -288,15 +324,15 @@ static int el_vooption
         return el_tty_open(options, value_str, speed);
     }
 
-    #endif /* ENABLE_OUT_TTY */
+#   endif /* ENABLE_OUT_TTY */
 
-    #if ENABLE_OUT_CUSTOM
+#   if ENABLE_OUT_CUSTOM
 
     case EL_CUSTOM_PUTS:
         options->custom_puts = va_arg(ap, el_custom_puts);
         return 0;
 
-    #endif /* ENABLE_OUT_CUSTOM */
+#   endif /* ENABLE_OUT_CUSTOM */
 
     default:
         /*
@@ -361,8 +397,12 @@ int el_oinit
 
     memset(options, 0, sizeof(struct el_options));
     options->print_log_level = 1;
+    options->print_newline = 1;
     options->level = EL_INFO;
+    options->level_current_msg = EL_DBG;
+    options->file_sync_level = EL_FATAL;
     options->serial_fd = -1;
+    options->file_sync_every = 32768;
     return 0;
 }
 

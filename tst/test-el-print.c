@@ -19,13 +19,14 @@
 #include <ctype.h>
 #include <errno.h>
 #include <libgen.h>
+#include <stdint.h>
+#include <math.h>
 
 #include "mtest.h"
 #include "stdlib.h"
 #include "embedlog.h"
 
-#include "config-priv.h"
-#include "el-options.h"
+#include "el-private.h"
 
 
 /* ==========================================================================
@@ -122,6 +123,7 @@ static int print_check(void)
     int                 i;
     int                 slevel;
     size_t              msglen;
+#if ENABLE_COLORS_EXTENDED
     static const char  *color[] =
     {
         "\e[91m",  /* fatal             light red */
@@ -134,6 +136,20 @@ static int print_check(void)
         "\e[34m",  /* debug             blue */
         "\e[0m"    /* remove all formats */
     };
+#else
+    static const char  *color[] =
+    {
+        "\e[31m",  /* fatal             light red */
+        "\e[31m",  /* alert             red */
+        "\e[35m",  /* critical          light magenta */
+        "\e[35m",  /* error             magenta */
+        "\e[33m",  /* warning           light yellow */
+        "\e[32m",  /* notice            light green */
+        "\e[32m",  /* information       green */
+        "\e[34m",  /* debug             blue */
+        "\e[0m"    /* remove all formats */
+    };
+#endif
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     msg = logbuf;
@@ -196,29 +212,46 @@ static int print_check(void)
             IS_CHAR(':');
             IS_DIGIT();
             IS_DIGIT();
-            IS_CHAR('.');
 
-            for (i = 0; i != 6; ++i)
+            if (g_options.timestamp_fractions)
             {
-                IS_DIGIT();
+                IS_CHAR('.');
+
+                for (i = 0; i != 3 * g_options.timestamp_fractions; ++i)
+                {
+                    IS_DIGIT();
+                }
             }
+
             IS_CHAR(']');
 
         }
         else if (g_options.timestamp == EL_TS_SHORT)
         {
             IS_CHAR('[');
-            while (*msg != '.' )
+
+            if (g_options.timestamp_fractions)
             {
-                IS_DIGIT();
+                while (*msg != '.')
+                {
+                    IS_DIGIT();
+                }
+
+                ++msg; /* skip the '.' character */
+
+                for (i = 0; i != 3 * g_options.timestamp_fractions; ++i)
+                {
+                    IS_DIGIT();
+                }
+            }
+            else
+            {
+                while (*msg != ']')
+                {
+                    IS_DIGIT();
+                }
             }
 
-            ++msg; /* skip the '.' character */
-
-            for (i = 0; i != 6; ++i)
-            {
-                IS_DIGIT();
-            }
             IS_CHAR(']');
         }
         else if (g_options.timestamp == EL_TS_OFF)
@@ -315,8 +348,8 @@ static int print_check(void)
              g_options.timestamp != EL_TS_OFF)
         {
             /*
-             * file info or timestamp information is enabled, in that case
-             * we check for additional space between info and log message
+             * prefix or timestamp information  is  enabled,  in  that  case
+             * we check for additional space between info  and  log  message
              */
 
             if (*msg++ != ' ')
@@ -340,6 +373,27 @@ static int print_check(void)
             {
                 return -1;
             }
+        }
+
+        /*
+         * check for prefix
+         */
+
+        if (g_options.prefix)
+        {
+            char expected_prefix[EL_PREFIX_LEN + 1] = {0};
+            size_t expected_prefix_len;
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+            strncat(expected_prefix, g_options.prefix, EL_PREFIX_LEN);
+            expected_prefix_len = strlen(expected_prefix);
+
+            if (strncmp(expected_prefix, msg, expected_prefix_len) != 0)
+            {
+                return -1;
+            }
+
+            msg += expected_prefix_len;
         }
 
         msglen = strlen(expected.msg);
@@ -369,20 +423,25 @@ static int print_check(void)
             msg += 4;
         }
 
-        if (*msg != '\n')
+        if (g_options.print_newline)
         {
+            if (*msg != '\n')
+            {
+                /*
+                 * when new line is enabled, log should end with new line
+                 */
+
+                return -1;
+            }
+
             /*
-             * all logs should be ended with new line
+             * set msg to point to next message, there is no  need  to  move
+             * msg pointer if newline is not printed as msg  already  points
+             * to next message
              */
 
-            return -1;
+            ++msg;
         }
-
-        /*
-         * set msg to point to next message
-         */
-
-        ++msg;
     }
 
     return 0;
@@ -469,6 +528,19 @@ static void print_simple_message(void)
    ========================================================================== */
 
 
+static void print_simple_message_no_newline(void)
+{
+    el_option(EL_PRINT_NL, 0);
+    add_log(ELF, "print simple no newline");
+    add_log(ELF, "print simple no newline second");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void print_simple_multiple_message(void)
 {
     add_log(ELF, "print_simple_multiple_message first");
@@ -505,7 +577,7 @@ static void print_log_level(void)
 static void print_colorful_output(void)
 {
     el_option(EL_COLORS, 1);
-    el_option(EL_LEVEL, EL_DBG + 2);
+    el_option(EL_LEVEL, EL_DBG);
     add_log(ELF, "print_colorful_output fatal message");
     add_log(ELA, "print_colorful_output alert message");
     add_log(ELC, "print_colorful_output critical message");
@@ -527,7 +599,7 @@ static void print_colorful_output(void)
 static void print_custom_log_level(void)
 {
     el_option(EL_PRINT_LEVEL, 1);
-    el_option(EL_LEVEL, EL_DBG + 5);
+    el_option(EL_LEVEL, EL_DBG);
     add_log(ELD + 4, "print_custom_log_level custom debug 4");
     add_log(ELD + 5, "print_custom_log_level custom debug 5");
     add_log(ELD + 6, "print_custom_log_level custom debug 6");
@@ -557,6 +629,118 @@ static void print_timestamp_long(void)
     el_option(EL_TS, EL_TS_LONG);
     add_log(ELF, "print_timestamp_long first");
     add_log(ELF, "print_timestamp_long second");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_short_no_fractions(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
+    el_option(EL_TS, EL_TS_SHORT);
+    add_log(ELF, "first meaningless message");
+    add_log(ELF, "second stupid log");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_long_no_fractions(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
+    el_option(EL_TS, EL_TS_LONG);
+    add_log(ELF, "they don't even care");
+    add_log(ELF, "what I put in here");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_short_fractions_ms(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_MS);
+    el_option(EL_TS, EL_TS_SHORT);
+    add_log(ELF, "first meaningless message");
+    add_log(ELF, "second stupid log");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_long_fractions_ms(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_MS);
+    el_option(EL_TS, EL_TS_LONG);
+    add_log(ELF, "they don't even care");
+    add_log(ELF, "what I put in here");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_short_fractions_us(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_US);
+    el_option(EL_TS, EL_TS_SHORT);
+    add_log(ELF, "first meaningless message");
+    add_log(ELF, "second stupid log");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_long_fractions_us(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_US);
+    el_option(EL_TS, EL_TS_LONG);
+    add_log(ELF, "they don't even care");
+    add_log(ELF, "what I put in here");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_short_fractions_ns(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
+    el_option(EL_TS, EL_TS_SHORT);
+    add_log(ELF, "first meaningless message");
+    add_log(ELF, "second stupid log");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_timestamp_long_fractions_ns(void)
+{
+    el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
+    el_option(EL_TS, EL_TS_LONG);
+    add_log(ELF, "they don't even care");
+    add_log(ELF, "what I put in here");
     mt_fok(print_check());
 }
 
@@ -607,21 +791,29 @@ static void print_mix_of_everything(void)
     int printlevel;
     int finfo;
     int colors;
+    int prefix;
+    int fract;
+    int nl;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (level = EL_FATAL;          level <= EL_DBG;              ++level)
+    for (fract = EL_TS_FRACT_OFF;   fract != EL_TS_FRACT_ERROR;   ++fract)
     for (timestamp = EL_TS_OFF;     timestamp != EL_TS_ERROR;     ++timestamp)
+    for (level = EL_FATAL;          level <= EL_DBG;              ++level)
     for (printlevel = 0;            printlevel <= 1;              ++printlevel)
-    for (finfo = 0;                 finfo <= 1;                   ++finfo)
     for (colors = 0;                colors <= 1;                  ++colors)
+    for (prefix = 0;                prefix <= 1;                  ++prefix)
+    for (finfo = 0;                 finfo <= 1;                   ++finfo)
+    for (nl = 0;                    nl <= 1;                      ++nl)
     {
         test_prepare();
         el_option(EL_LEVEL, level);
         el_option(EL_TS, timestamp);
         el_option(EL_PRINT_LEVEL, printlevel);
+        el_option(EL_PRINT_NL, nl);
         el_option(EL_FINFO, finfo);
         el_option(EL_COLORS, colors);
+        el_option(EL_PREFIX, prefix ? "prefix" : NULL);
 
         add_log(ELF, "fatal message");
         add_log(ELA, "alert message");
@@ -631,6 +823,7 @@ static void print_mix_of_everything(void)
         add_log(ELN, "notice message");
         add_log(ELI, "info message");
         add_log(ELD, "debug message");
+
         mt_fok(print_check());
 
         test_cleanup();
@@ -653,7 +846,41 @@ static void print_too_long_print_truncate(void)
     msg[sizeof(msg) - 2] = '3';
     msg[sizeof(msg) - 3] = '2';
     msg[sizeof(msg) - 4] = '1';
-    msg[sizeof(msg) - 4] = '0';
+    msg[sizeof(msg) - 5] = '0';
+
+    add_log(ELI, "not truncated");
+    add_log(ELI, msg);
+
+    /*
+     * while el_print will make copy of msg, our test  print_check  function
+     * will just use pointer to our msg here, and since we expect message to
+     * be truncated, we truncate it here  and  print_check  will  take  this
+     * truncated message as expected one.
+     */
+
+    msg[sizeof(msg) - 3] = '\0';
+
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_too_long_print_truncate_no_newline(void)
+{
+    char  msg[EL_LOG_MAX + 3];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_option(EL_PRINT_NL, 0);
+    memset(msg, 'a', sizeof(msg));
+    msg[sizeof(msg) - 1] = '\0';
+    msg[sizeof(msg) - 2] = '3';
+    msg[sizeof(msg) - 3] = '2';
+    msg[sizeof(msg) - 4] = '1';
+    msg[sizeof(msg) - 5] = '0';
 
     add_log(ELI, "not truncated");
     add_log(ELI, msg);
@@ -704,14 +931,26 @@ static void print_truncate_with_date(void)
 
 static void print_truncate_with_all_options(void)
 {
-    char  msg[EL_LOG_MAX + 3];
+    char   msg[EL_LOG_MAX + 3];
+    char   finfo[EL_FLEN_MAX + 1];
+    char   prefix[EL_PREFIX_MAX + 1];
+    size_t fline;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     el_option(EL_TS, EL_TS_LONG);
+    el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
+    el_option(EL_TS_TM, EL_TS_TM_REALTIME);
     el_option(EL_FINFO, 1);
+    el_option(EL_COLORS, 1);
+    el_option(EL_PREFIX, prefix);
     el_option(EL_PRINT_LEVEL, 1);
     memset(msg, 'a', sizeof(msg));
+    memset(finfo, 'b', sizeof(finfo));
+    memset(prefix, 'c', sizeof(prefix));
+    finfo[sizeof(finfo) - 1] = '\0';
+    prefix[sizeof(prefix) - 1] = '\0';
+    fline = (size_t)pow(10, EL_PRE_FINFO_LINE_MAX_LEN) - 1;
     msg[sizeof(msg) - 1] = '\0';
     msg[sizeof(msg) - 2] = '3';
     msg[sizeof(msg) - 3] = '2';
@@ -719,7 +958,7 @@ static void print_truncate_with_all_options(void)
     msg[sizeof(msg) - 4] = '0';
 
     add_log(ELI, "not truncated");
-    add_log(ELI, msg);
+    add_log(finfo, fline, EL_FATAL, msg);
 
     msg[sizeof(msg) - 3] = '\0';
 
@@ -781,6 +1020,59 @@ static void print_null(void)
     mt_ferr(el_print(ELA, NULL), EINVAL);
 }
 
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_prefix(void)
+{
+    el_option(EL_PREFIX, "prefix");
+    add_log(ELI, "message with prefix");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_prefix_full(void)
+{
+    char p[EL_PREFIX_LEN + 1] = {0};
+    int i;
+
+    for (i = 0; i != EL_PREFIX_LEN; ++i)
+    {
+        p[i] = '0' + (i % 32);
+    }
+
+    el_option(EL_PREFIX, p);
+    add_log(ELI, "message with fill prefix");
+    mt_fok(print_check());
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void print_prefix_overflow(void)
+{
+    char p[EL_PREFIX_LEN + 10] = {0};
+    int i;
+
+    for (i = 0; i != sizeof(p) - 1; ++i)
+    {
+        p[i] = '0' + (i % 32);
+    }
+
+    el_option(EL_PREFIX, p);
+    add_log(ELI, "message with overflown prefix");
+    mt_fok(print_check());
+}
+
+
 /* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
@@ -800,14 +1092,24 @@ void el_print_test_group(void)
     mt_cleanup_test = &test_cleanup;
 
     mt_run(print_simple_message);
+    mt_run(print_simple_message_no_newline);
     mt_run(print_simple_multiple_message);
     mt_run(print_log_level);
     mt_run(print_colorful_output);
     mt_run(print_custom_log_level);
     mt_run(print_timestamp_short);
     mt_run(print_timestamp_long);
+    mt_run(print_timestamp_short_no_fractions);
+    mt_run(print_timestamp_long_no_fractions);
+    mt_run(print_timestamp_short_fractions_ms);
+    mt_run(print_timestamp_long_fractions_ms);
+    mt_run(print_timestamp_short_fractions_us);
+    mt_run(print_timestamp_long_fractions_us);
+    mt_run(print_timestamp_short_fractions_ns);
+    mt_run(print_timestamp_long_fractions_ns);
     mt_run(print_finfo);
     mt_run(print_too_long_print_truncate);
+    mt_run(print_too_long_print_truncate_no_newline);
     mt_run(print_truncate_with_date);
     mt_run(print_truncate_with_all_options);
     mt_run(print_with_no_output_available);
@@ -815,4 +1117,7 @@ void el_print_test_group(void)
     mt_run(print_finfo_path);
     mt_run(print_nofinfo);
     mt_run(print_null);
+    mt_run(print_prefix);
+    mt_run(print_prefix_full);
+    mt_run(print_prefix_overflow);
 }

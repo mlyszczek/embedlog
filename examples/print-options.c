@@ -5,13 +5,17 @@
 
 #include "embedlog.h"
 
+#define EL_OPTIONS_OBJECT &opts
+
 int main(void)
 {
+    struct el_options  opts;
+
     el_init();
     el_option(EL_OUT, EL_OUT_STDERR);
 
     el_option(EL_PRINT_LEVEL, 0);
-    el_print(ELI, "We can disable information about log level");
+    el_print(ELI, "We can disable information about log level\b");
     el_print(ELF, "message still will be filtered by log level");
     el_print(ELA, "but there is no way to tell what level message is");
     el_print(ELD, "like this message will not be printed");
@@ -28,11 +32,21 @@ int main(void)
     el_print(ELF, "if higher precision is needed we can use CLOCK_REALTIME");
     el_option(EL_TS, EL_TS_SHORT);
     el_print(ELF, "we can also mix REALTIME with short format");
+    el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
+    el_print(ELF, "and iff you don't need high resolution");
+    el_print(ELF, "you can disable fractions of seconds to save space!");
+    el_option(EL_TS_FRACT, EL_TS_FRACT_MS);
+    el_print(ELF, "or enable only millisecond resolution");
+    el_option(EL_TS_FRACT, EL_TS_FRACT_US);
+    el_print(ELF, "or enable only microsecond resolution");
+    el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
+    el_print(ELF, "or enable only nanosecond resolution");
     el_option(EL_TS, EL_TS_LONG);
     el_option(EL_TS_TM, EL_TS_TM_CLOCK);
     el_print(ELF, "or long with clock() if you desire");
     el_option(EL_TS, EL_TS_OFF);
     el_print(ELF, "no time information, if your heart desire it");
+    el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
 
     el_option(EL_FINFO, 1);
     el_print(ELF, "log location is very usefull for debuging");
@@ -42,6 +56,12 @@ int main(void)
     el_option(EL_PRINT_LEVEL, 1);
     el_print(ELF, "Different scenarios need different options");
     el_print(ELA, "So we can mix options however we want");
+
+    el_option(EL_PRINT_NL, 0);
+    el_print(ELF, "you can also remove printing new line ");
+    el_puts("to join el_print and el_puts in a single ");
+    el_puts("long line as needed\n");
+    el_option(EL_PRINT_NL, 1);
 
     el_option(EL_COLORS, 1);
     el_option(EL_LEVEL, EL_DBG);
@@ -54,5 +74,22 @@ int main(void)
     el_print(ELA, "glance into");
     el_print(ELF, "log file");
 
+    el_option(EL_PREFIX, "embedlog: ");
+    el_print(ELI, "you can also use prefixes");
+    el_print(ELI, "to every message you send");
+
+    el_option(EL_PREFIX, NULL);
+    el_print(ELI, "set prefix to null to disable it");
+
     el_cleanup();
+
+
+    el_oinit(&opts);
+    el_ooption(&opts, EL_OUT, EL_OUT_STDERR);
+    el_oprint(ELI, &opts, "you can do same thing as about with custom");
+    el_oprint(ELI, &opts, "options object for two or more logger.");
+    el_oprint(OELE, "and if you define EL_OPTIONS_OBJECT you will be");
+    el_oprint(OELF, "able to print messages without passing options");
+    el_oprint(OELW, "each time to print functions");
+    el_ocleanup(&opts);
 }

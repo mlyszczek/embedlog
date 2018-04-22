@@ -78,7 +78,6 @@ AC_ARG_ENABLE([out-stderr],
 AS_IF([test "x$enable_out_stderr" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr])
-    AC_CHECK_FUNCS(access)
     AC_CHECK_FUNCS([fputs],,
         AC_MSG_ERROR(not found, needed by --enable-out-stderr))
 ])
@@ -97,6 +96,7 @@ AM_CONDITIONAL([ENABLE_OUT_FILE], [test "x$enable_out_file" = "xyes"])
 AS_IF([test "x$enable_out_file" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_FILE], [1], [Enable printing to file])
+    AC_CHECK_FUNCS(access stat fsync fileno)
     AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
         AC_MSG_ERROR(not found, needed by --enable-out-file))
 ])
@@ -115,6 +115,7 @@ AM_CONDITIONAL([ENABLE_OUT_TTY], [test "x$enable_out_tty" = "xyes"])
 AS_IF([test "x$enable_out_tty" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_TTY], [1], [Enable printing to tty])
+    AC_CHECK_HEADERS(termios.h)
     AC_CHECK_FUNCS([open tcgetattr cfsetispeed tcsetattr close],,
         AC_MSG_ERROR(not found, needed by --enable-out-tty))
 ])
@@ -150,8 +151,25 @@ AC_ARG_ENABLE([timestamp],
 AS_IF([test "x$enable_timestamp" = "xyes"],
 [
     AC_DEFINE([ENABLE_TIMESTAMP], [1], [Enable printing timestamp with log])
-    AC_CHECK_FUNCS([clock time],,
+    AC_CHECK_FUNCS([clock time sprintf],,
         AC_MSG_ERROR(not found, needed by --enable-timestamp))
+])
+
+
+###
+# --enable-fractions
+#
+
+
+AC_ARG_ENABLE([fractions],
+    AS_HELP_STRING([--enable-fractions], [Enable printing fractions with log]),
+    [], [enable_fractions="yes"])
+
+AS_IF([test "x$enable_fractions" = "xyes"],
+[
+    AC_DEFINE([ENABLE_FRACTIONS], [1], [Enable printing fractions with log])
+    AC_CHECK_FUNCS([sprintf],,
+        AC_MSG_ERROR(not found, needed by --enable-fractions))
 ])
 
 
@@ -200,6 +218,63 @@ AS_IF([test "x$enable_monotonic" = "xyes"],
 
 
 ###
+# --enable-clock
+#
+
+
+AC_ARG_ENABLE([clock],
+    AS_HELP_STRING([--enable-clock], [Enable using clock() as tme source in log]),
+    [], [enable_clock="yes"])
+
+AS_IF([test "x$enable_clock" = "xyes"],
+[
+    AS_IF([test "x$enable_timestamp" != "xyes"],
+    [
+        AC_MSG_WARN(--enable-clock without --enable-timestamp has no effect)
+    ])
+
+    AC_DEFINE([ENABLE_CLOCK], [1], [Enable using clock() as time source in log])
+    AC_CHECK_FUNCS([clock],,
+        AC_MSG_ERROR(not found, needed by --enable-clock))
+])
+
+
+###
+# --enable-binary
+#
+
+
+AC_ARG_ENABLE([binary-logs],
+    AS_HELP_STRING([--enable-binary-logs], [Enable printing binary logs]),
+    [], [enable_binary_logs="no"])
+
+AM_CONDITIONAL([ENABLE_BINARY_LOGS], [test "x$enable_binary_logs" = "xyes"])
+AS_IF([test "x$enable_binary_logs" = "xyes"],
+[
+    AC_DEFINE([ENABLE_BINARY_LOGS], [1], [Enable printing binary logs])
+    AC_CHECK_FUNCS([memcpy],,
+        AC_MSG_ERROR(not found, needed by --enable-binary-logs))
+])
+
+
+###
+# --enable-prefix
+#
+
+
+AC_ARG_ENABLE([prefix],
+    AS_HELP_STRING([--enable-prefix], [Enable printing prefix to each message]),
+    [], [enable_prefix="yes"])
+
+AS_IF([test "x$enable_prefix" = "xyes"],
+[
+    AC_DEFINE([ENABLE_PREFIX], [1], [Enable printing prefix to each message])
+    AC_CHECK_FUNCS([strncat strlen],,
+        AC_MSG_ERROR(not found, needed by --enable-prefix))
+])
+
+
+###
 # --enable-finfo
 #
 
@@ -234,6 +309,21 @@ AS_IF([test "x$enable_colors" = "xyes"],
 
 
 ###
+# --enable-colors-extended
+#
+
+
+AC_ARG_ENABLE([colors-extended],
+    AS_HELP_STRING([--enable-colors-extended], [Enable more colors in logs]),
+    [], [enable_colors_extended="no"])
+
+AS_IF([test "x$enable_colors_extended" = "xyes"],
+[
+    AC_DEFINE([ENABLE_COLORS_EXTENDED], [1], [Enable more colors in logs])
+])
+
+
+###
 # --enable-reentrant
 #
 
@@ -253,6 +343,15 @@ AS_IF([test "x$enable_reentrant" = "xyes"],
 ###
 # VARIABLES=value options
 #
+
+###
+# EL_PREFIX_MAX
+#
+
+
+AC_ARG_VAR([EL_PREFIX_MAX], [Maximum size of prefix])
+AS_IF([test "x$EL_PREFIX_MAX" = x], [EL_PREFIX_MAX="128"])
+AC_DEFINE_UNQUOTED([EL_PREFIX_MAX], [$EL_PREFIX_MAX], [Maximum size of prefix])
 
 
 ###
@@ -317,12 +416,18 @@ echo "print to file............... : $enable_out_file"
 echo "print to tty................ : $enable_out_tty"
 echo "print to custom routine..... : $enable_out_custom"
 echo "print timestamp enabled..... : $enable_timestamp"
+echo "print fractions of seconds.. : $enable_fractions"
 echo "clock_realtime timestamp.... : $enable_realtime"
 echo "clock_monotonic timestamp... : $enable_monotonic"
+echo "clock() timestamp........... : $enable_clock"
+echo "print prefix with each msg.. : $enable_prefix"
 echo "print file info with log.... : $enable_finfo"
 echo "force portable snprintf......: $enable_portable_snprintf"
+echo "binary logs..................: $enable_binary_logs"
 echo "colorize output............. : $enable_colors"
+echo "extended colors............. : $enable_colors_extended"
 echo "reentrant functions......... : $enable_reentrant"
+echo "maximum prefix length....... : $EL_PREFIX_MAX"
 echo "maximum file length......... : $EL_FLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
 echo "maximum path length......... : $MAX_PATH"

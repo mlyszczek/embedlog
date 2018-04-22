@@ -29,7 +29,7 @@ Value inside parenthesis determines argument types of variadic arguments
 sets what the current logging level shall be.
 Altough it accepts
 .   B enum el_level
-type, this can be whatever number from range <0, INT_MAX>.
+type, this can be whatever number from range <0, 7>.
 The higher the level, the lower priority of the message.
 All messages that have lower priority (higher number) then currently set
 .   I level
@@ -54,34 +54,14 @@ There are 8 predefined levels, sorted by priority (highest first):
 .       B EL_DBG
 .   RE
 .   PP
-If 8 print levels are not enough, one can define new levels, knowing that
-.   B EL_FATAL
-has int value of 0, and
-.   B EL_DBG
-has int value of 7.
-User can also use debug level and add an integer like:
-.   B EL_DBG
-+
-.   I n
-- where
-.   I n
-can be any number from range <0, INT_MAX - 8>.
-.   PP
-If messages are printed with lower priority than
-.   B EL_DBG
-they all will be treated as messages printed with level
-.   BR EL_DBG ,
-that means message printed with level
-.   B EL_DBG
-and
-.   BR "EL_DBG + 3" ,
-will be printed exactly the same, so same color (if colors are enabled) and if
-log level printig is enabled, such messages will have same 'd/' prefix no matter
-the level.
-.   PP
 .   B ERRORS
 .   RS
-Setting log level cannot fail
+.       B EINVAL
+.       RS
+specified
+.       I level
+is invalid (bigger than EL_DBG).
+.       RE
 .   RE
 .RE
 .PP
@@ -119,7 +99,7 @@ POSIX.1-2001 and any syslog daemon
 .   RS
 Messages will be printed to file.
 To work user should set output file with
-.       BR EL_FNAME .
+.       BR EL_FPATH .
 Log rotation can be configured with
 .       B EL_FROTATE_NUMBER
 and
@@ -182,6 +162,32 @@ Specified
 is not implemented on current system (support was not compiled into library)
 .       RE
 .   RE
+.RE
+.PP
+.BI "EL_PREFIX (" const " " char " " * "prefix)"
+.RS
+You can configure logger to add
+.   I prefix
+to every message you print.
+.   I prefix
+will be printed between log level info "i/" and you message.
+No spaces are added.
+If you set your
+.   I prefix
+to simple
+.   BR PREFIX ,
+printed message will be
+.   BR "i/PREFIXmy log message" ,
+so you might want to add space there.
+If
+.   I prefix
+is bigger than
+.   B EL_PREFIX_LEN
+prefix will be truncated.
+To disable prefixing, simply set
+.   I prefix
+to
+.   BR NULL .
 .RE
 .PP
 .BI "EL_COLORS (" int " colors)"
@@ -310,6 +316,26 @@ Specified timer source was not compiled in and is not available
 .   RE
 .RE
 .PP
+.BI "EL_TS_FRACT (" enum " " el_option_timestamp_fraction " fraction)
+.RS
+This options controls how to display fractions of seconds.
+If high resolution is not needed or not supported, it's best to set this to
+lowest resolution possible.
+Table will show exacly what this is about.
+Example uses long timestamp, interesting part is after date after dot '.'.
+.PP
+.EX
+    +-----------------+-------------------------------+
+    |      value      |  resulting timestamp string   |
+    +-----------------+-------------------------------+
+    | EL_TS_FRACT_OFF | 2018-04-17 22:02:57           |
+    | EL_TS_FRACT_MS  | 2018-04-17 22:02:57.070       |
+    | EL_TS_FRACT_US  | 2018-04-17 22:02:57.070518    |
+    | EL_TS_FRACT_NS  | 2018-04-17 22:02:57.070518782 |
+    +-----------------+-------------------------------+
+.EE
+.RE
+.PP
 .BI "EL_PRINT_LEVEL (" int " print)"
 .RS
 If this is set to 1, each log will have log level information prefix in format
@@ -369,7 +395,7 @@ It is still mandatory to enable custom printing with
 .   BR el_option (3)
 .RE
 .PP
-.BI "EL_FNAME (" const " " char " " * "path)"
+.BI "EL_FPATH (" const " " char " " * "path)"
 .RS
 Sets the
 .I path
@@ -407,7 +433,7 @@ specified file without size limit.
 The only size limit is the one presented by the filesystem and architecture.
 .   PP
 If this value is bigger than 0, file rotation will be enabled. All files will
-have suffixes added to name set in EL_FNAME. For example,
+have suffixes added to name set in EL_FPATH. For example,
 .   IR program.log.0 .
 Files are enumareted from
 .   I .0
@@ -428,7 +454,7 @@ will be renamed to
 .   I log.2
 will be renamed to
 .   I log.1
-and so on.
+and so on).
 .   PP
 User can also pass 1 here, but if file reaches its size limit, it will be
 deleted and printing will continue from the empty file
@@ -465,6 +491,64 @@ Value is less than 1
 .   RE
 .RE
 .PP
+.BI "EL_FILE_SYNC_EVERY (" long " size)"
+.RS
+Simply writing data to file descriptor is not enough, metadata also has to be
+synced or you are facing data loose on unexpected power loose.
+Yes, data will be on block device, but entry to it in file system will not be
+updated, thus system will think file did not change.
+To prevent that one must sync data and metadata periodically.
+Data will be synced every
+.I size
+of bytes written.
+It basically translates to 'how much data am I ready to loose?'.
+Set this too high and you may loose a significant ammout of data on power lose.
+Set this too low and your performance goes out of the window.
+.   PP
+.   B ERRORS
+.   RS
+.       B EINVAL
+.       RS
+Value is less than 0
+.       RE
+.   RE
+.RE
+.PP
+.BI "EL_FILE_SYNC_LEVEL (" enum " " el_level " level)"
+.RS
+If level of printed message is
+.   I level
+or less (that is higher priority), it will be synced to disk every single time
+regardless of
+.   B EL_FILE_SYNC_EVERY
+option.
+Messages with level
+.   B EL_FATAL
+(that is also default value for level sync) are synced always regardless of any
+options set.
+Messages printed with functions that don't take log level, will be treated as
+messages with
+.   B EL_DBG
+level.
+If
+.   I level
+is set to
+.   B EL_DBG
+every message printed with any function will be immediately synced to drive
+(careful with that, this will impact performance a great deal if you print a lot
+of debug messages).
+.   PP
+.   B ERRORS
+.   RS
+.       B EINVAL
+.       RS
+specified
+.       I level
+is invalid (bigger than EL_DBG).
+.       RE
+.   RE
+.RE
+.PP
 .BI "EL_TTY_DEV (" const\ char\ * "dev, " speed_t " speed)"
 .RS
 Tells
@@ -479,6 +563,12 @@ Logger uses only transmit pin (TX) and will translate all
 .B LF
 into
 .BR CR-LF .
+If
+.I speed
+is configured to
+.BR B0,
+serial port settings will not be altered, library will simply open port and
+will happily work on current serial settings.
 .   PP
 .   B ERRORS
 .   RS

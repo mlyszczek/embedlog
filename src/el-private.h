@@ -1,12 +1,14 @@
 /* ==========================================================================
-    Licensed under BSD 2clause license. See LICENSE file for more information
+    Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ========================================================================== */
 
+/*
+ * this file contains stuff internal to the library
+ */
 
-#ifndef EL_CONFIGPRIV_H
-#define EL_CONFIGPRIV_H 1
-
+#ifndef EL_PRIVATE_H
+#define EL_PRIVATE_H 1
 
 /* ==========================================================================
           _               __            __         ____ _  __
@@ -17,20 +19,47 @@
 
    ========================================================================== */
 
-
 #if HAVE_CONFIG_H
-#include "config.h"
+#   include "config.h"
 #endif
 
+#include "embedlog.h"
+#include "valid.h"
 
-/* ==== library private macros ============================================== */
+#if HAVE_TERMIOS_H
+#   include <termios.h>
+#endif
+
+#include <limits.h>
+
+/* ==========================================================================
+                  __        __            __
+          ____ _ / /____   / /_   ____ _ / /  _   __ ____ _ _____ _____
+         / __ `// // __ \ / __ \ / __ `// /  | | / // __ `// ___// ___/
+        / /_/ // // /_/ // /_/ // /_/ // /   | |/ // /_/ // /   (__  )
+        \__, //_/ \____//_.___/ \__,_//_/    |___/ \__,_//_/   /____/
+       /____/
+   ========================================================================== */
 
 
-/* ==== defines for el_mprint function ====================================== */
+extern struct el_options g_options;
 
 
 /* ==========================================================================
-    single line of el_print_mem will be similar to this
+                                       __                 __
+            _____ ____   ____   _____ / /_ ____ _ ____   / /_ _____
+           / ___// __ \ / __ \ / ___// __// __ `// __ \ / __// ___/
+          / /__ / /_/ // / / /(__  )/ /_ / /_/ // / / // /_ (__  )
+          \___/ \____//_/ /_//____/ \__/ \__,_//_/ /_/ \__//____/
+
+   ========================================================================== */
+
+
+/* ==== defines for el_pmemory function ===================================== */
+
+
+/* ==========================================================================
+    single line of el_pmemory will be similar to this
 
     0xNNNN  HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH  CCCCCCCCCCCCCCC
    ========================================================================== */
@@ -75,30 +104,52 @@
 /* ==========================================================================
     length of long timestamp in a single log. Timestamp format is
 
-        [yyyy-mm-dd hh:mm:ss.uuuuuu]
+        [yyyy-mm-dd hh:mm:ss]
 
-    which is 28 bytes long
+    which is 21 bytes long
    ========================================================================== */
 
 
-#if ENABLE_TIMESTAMP
-    #define EL_PRE_TS_LONG_LEN 28
-#else
-    #define EL_PRE_TS_LONG_LEN 0
-#endif
+#define EL_PRE_TS_LONG_LEN 21
 
 
 /* ==========================================================================
     length of short timestamp in a single log. Timestamp format is
 
-        [ssssssssss.uuuuuu]
+        [ssssssssss]
 
-    which is 19 bytes long. This is maximum value for short timestamp, as it
+    which is 12 bytes long. This is maximum value for short timestamp, as it
     can be shorter.
    ========================================================================== */
 
 
-#define EL_PRE_TS_SHORT_LEN 19
+#define EL_PRE_TS_SHORT_LEN 12
+
+
+/* ==========================================================================
+    Size of the fractions of seconds, that is part after seconds like:
+
+    [ssssssssss.fffffffff]
+
+    or
+
+    [yyyy-mm-dd hh:mm:ss.fffffffff]
+   ========================================================================== */
+
+
+#define EL_PRE_TS_FRACT_LEN 10
+
+
+/* ==========================================================================
+    Calculate what is the minimum needed length to hold longest timestamp
+   ========================================================================== */
+
+
+#if ENABLE_TIMESTAMP
+#   define EL_PRE_TS_MAX (EL_PRE_TS_LONG_LEN + EL_PRE_TS_FRACT_LEN)
+#else
+#   define EL_PRE_TS_MAX 0
+#endif
 
 
 /* ==========================================================================
@@ -124,9 +175,9 @@
 
 
 #if ENABLE_FINFO
-    #define EL_PRE_FINFO_LEN ((EL_FLEN_MAX) + 3 + EL_PRE_FINFO_LINE_MAX_LEN)
+#   define EL_PRE_FINFO_LEN ((EL_FLEN_MAX) + 3 + EL_PRE_FINFO_LINE_MAX_LEN)
 #else
-    #define EL_PRE_FINFO_LEN 0
+#   define EL_PRE_FINFO_LEN 0
 #endif
 
 
@@ -144,11 +195,18 @@
 /* ==========================================================================
     maximum length of preamble which may look like this
 
-        [2017-05-24 14:43:10.123456][source-file.c:12345] e/
+        [2017-05-24 14:43:10.123456][source-file.c:12345] e/prefix
    ========================================================================== */
 
 
-#define EL_PRE_LEN (EL_PRE_TS_LONG_LEN + EL_PRE_FINFO_LEN + EL_PRE_LEVEL_LEN)
+#if ENABLE_PREFIX
+#   define EL_PREFIX_LEN EL_PREFIX_MAX
+#else
+#   define EL_PREFIX_LEN 0
+#endif
+
+#define EL_PRE_LEN (EL_PRE_TS_MAX + EL_PRE_FINFO_LEN + EL_PREFIX_LEN + \
+    EL_PRE_LEVEL_LEN)
 
 
 /* ==========================================================================
@@ -159,9 +217,9 @@
 
 
 #if ENABLE_COLORS
-    #define EL_COLORS_LEN (5 + 4)
+#   define EL_COLORS_LEN (5 + 4)
 #else
-    #define EL_COLORS_LEN 0
+#   define EL_COLORS_LEN 0
 #endif
 
 
@@ -173,6 +231,51 @@
 
 
 #define EL_BUF_MAX (EL_PRE_LEN + (EL_LOG_MAX) + EL_COLORS_LEN)
+
+
+/* ==========================================================================
+    Defines if timestamp should be stored into buffer as string or binary
+   ========================================================================== */
+
+
+#define TS_STRING (0)
+#define TS_BINARY (1)
+
+
+/* ==========================================================================
+               ____                     __   _
+              / __/__  __ ____   _____ / /_ (_)____   ____   _____
+             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
+            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
+           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+
+   ========================================================================== */
+
+
+#if ENABLE_OUT_FILE
+int el_file_open(struct el_options *options);
+int el_file_puts(struct el_options *options, const char *s);
+int el_file_putb(struct el_options *options, const void *mem, size_t mlen);
+void el_file_cleanup(struct el_options *options);
+#endif
+
+
+#if ENABLE_OUT_TTY
+int el_tty_open(struct el_options *options, const char *dev, speed_t speed);
+int el_tty_puts(struct el_options *options, const char *s);
+int el_tty_close(struct el_options *options);
+#endif
+
+int el_log_allowed(struct el_options *options, enum el_level level);
+size_t el_timestamp(struct el_options *options, void *buf, int binary);
+
+#if LLONG_MAX
+size_t el_encode_number(unsigned long long number, void *out);
+size_t el_decode_number(const void *number, unsigned long long *out);
+#else
+size_t el_encode_number(unsigned long number, void *out);
+size_t el_decode_number(const void *number, unsigned long *out);
+#endif
 
 
 #endif

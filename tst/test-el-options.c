@@ -16,8 +16,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "embedlog.h"
-#include "el-options.h"
+#include "el-private.h"
 #include "mtest.h"
 #include "test-group-list.h"
 #include "config.h"
@@ -93,22 +92,27 @@ static void options_init(void)
 
 
     memset(&default_options, 0, sizeof(default_options));
-    default_options.outputs         = 0;
-    default_options.level           = EL_INFO;
-    default_options.colors          = 0;
-    default_options.timestamp       = EL_TS_OFF;
-    default_options.timestamp_timer = EL_TS_TM_CLOCK;
-    default_options.print_log_level = 1;
-    default_options.custom_puts     = NULL;
-    default_options.serial_fd       = -1;
+    default_options.outputs             = 0;
+    default_options.level               = EL_INFO;
+    default_options.file_sync_level     = EL_FATAL;
+    default_options.level_current_msg   = EL_DBG;
+    default_options.colors              = 0;
+    default_options.timestamp           = EL_TS_OFF;
+    default_options.timestamp_timer     = EL_TS_TM_TIME;
+    default_options.timestamp_fractions = EL_TS_FRACT_OFF;
+    default_options.print_log_level     = 1;
+    default_options.print_newline       = 1;
+    default_options.custom_puts         = NULL;
+    default_options.serial_fd           = -1;
 
-    default_options.finfo           = 0;
-    default_options.frotate_number  = 0;
-    default_options.fcurrent_rotate = 0;
-    default_options.frotate_size    = 0;
-    default_options.fpos            = 0;
-    default_options.file            = NULL;
-    default_options.fname           = NULL;
+    default_options.finfo               = 0;
+    default_options.frotate_number      = 0;
+    default_options.fcurrent_rotate     = 0;
+    default_options.frotate_size        = 0;
+    default_options.fpos                = 0;
+    default_options.file                = NULL;
+    default_options.file_sync_every     = 32768;
+    default_options.fname               = NULL;
 
     mt_fail(el_oinit(&options) == 0);
     mt_fail(memcmp(&options, &default_options, sizeof(options)) == 0);
@@ -142,10 +146,44 @@ static void options_level_set(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (i = 0; i != 32; ++i)
+    for (i = 0; i != 16; ++i)
     {
-        mt_fail(el_option(EL_LEVEL, i) == 0);
-        mt_fail(g_options.level == i);
+        if (i <= EL_DBG)
+        {
+            mt_fail(el_option(EL_LEVEL, i) == 0);
+            mt_fail(g_options.level == i);
+        }
+        else
+        {
+            mt_ferr(el_option(EL_LEVEL, i), EINVAL);
+            mt_fail(g_options.level == EL_DBG);
+        }
+    }
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void options_file_sync_level_set(void)
+{
+    int i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    for (i = 0; i != 16; ++i)
+    {
+        if (i <= EL_DBG)
+        {
+            mt_fail(el_option(EL_FILE_SYNC_LEVEL, i) == 0);
+            mt_fail(g_options.file_sync_level == i);
+        }
+        else
+        {
+            mt_ferr(el_option(EL_FILE_SYNC_LEVEL, i), EINVAL);
+            mt_fail(g_options.file_sync_level == EL_DBG);
+        }
     }
 }
 
@@ -156,11 +194,8 @@ static void options_level_set(void)
 
 static void options_output(void)
 {
-    int current_outputs;
     int i;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    current_outputs = 0;
 
     for (i = 0; i != EL_OUT_ALL; ++i)
     {
@@ -341,6 +376,14 @@ static void options_opt_timestamp_timer(void)
         }
 #   endif
 
+#   if ENABLE_CLOCK == 0
+        if (i == EL_TS_TM_CLOCK)
+        {
+            mt_ferr(el_option(EL_TS_TM, i), ENODEV);
+            continue;
+        }
+#   endif
+
         mt_fok(el_option(EL_TS_TM, i));
         mt_fail(g_options.timestamp_timer == i);
 #else
@@ -356,6 +399,29 @@ static void options_opt_timestamp_timer(void)
 }
 
 
+static void options_opt_timestamp_fraction(void)
+{
+    int i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    for (i = EL_TS_FRACT_OFF; i != EL_TS_FRACT_ERROR; ++i)
+    {
+#if ENABLE_FRACTIONS && ENABLE_TIMESTAMP
+        mt_fok(el_option(EL_TS_FRACT, i));
+        mt_fail(g_options.timestamp_fractions == i);
+#else
+        mt_ferr(el_option(EL_TS_FRACT, i), ENOSYS);
+#endif
+    }
+
+#if ENABLE_FRACTIONS && ENABLE_TIMESTAMP
+    mt_ferr(el_option(EL_TS_FRACT, i), EINVAL);
+#else
+    mt_ferr(el_option(EL_TS_FRACT, i), ENOSYS);
+#endif
+}
+
 /* ==========================================================================
    ========================================================================== */
 
@@ -367,11 +433,29 @@ static void options_ooption_test(void)
 
 
 #if ENABLE_TIMESTAMP
-    el_ooption(&opts, EL_TS_TM, EL_TS_TM_CLOCK);
-    mt_fail(opts.timestamp_timer == EL_TS_TM_CLOCK);
+    el_ooption(&opts, EL_TS_TM, EL_TS_TM_TIME);
+    mt_fail(opts.timestamp_timer == EL_TS_TM_TIME);
 #else
-    mt_ferr(el_ooption(&opts, EL_TS_TM, EL_TS_TM_CLOCK), ENOSYS);
+    mt_ferr(el_ooption(&opts, EL_TS_TM, EL_TS_TM_TIME), ENOSYS);
 #endif
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void options_prefix(void)
+{
+    el_option(EL_PREFIX, "prefix");
+#if ENABLE_PREFIX
+    mt_fok(strcmp("prefix", g_options.prefix));
+#else
+    mt_fail(g_options.prefix == NULL);
+#endif
+
+    el_option(EL_PREFIX, NULL);
+    mt_fail(g_options.prefix == NULL);
 }
 
 
@@ -404,12 +488,15 @@ void el_options_test_group(void)
     mt_cleanup_test = &test_cleanup;
 
     mt_run(options_level_set);
+    mt_run(options_file_sync_level_set);
     mt_run(options_output);
     mt_run(options_log_allowed);
     mt_run(options_opt_print_level);
     mt_run(options_opt_colors);
     mt_run(options_opt_timestamp);
     mt_run(options_opt_timestamp_timer);
+    mt_run(options_opt_timestamp_fraction);
     mt_run(options_ooption_test);
     mt_run(options_einval);
+    mt_run(options_prefix);
 }
