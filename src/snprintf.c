@@ -411,7 +411,7 @@ int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
 
 /* declarations */
 
-#if !defined(HAVE_SNPRINTF)
+#if defined(PREFER_PORTABLE_SNPRINTF)
 static char credits[] = "\n\
 @(#)snprintf.c, v2.2: Mark Martinec, <mark.martinec@ijs.si>\n\
 @(#)snprintf.c, v2.2: Copyright 1999, Mark Martinec. Frontier Artistic License applies.\n\
