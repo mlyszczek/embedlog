@@ -262,7 +262,7 @@ static void file_directory_deleted(void)
     el_puts(s9);
     unlink(WORKDIR"/log");
     rmdir(WORKDIR);
-    mt_ferr(el_puts(s9), EBADF);
+    mt_ferr(el_puts(s9), ENOENT);
     mkdir(WORKDIR, 0755);
 }
 
@@ -276,10 +276,61 @@ static void file_directory_reappear_after_delete(void)
     el_puts(s9);
     unlink(WORKDIR"/log");
     rmdir(WORKDIR);
-    mt_ferr(el_puts(s9), EBADF);
+    mt_ferr(el_puts(s9), ENOENT);
     mkdir(WORKDIR, 0755);
     mt_fok(el_puts(s9));
     mt_fok(file_check(WORKDIR"/log", s9));
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_write_after_failed_open(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+
+    rmdir(WORKDIR);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(el_puts(s9));
+    mt_fok(file_check(WORKDIR"/log", s9));
+
+    unlink(WORKDIR"/log");
+    el_cleanup();
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void file_write_after_failed_open_to_existing_file(void)
+{
+    /*
+     * mt_prepare_test not running here
+     */
+
+    el_init();
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FILE_SYNC_EVERY, 0);
+
+    rmdir(WORKDIR);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
+    mkdir(WORKDIR, 0755);
+    mt_fok(system("echo test > \""WORKDIR"/log\""));
+    mt_fok(el_puts(s9));
+    mt_fok(file_check(WORKDIR"/log", "test\n"s9));
+
+    unlink(WORKDIR"/log");
+    el_cleanup();
 }
 
 
@@ -292,7 +343,7 @@ static void file_and_directory_reapear(void)
     el_puts(s9);
     unlink(WORKDIR"/log");
     rmdir(WORKDIR);
-    mt_ferr(el_puts(s9), EBADF);
+    mt_ferr(el_puts(s9), ENOENT);
     mkdir(WORKDIR, 0755);
     mt_fok(system("echo test > \""WORKDIR"/log\""));
     mt_fok(el_puts(s9));
@@ -362,6 +413,7 @@ static void file_print_after_cleanup(void)
     el_option(EL_FILE_SYNC_EVERY, 0);
     el_cleanup();
     mt_ferr(el_puts("whatev"), ENODEV);
+    unlink(WORKDIR"/log");
 }
 
 
@@ -907,7 +959,7 @@ static void file_rotate_5_rename_file_halfway(void)
 static void file_no_dir_for_logs(void)
 {
     mt_ferr(el_option(EL_FPATH, "/tmp/i-dont/exist"), ENOENT);
-    mt_ferr(el_puts("whatever"), EBADF);
+    mt_ferr(el_puts("whatever"), ENOENT);
 }
 
 
@@ -920,7 +972,7 @@ static void file_dir_removed_after_open_then_created_back_again(void)
     mt_fok(el_puts(s8));
     unlink(WORKDIR"/log");
     rmdir(WORKDIR);
-    mt_ferr(el_puts(s3), EBADF);
+    mt_ferr(el_puts(s3), ENOENT);
     mkdir(WORKDIR, 0755);
     mt_fok(el_puts(s8));
 }
@@ -946,7 +998,7 @@ static void file_dir_no_access(void)
     else
     {
         mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
-        mt_ferr(el_puts(s3), EBADF);
+        mt_ferr(el_puts(s3), EACCES);
     }
     unlink("/tmp/embedlog-no-write/log");
     rmdir("/tmp/embedlog-no-write");
@@ -976,7 +1028,7 @@ static void file_no_access_to_file(void)
     else
     {
         mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
-        mt_ferr(el_puts("whatever"), EBADF);
+        mt_ferr(el_puts("whatever"), EACCES);
     }
     unlink("/tmp/embedlog-no-write/log");
     rmdir("/tmp/embedlog-no-write");
@@ -991,7 +1043,7 @@ static void file_rotate_no_dir_for_logs(void)
 {
     el_option(EL_FROTATE_NUMBER, 5);
     mt_ferr(el_option(EL_FPATH, "/tmp/i-dont/exist"), ENOENT);
-    mt_ferr(el_puts("whatever"), EBADF);
+    mt_ferr(el_puts("whatever"), ENOENT);
 }
 
 
@@ -1012,7 +1064,7 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
     rmdir(WORKDIR);
-    mt_ferr(el_puts(s3), EBADF);
+    mt_ferr(el_puts(s3), ENOENT);
     mkdir(WORKDIR, 0755);
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s5));
@@ -1061,7 +1113,7 @@ static void file_rotate_dir_no_access(void)
     else
     {
         mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
-        mt_ferr(el_puts(s3), EBADF);
+        mt_ferr(el_puts(s3), EACCES);
     }
 
     unlink("/tmp/embedlog-no-write/log.0");
@@ -1093,7 +1145,7 @@ static void file_rotate_no_access_to_file(void)
     else
     {
         mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
-        mt_ferr(el_puts("whatever"), EBADF);
+        mt_ferr(el_puts("whatever"), EACCES);
     }
 
     unlink("/tmp/embedlog-no-write/log.0");
@@ -1269,6 +1321,8 @@ void el_file_test_group(void)
     mt_run(file_print_without_init);
     mt_run(file_print_after_cleanup);
     mt_run(file_print_without_setting_file);
+    mt_run(file_write_after_failed_open);
+    mt_run(file_write_after_failed_open_to_existing_file);
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;

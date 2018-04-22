@@ -434,12 +434,10 @@ int el_file_open
             if ((f = fopen(options->current_log, "a")) == NULL)
             {
                 /*
-                 * well not so fast!  while file exists, and we were able to
-                 * read it (stat) it looks like we cannot write to it, tough
-                 * luck, that means error and no logging to file
+                 * couldn't open file, probably directory doesn't exist,  or
+                 * we have no permissions to create file here
                  */
 
-                options->current_log[0] = '\0';
                 return -1;
             }
 
@@ -531,7 +529,14 @@ int el_file_open
 
     if ((options->file = fopen(options->current_log, "a")) == NULL)
     {
-        options->current_log[0] = '\0';
+        /*
+         * we couldn't open file, but don't set clear  options->current_log,
+         * we will try to reopen this file each time we print to file.  This
+         * is usefull when user tries to open log file in  not-yet  existing
+         * directory.  Error is of course returned to user is aware of  this
+         * whole situation
+         */
+
         return -1;
     }
 
@@ -608,7 +613,6 @@ int el_file_putb
 
         if ((options->file = fopen(options->current_log, "a")) == NULL)
         {
-            errno = EBADF;
             return -1;
         }
 
