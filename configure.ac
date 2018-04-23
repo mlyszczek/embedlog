@@ -16,6 +16,8 @@ AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
 
+AC_SEARCH_LIBS([pow], [m])
+
 ###
 # compile own snprintf if system doesn't provide one
 #
