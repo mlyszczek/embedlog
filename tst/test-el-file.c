@@ -1076,11 +1076,11 @@ static void file_rotate_write_after_failed_open_to_existing_file(void)
     rmdir(WORKDIR);
     mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
     mkdir(WORKDIR, 0755);
-    mt_fok(system("echo -n qaz > \""WORKDIR"/log.0\""));
-    mt_fok(system("echo -n ws > \""WORKDIR"/log.1\""));
+    mt_fok(system("echo qa > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo w > \""WORKDIR"/log.1\""));
     mt_fok(el_puts("edc"));
-    mt_fok(file_check(WORKDIR"/log.0", "qaz"));
-    mt_fok(file_check(WORKDIR"/log.1", "ws"));
+    mt_fok(file_check(WORKDIR"/log.0", "qa\n"));
+    mt_fok(file_check(WORKDIR"/log.1", "w\n"));
     mt_fok(file_check(WORKDIR"/log.2", "edc"));
 
     unlink(WORKDIR"/log.0");
@@ -1109,14 +1109,14 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes(void
     rmdir(WORKDIR);
     mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
     mkdir(WORKDIR, 0755);
-    mt_fok(system("echo -n qaz > \""WORKDIR"/log.0\""));
-    mt_fok(system("echo -n ws > \""WORKDIR"/log.2\""));
-    mt_fok(system("echo -n e > \""WORKDIR"/log.4\""));
+    mt_fok(system("echo qa > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo ws > \""WORKDIR"/log.2\""));
+    mt_fok(system("echo e > \""WORKDIR"/log.4\""));
     mt_fok(el_puts("123"));
     mt_fok(el_puts("456"));
 
-    mt_fok(file_check(WORKDIR"/log.0", "ws"));
-    mt_fok(file_check(WORKDIR"/log.2", "e"));
+    mt_fok(file_check(WORKDIR"/log.0", "ws\n"));
+    mt_fok(file_check(WORKDIR"/log.2", "e\n"));
     mt_fok(file_check(WORKDIR"/log.3", "123"));
     mt_fok(file_check(WORKDIR"/log.4", "456"));
 
@@ -1148,15 +1148,15 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes2(voi
     rmdir(WORKDIR);
     mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
     mkdir(WORKDIR, 0755);
-    mt_fok(system("echo -n qaz > \""WORKDIR"/log.0\""));
-    mt_fok(system("echo -n ws > \""WORKDIR"/log.3\""));
-    mt_fok(system("echo -n e > \""WORKDIR"/log.4\""));
+    mt_fok(system("echo qa > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo ws > \""WORKDIR"/log.3\""));
+    mt_fok(system("echo e > \""WORKDIR"/log.4\""));
     mt_fok(el_puts("123"));
     mt_fok(el_puts("456"));
 
-    mt_fok(file_check(WORKDIR"/log.0", "qaz"));
-    mt_fok(file_check(WORKDIR"/log.1", "ws"));
-    mt_fok(file_check(WORKDIR"/log.2", "e"));
+    mt_fok(file_check(WORKDIR"/log.0", "qa\n"));
+    mt_fok(file_check(WORKDIR"/log.1", "ws\n"));
+    mt_fok(file_check(WORKDIR"/log.2", "e\n"));
     mt_fok(file_check(WORKDIR"/log.3", "123"));
     mt_fok(file_check(WORKDIR"/log.4", "456"));
 
@@ -1188,14 +1188,14 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes3(voi
     rmdir(WORKDIR);
     mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
     mkdir(WORKDIR, 0755);
-    mt_fok(system("echo -n qaz > \""WORKDIR"/log.1\""));
-    mt_fok(system("echo -n ws > \""WORKDIR"/log.3\""));
-    mt_fok(system("echo -n e > \""WORKDIR"/log.4\""));
+    mt_fok(system("echo qa > \""WORKDIR"/log.1\""));
+    mt_fok(system("echo ws > \""WORKDIR"/log.3\""));
+    mt_fok(system("echo e > \""WORKDIR"/log.4\""));
     mt_fok(el_puts("123"));
     mt_fok(el_puts("456"));
     mt_fok(el_puts("789"));
-    mt_fok(file_check(WORKDIR"/log.0", "ws"));
-    mt_fok(file_check(WORKDIR"/log.1", "e"));
+    mt_fok(file_check(WORKDIR"/log.0", "ws\n"));
+    mt_fok(file_check(WORKDIR"/log.1", "e\n"));
     mt_fok(file_check(WORKDIR"/log.2", "123"));
     mt_fok(file_check(WORKDIR"/log.3", "456"));
     mt_fok(file_check(WORKDIR"/log.4", "789"));
@@ -1238,14 +1238,14 @@ static void file_rotate_and_directory_reappear(void)
     mt_ferr(el_puts(s9), ENOENT);
     mkdir(WORKDIR, 0755);
 
-    mt_fok(system("echo -n 123 > \""WORKDIR"/log.0\""));
-    mt_fok(system("echo -n 456 > \""WORKDIR"/log.1\""));
-    mt_fok(system("echo -n 789 > \""WORKDIR"/log.2\""));
+    mt_fok(system("echo 12 > \""WORKDIR"/log.0\""));
+    mt_fok(system("echo 45 > \""WORKDIR"/log.1\""));
+    mt_fok(system("echo 78 > \""WORKDIR"/log.2\""));
 
     mt_fok(el_puts("qaz"));
-    mt_fok(file_check(WORKDIR"/log.0", "123"));
-    mt_fok(file_check(WORKDIR"/log.1", "456"));
-    mt_fok(file_check(WORKDIR"/log.2", "789"));
+    mt_fok(file_check(WORKDIR"/log.0", "12\n"));
+    mt_fok(file_check(WORKDIR"/log.1", "45\n"));
+    mt_fok(file_check(WORKDIR"/log.2", "78\n"));
     mt_fok(file_check(WORKDIR"/log.3", "qaz"));
 
     unlink(WORKDIR"/log.0");
