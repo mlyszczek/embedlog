@@ -30,6 +30,7 @@
 
    ========================================================================== */
 
+
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -85,8 +86,8 @@ int el_oputs
     int                 rv;        /* return value from function */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    VALID(EINVAL, options);
     VALID(EINVAL, s);
+    VALID(EINVAL, options);
     VALID(ENODEV, options->outputs != 0);
 
     rv = 0;
@@ -171,9 +172,9 @@ int el_oputb
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    VALID(EINVAL, options);
     VALID(EINVAL, mem);
     VALID(EINVAL, mlen);
+    VALID(EINVAL, options);
     VALID(ENODEV, options->outputs != 0);
 
     rv = 0;

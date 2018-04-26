@@ -72,6 +72,8 @@ static int el_ovperror
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+    VALID(EINVAL, options);
+
     e = errno;
     rc = 0;
 

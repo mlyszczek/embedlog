@@ -385,6 +385,7 @@ int el_ovprint
 
 
     VALID(EINVAL, fmt);
+    VALID(EINVAL, options);
     VALID(ERANGE, el_log_allowed(options, level));
     VALID(ENODEV, options->outputs);
 
