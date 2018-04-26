@@ -70,6 +70,22 @@ const void *" memory ", size_t " mlen ")"
 .br
 .BI "#define ELD " __FILE__ ", " __LINE__ ", " EL_DBG
 .PP
+.BI "#define OELF " __FILE__ ", " __LINE__ ", " EL_FATAL ", " EL_OPTIONS_OBJECT
+.br
+.BI "#define OELA " __FILE__ ", " __LINE__ ", " EL_ALERT ", " EL_OPTIONS_OBJECT
+.br
+.BI "#define OELC " __FILE__ ", " __LINE__ ", " EL_CRIT ", " EL_OPTIONS_OBJECT
+.br
+.BI "#define OELE " __FILE__ ", " __LINE__ ", " EL_ERROR ", " EL_OPTIONS_OBJECT
+.br
+.BI "#define OELW " __FILE__ ", " __LINE__ ", " EL_WARN ", " EL_OPTIONS_OBJECT
+.br
+.BI "#define OELN " __FILE__ ", " __LINE__ ", " EL_NOTICE ", " EL_OPTIONS_OBJECT
+.br
+.BI "#define OELI " __FILE__ ", " __LINE__ ", " EL_INFO ", " EL_OPTIONS_OBJECT
+.br
+.BI "#define OELD " __FILE__ ", " __LINE__ ", " EL_DBG ", " EL_OPTIONS_OBJECT
+.PP
 .BI "#define EL_DEBUG(" ... ") el_print(ELD, __VA_ARGS__)
 .PP
 Feature Test Macro
@@ -290,6 +306,25 @@ This is useful if we want for example, print logs into one file, and program
 queries into another.
 It can also be used to print every level into different file.
 .PP
+When user defines
+.B EL_OPTIONS_OBJECT
+macros with
+.B OEL*
+can be used to save yourself the trouble to type
+.B &opt_obj
+each time.
+This macro should be defined to what normally would be passed to
+.B el_oprint
+functions familly.
+It usually is used with
+.B extern
+keyword like
+.PP
+.EX
+    extern struct el_options   log_foobar;
+    #define EL_OPTIONS_OBJECT &log_foobar
+.EE
+.PP
 It is real pain in the ass to provide information about file in every print
 function. For that matter very simple macros have been provided.
 .PP
@@ -337,6 +372,18 @@ standards.
 All side effects (like from calling function or incrementing variable in print
 function call) will take effect always regardless of set logging level.
 Also strings used in functions will be compiled and put into binary - always.
+If user defines
+.B NOFINFO
+in his project, all
+.B __FILE__
+and
+.B __LINE__
+will be unconditionally set to
+.B NULL
+and
+.B 0
+and no file information will be printed - even if it was enabled with
+.BR el_options (3).
 .PP
 If user has access to
 .B c99
