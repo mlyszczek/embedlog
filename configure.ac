@@ -169,9 +169,17 @@ AC_ARG_ENABLE([fractions],
 
 AS_IF([test "x$enable_fractions" = "xyes"],
 [
-    AC_DEFINE([ENABLE_FRACTIONS], [1], [Enable printing fractions with log])
-    AC_CHECK_FUNCS([sprintf],,
-        AC_MSG_ERROR(not found, needed by --enable-fractions))
+    AS_IF([test "x$enable_timestamp" = "xyes"],
+    [
+        AC_DEFINE([ENABLE_FRACTIONS], [1], [Enable printing fractions with log])
+        AC_CHECK_FUNCS([sprintf],,
+            AC_MSG_ERROR(not found, needed by --enable-fractions))
+    ],
+    #else
+    [
+        AC_MSG_WARN(--enable-fractions without --enable_timestamp has no effect)
+        enable_fractions="no (unmet dependency)"
+    ])
 ])
 
 
@@ -186,14 +194,17 @@ AC_ARG_ENABLE([realtime],
 
 AS_IF([test "x$enable_realtime" = "xyes"],
 [
-    AS_IF([test "x$enable_timestamp" != "xyes"],
+    AS_IF([test "x$enable_timestamp" = "xyes"],
+    [
+        AC_DEFINE([ENABLE_REALTIME], [1], [Enable using CLOCK_REALTIME in log])
+        AC_CHECK_FUNCS([clock_gettime],,
+            AC_MSG_ERROR(not found, needed by --enable-realtime))
+    ],
+    #else
     [
         AC_MSG_WARN(--enable-realtime without --enable-timestamp has no effect)
+        enable_realtime="no (unmet dependency)"
     ])
-
-    AC_DEFINE([ENABLE_REALTIME], [1], [Enable using CLOCK_REALTIME in log])
-    AC_CHECK_FUNCS([clock_gettime],,
-        AC_MSG_ERROR(not found, needed by --enable-realtime))
 ])
 
 
@@ -208,14 +219,17 @@ AC_ARG_ENABLE([monotonic],
 
 AS_IF([test "x$enable_monotonic" = "xyes"],
 [
-    AS_IF([test "x$enable_timestamp" != "xyes"],
+    AS_IF([test "x$enable_timestamp" = "xyes"],
+    [
+        AC_DEFINE([ENABLE_MONOTONIC], [1], [Enable using CLOCK_MONOTONIC in log])
+        AC_CHECK_FUNCS([clock_gettime],,
+            AC_MSG_ERROR(not found, needed by --enable-monotonic))
+    ],
+    #else
     [
         AC_MSG_WARN(--enable-monotonic without --enable-timestamp has no effect)
+        enable_monotonic="no (unmet dependency)"
     ])
-
-    AC_DEFINE([ENABLE_MONOTONIC], [1], [Enable using CLOCK_MONOTONIC in log])
-    AC_CHECK_FUNCS([clock_gettime],,
-        AC_MSG_ERROR(not found, needed by --enable-monotonic))
 ])
 
 
@@ -230,14 +244,17 @@ AC_ARG_ENABLE([clock],
 
 AS_IF([test "x$enable_clock" = "xyes"],
 [
-    AS_IF([test "x$enable_timestamp" != "xyes"],
+    AS_IF([test "x$enable_timestamp" = "xyes"],
+    [
+        AC_DEFINE([ENABLE_CLOCK], [1], [Enable using clock() as time source in log])
+        AC_CHECK_FUNCS([clock],,
+            AC_MSG_ERROR(not found, needed by --enable-clock))
+    ],
+    # else
     [
         AC_MSG_WARN(--enable-clock without --enable-timestamp has no effect)
+        enable_clock="no (unmet dependency)"
     ])
-
-    AC_DEFINE([ENABLE_CLOCK], [1], [Enable using clock() as time source in log])
-    AC_CHECK_FUNCS([clock],,
-        AC_MSG_ERROR(not found, needed by --enable-clock))
 ])
 
 
@@ -251,11 +268,20 @@ AC_ARG_ENABLE([binary-logs],
     [], [enable_binary_logs="no"])
 
 AM_CONDITIONAL([ENABLE_BINARY_LOGS], [test "x$enable_binary_logs" = "xyes"])
+
 AS_IF([test "x$enable_binary_logs" = "xyes"],
 [
-    AC_DEFINE([ENABLE_BINARY_LOGS], [1], [Enable printing binary logs])
-    AC_CHECK_FUNCS([memcpy],,
-        AC_MSG_ERROR(not found, needed by --enable-binary-logs))
+    AS_IF([test "x$enable_out_file" = "xyes"],
+    [
+        AC_DEFINE([ENABLE_BINARY_LOGS], [1], [Enable printing binary logs])
+        AC_CHECK_FUNCS([memcpy],,
+            AC_MSG_ERROR(not found, needed by --enable-binary-logs))
+    ],
+    # else
+    [
+        AC_MSG_WARN(--enable-binary-logs without --enable-out-file has no effect)
+        enable_binary_logs="no (unmet dependency)"
+    ])
 ])
 
 
@@ -321,7 +347,15 @@ AC_ARG_ENABLE([colors-extended],
 
 AS_IF([test "x$enable_colors_extended" = "xyes"],
 [
-    AC_DEFINE([ENABLE_COLORS_EXTENDED], [1], [Enable more colors in logs])
+    AS_IF([test "x$enable_colors" = "xyes"],
+    [
+        AC_DEFINE([ENABLE_COLORS_EXTENDED], [1], [Enable more colors in logs])
+    ],
+    #else
+    [
+        AC_MSG_WARN(--enable-colors-extended without --enable-colors has no effect)
+        enable_colors_extended="no (unmet dependency)"
+    ])
 ])
 
 
@@ -424,8 +458,8 @@ echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "clock() timestamp........... : $enable_clock"
 echo "print prefix with each msg.. : $enable_prefix"
 echo "print file info with log.... : $enable_finfo"
-echo "force portable snprintf......: $enable_portable_snprintf"
-echo "binary logs..................: $enable_binary_logs"
+echo "force portable snprintf..... : $enable_portable_snprintf"
+echo "binary logs................. : $enable_binary_logs"
 echo "colorize output............. : $enable_colors"
 echo "extended colors............. : $enable_colors_extended"
 echo "reentrant functions......... : $enable_reentrant"
