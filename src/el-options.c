@@ -314,10 +314,10 @@ static int el_vooption
 
     case EL_TTY_DEV:
     {
-        speed_t speed;
+        unsigned int speed;
 
         value_str = va_arg(ap, const char *);  /* serial tty to open */
-        speed = va_arg(ap, speed_t);
+        speed = va_arg(ap, unsigned int);
 
         VALID(EINVAL, value_str);
 

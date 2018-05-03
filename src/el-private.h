@@ -261,7 +261,7 @@ void el_file_cleanup(struct el_options *options);
 
 
 #if ENABLE_OUT_TTY
-int el_tty_open(struct el_options *options, const char *dev, speed_t speed);
+int el_tty_open(struct el_options *options, const char *dev, unsigned int speed);
 int el_tty_puts(struct el_options *options, const char *s);
 int el_tty_close(struct el_options *options);
 #endif

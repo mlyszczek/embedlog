@@ -54,11 +54,13 @@ int el_tty_open
 (
     struct el_options  *options,  /* store serial file descriptor here */
     const char         *dev,      /* device to open like /dev/ttyS0 */
-    speed_t             speed     /* serial port baud rate */
+    unsigned int        speed     /* serial port baud rate */
 )
 {
+#if HAVE_TERMIOS_H
     struct termios      tty;      /* serial port settings */
     int                 e;        /* holder for errno */
+#endif
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -100,7 +102,7 @@ int el_tty_open
         goto error;
     }
 
-    if (cfsetispeed(&tty, speed) != 0)
+    if (cfsetispeed(&tty, (speed_t)speed) != 0)
     {
         goto error;
     }
@@ -129,8 +131,6 @@ error:
     return -1;
 
 #else
-    (void)tty;
-    (void)e;
     return 0;
 #endif
 }
