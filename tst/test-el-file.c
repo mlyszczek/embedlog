@@ -1263,7 +1263,7 @@ static void file_rotate_and_directory_reappear(void)
 
 static void file_no_dir_for_logs(void)
 {
-    mt_ferr(el_option(EL_FPATH, "/tmp/i-dont/exist"), ENOENT);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/i-dont/exist"), ENOENT);
     mt_ferr(el_puts("whatever"), ENOENT);
 }
 
@@ -1289,24 +1289,24 @@ static void file_dir_removed_after_open_then_created_back_again(void)
 
 static void file_dir_no_access(void)
 {
-    mkdir("/tmp/embedlog-no-write", 0555);
+    mkdir(WORKDIR"/embedlog-no-write", 0555);
     if (getuid() == 0)
     {
         /*
          * root just doesn't give a fuck about no-write-permissions
          */
 
-        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"));
         mt_fok(el_puts(s3));
-        mt_fok(file_check("/tmp/embedlog-no-write/log", s3));
+        mt_fok(file_check(WORKDIR"/embedlog-no-write/log", s3));
     }
     else
     {
-        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts(s3), EACCES);
     }
-    unlink("/tmp/embedlog-no-write/log");
-    rmdir("/tmp/embedlog-no-write");
+    unlink(WORKDIR"/embedlog-no-write/log");
+    rmdir(WORKDIR"/embedlog-no-write");
 }
 
 
@@ -1320,23 +1320,23 @@ static void file_no_access_to_file(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    mkdir("/tmp/embedlog-no-write", 0755);
-    fd = open("/tmp/embedlog-no-write/log", O_CREAT, 0444);
+    mkdir(WORKDIR"/embedlog-no-write", 0755);
+    fd = open(WORKDIR"/embedlog-no-write/log", O_CREAT, 0444);
     close(fd);
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"));
         mt_fok(el_puts(s5));
-        mt_fok(file_check("/tmp/embedlog-no-write/log", s5));
+        mt_fok(file_check(WORKDIR"/embedlog-no-write/log", s5));
     }
     else
     {
-        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts("whatever"), EACCES);
     }
-    unlink("/tmp/embedlog-no-write/log");
-    rmdir("/tmp/embedlog-no-write");
+    unlink(WORKDIR"/embedlog-no-write/log");
+    rmdir(WORKDIR"/embedlog-no-write");
 }
 
 
@@ -1347,7 +1347,7 @@ static void file_no_access_to_file(void)
 static void file_rotate_no_dir_for_logs(void)
 {
     el_option(EL_FROTATE_NUMBER, 5);
-    mt_ferr(el_option(EL_FPATH, "/tmp/i-dont/exist"), ENOENT);
+    mt_ferr(el_option(EL_FPATH, WORKDIR"/i-dont/exist"), ENOENT);
     mt_ferr(el_puts("whatever"), ENOENT);
 }
 
@@ -1407,22 +1407,22 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
 static void file_rotate_dir_no_access(void)
 {
     el_option(EL_FROTATE_NUMBER, 5);
-    mkdir("/tmp/embedlog-no-write", 0555);
+    mkdir(WORKDIR"/embedlog-no-write", 0555);
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"));
         mt_fok(el_puts(s3));
-        mt_fok(file_check("/tmp/embedlog-no-write/log.0", s3));
+        mt_fok(file_check(WORKDIR"/embedlog-no-write/log.0", s3));
     }
     else
     {
-        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts(s3), EACCES);
     }
 
-    unlink("/tmp/embedlog-no-write/log.0");
-    rmdir("/tmp/embedlog-no-write");
+    unlink(WORKDIR"/embedlog-no-write/log.0");
+    rmdir(WORKDIR"/embedlog-no-write");
 }
 
 
@@ -1437,24 +1437,24 @@ static void file_rotate_no_access_to_file(void)
 
 
     el_option(EL_FROTATE_NUMBER, 5);
-    mkdir("/tmp/embedlog-no-write", 0755);
-    fd = open("/tmp/embedlog-no-write/log.0", O_CREAT, 0444);
+    mkdir(WORKDIR"/embedlog-no-write", 0755);
+    fd = open(WORKDIR"/embedlog-no-write/log.0", O_CREAT, 0444);
     close(fd);
 
     if (getuid() == 0)
     {
-        mt_fok(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"));
+        mt_fok(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"));
         mt_fok(el_puts(s8));
-        mt_fok(file_check("/tmp/embedlog-no-write/log.0", s8));
+        mt_fok(file_check(WORKDIR"/embedlog-no-write/log.0", s8));
     }
     else
     {
-        mt_ferr(el_option(EL_FPATH, "/tmp/embedlog-no-write/log"), EACCES);
+        mt_ferr(el_option(EL_FPATH, WORKDIR"/embedlog-no-write/log"), EACCES);
         mt_ferr(el_puts("whatever"), EACCES);
     }
 
-    unlink("/tmp/embedlog-no-write/log.0");
-    rmdir("/tmp/embedlog-no-write");
+    unlink(WORKDIR"/embedlog-no-write/log.0");
+    rmdir(WORKDIR"/embedlog-no-write");
 }
 
 

@@ -71,7 +71,7 @@ struct log_message
 
 
 mt_defs_ext();
-static const char   *logpath = "/tmp/embedlog-pbinary-test";
+static const char   *logpath = "./embedlog-pbinary-test";
 static struct rb    *expected_logs;        /* array of expected logs */
 static int           truncate_test;
 
