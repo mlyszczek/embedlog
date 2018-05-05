@@ -64,7 +64,7 @@ architectures. No exceptions.
 operating system tests
 ----------------------
 
-* arm-cortex-m4-nuttx (manual) ![test-result-svg][fsan]
+* arm-cortex-m4-nuttx-7.24 (manual) ![test-result-svg][fsan]
 * parisc-polarhome-hpux-11.11 ![test-result-svg][prhpux]
 * power4-polarhome-aix-7.1 ![test-result-svg][p4aix]
 * i686-builder-freebsd-11.1 ![test-result-svg][x32fb]

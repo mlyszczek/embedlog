@@ -32,7 +32,7 @@ size_t " mlen ")
 .PP
 .BI "int el_oputs(struct el_options *" options ", const char *" message ")"
 .br
-.BI "int el_putb(struct el_options *" options ", const void *" memory ", \
+.BI "int el_oputb(struct el_options *" options ", const void *" memory ", \
 size_t " mlen ")"
 .br
 .BI "int el_oprint(const char *" file ", size_t " line ", \
@@ -47,11 +47,11 @@ const char *" fmt ", va_list " ap ")"
 enum el_level " level ", struct el_options *" options ", \
 const char *" fmt ", " ... ")"
 .br
-.BI "int el_pmemory(const char *" file ", size_t " line ", \
+.BI "int el_opmemory(const char *" file ", size_t " line ", \
 enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .br
-.BI "int el_pbinary(enum el_level " level ", struct el_options *" options ", \
+.BI "int el_opbinary(enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .PP
 .BI "#define ELF " __FILE__ ", " __LINE__ ", " EL_FATAL

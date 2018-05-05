@@ -27,9 +27,13 @@ Logger incorporates features like:
 .RS
 - stderr
 .br
-- syslog
+- syslog (very limited, works on *nuttx* for now)
 .br
-- file (with optional rotating)
+- directly to serial device (like /dev/ttyS0)
+.br
+- file (with optional rotating and syncing to prevent data loss)
+.br
+- automatic file reopening on unexpected events (file deletion, SD remount)
 .br
 - custom routine, can be anything, embedlog just calls your function with
 string to print
@@ -43,12 +47,18 @@ string to print
 - CLOCK_REALTIME (requires POSIX)
 .br
 - CLOCK_MONOTONIC (requires POSIX)
+.br
+- configurable precision of fraction of seconds (mili, micro, nano)
 .RE
 - printing file and line information
 .br
-- 8 predefined log levels (and [sizeof(int) - 8] custom levels ;-))
+- 8 predefined log levels (total rip off from syslog(2) levels)
 .br
 - colorful output (for easy error spotting)
+.br
+- print memory block in wireshark-like output
+.br
+- fully binary logs with binary data (like CAN frames) to save space
 .RE
 .RE
 .PP
@@ -62,6 +72,8 @@ Library implements following functions:
 .br
 .BI "int el_puts(const char *" string ")"
 .br
+.BI "int el_putb(const void *" memory ", size_t " mlen ")"
+.br
 .BI "int el_print(const char *" file ", size_t " line ", \
 enum el_level " level ", const char *" fmt ", " ... ")"
 .br
@@ -73,6 +85,9 @@ enum el_level " level ", const void *" memory ", size_t " mlen ")"
 .br
 .BI "int el_perror(const char *" file ", size_t " line ", \
 enum el_level " level ", const char *" fmt ", " ... ")"
+.br
+.BI "int el_pbinary(enum el_level " level ", const void *" memory ", \
+size_t " mlen ")
 .PP
 Each functions has its equivalent function but accepting
 .I options
@@ -92,6 +107,9 @@ for more information.
 .br
 .BI "int el_oputs(struct el_options *" options ", const char *" string ")"
 .br
+.BI "int el_oputb(struct el_options *" options ", const void *" memory ", \
+size_t " mlen ")"
+.br
 .BI "int el_oprint(const char *" file ", size_t " line ", \
 enum el_level " level ", struct el_options *" options ", \
 const char * "fnt ", " ... ")"
@@ -107,6 +125,9 @@ const void *" memory ", size_t " mlen ")"
 .BI "int el_operror(const char *" file ", size_t " line ", \
 enum el_level " level ", struct el_options *" options ", \
 const char *" fmt ", " ... ")"
+.br
+.BI "int el_opbinary(enum el_level " level ", struct el_options *" options ", \
+const void *" memory ", size_t " mlen ")"
 .PP
 For more information about a function open manual page with functions name from
 section 3 (ie. for el_oputs, you'd open
@@ -149,6 +170,49 @@ You can simply call it like
 .PP
 .EX
     el_print(ELN, "Notice message");
+.EE
+.PP
+There are also equivalent macros for use with functions that also accepts
+.IR options .
+To make these work, you need to provide
+.B EL_OPTIONS_OBJECT
+macro.
+Check
+.BR el_print (3)
+for more info about that.
+.PP
+.RS
+.BR OELF "    Fatal errors, usually precedes application crash"
+.br
+.BR OELA "    Alert, vey major error that should be fixed as soon as possible"
+.br
+.BR OELC "    Critical"
+.br
+.BR OELE "    Error"
+.br
+.BR OELW "    Warning"
+.br
+.BR OELN "    Normal log, but of high importance"
+.br
+.BR OELI "    Information message, shouldn't spam too much here"
+.br
+.BR OELD "    Debug messages, can spam as much as you'd like"
+.RE
+.PP
+So instead of calling
+.PP
+.EX
+    el_oprint(__FILE__, __LINE__, EL_NOTICE, &g_log_object, "Notice message");
+.EE
+or
+.EX
+    el_oprint(ELN, &g_log_object, "Notice message");
+.EE
+.PP
+You can simply call it like
+.PP
+.EX
+    el_oprint(OELN, "Notice message");
 .EE
 .SH EXAMPLE
 .PP
