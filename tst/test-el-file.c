@@ -982,6 +982,7 @@ static void file_rotate_directory_deleted(void)
     mt_ferr(el_puts("rfv"), ENOENT);
 
     mkdir(WORKDIR, 0755);
+    el_cleanup();
 }
 
 
@@ -1027,6 +1028,7 @@ static void file_rotate_directory_reappear_after_delete(void)
     unlink(WORKDIR"/log.2");
     unlink(WORKDIR"/log.3");
     unlink(WORKDIR"/log.4");
+    el_cleanup();
 }
 
 
