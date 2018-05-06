@@ -1,4 +1,4 @@
-.TH "el_option" "3" " 3 May 2018 (v0.3.0)" "bofc.pl"
+.TH "el_option" "3" " 6 May 2018 (v0.3.0)" "bofc.pl"
 .SH NAME
 .PP
 .B el_option
@@ -423,8 +423,14 @@ for any of the errors specified for the routing
 .       BR fopen ()
 .   RE
 .PP
-If function fails, file is not opened and any calls that logs to file will
+If function fails with
+.B EINVAL
+or
+.BR ENAMETOOLONG ,
+file is not opened and any calls that logs to file will
 result in failure.
+Any other error is in reality just a warning, meaning file could not have been
+opened now, but embedlog will try to reopen in each time it logs to file.
 .RE
 .PP
 .BI "EL_FROTATE_NUMBER (" long " number)"
@@ -594,7 +600,7 @@ is invalid.
 .B ENOSYS
 Passed
 .I option
-is not supported on this system (support was not compiled)/
+is not supported on this system (support was not compiled)
 Also check for error description of specific option that failed for more
 informations
 .SH SEE ALSO

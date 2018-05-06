@@ -1,4 +1,4 @@
-.TH "el_init" "3" " 3 May 2018 (v0.3.0)" "bofc.pl"
+.TH "el_init" "3" " 6 May 2018 (v0.3.0)" "bofc.pl"
 .SH NAME
 .PP
 .B el_init
@@ -17,17 +17,32 @@ There are two types of functions in
 Functions that use global static structure inside library, these functions don't
 accept
 .I options
-argument, and are not thread-safe.
+argument.
 .PP
 Another type are functions that accept
 .I options
 argument. These functions are prefixed with
 .BR el_o .
-Options functions are thread-safe provided that threads are working on different
-.I options
-objects and
+.PP
+All functions (options or not) are "line" thread-safe (provided that
 .B \-\-enable\-reentrant
-is turned on.
+is turned on).
+That means library buffers whole line before it calls
+.B puts
+function, so lines in output will not overlap.
+.PP
+NOTE: this may not be entirely true for every operating system there is! Yes,
+.B embedlog
+will always buffer and print whole lines, but OS may, for example interrupt
+.B puts
+call from thread1, and call
+.B puts
+from thread2.
+In such case output will be mangled with 2 different lines.
+While this situation is very rare, it's only fair to mention it.
+If in doubt, check
+.B stdio
+implementation in your operating system.
 .PP
 .BR el_init (3)
 initializes static global option structure. This option structure is used by all

@@ -233,17 +233,17 @@ static int el_vooption
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_TM_ERROR);
 
 
-#   if ENABLE_REALTIME == 0
+#       if ENABLE_REALTIME == 0
         VALID(ENODEV, value_int != EL_TS_TM_REALTIME);
-#   endif
+#       endif
 
-#   if ENABLE_MONOTONIC == 0
+#       if ENABLE_MONOTONIC == 0
         VALID(ENODEV, value_int != EL_TS_TM_MONOTONIC);
-#   endif
+#       endif
 
-#   if ENABLE_CLOCK == 0
+#       if ENABLE_CLOCK == 0
         VALID(ENODEV, value_int != EL_TS_TM_CLOCK);
-#   endif
+#       endif
 
         options->timestamp_timer = value_int;
         return 0;
