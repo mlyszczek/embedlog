@@ -548,7 +548,8 @@ int el_file_open
 
 
 /* ==========================================================================
-    puts string s into file from options, if needed also rotates files
+    writes memory block pointed by mem of size mlen into a file,  if  needed
+    also rotates file
    ========================================================================== */
 
 
@@ -629,7 +630,7 @@ int el_file_putb
          * might not be updated and we will  lose  whole,  I  say  it  again
          * *whole* file.  To prevent data lose on power down we try to  sync
          * file and  its  metadata  to  block  device.   We  do  this  every
-         * configures "sync_every" field since syncing  every  single  write
+         * configured "sync_every" field since syncing  every  single  write
          * would simply kill performance - its up to user to decide how much
          * data he is willing to lose.  It is also possible that altough  we
          * sync our file  and  metadata,  parent  directory  might  not  get
