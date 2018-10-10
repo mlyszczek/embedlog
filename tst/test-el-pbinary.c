@@ -119,7 +119,12 @@ static int pbinary_check(void)
     size_t              msglen;
     size_t              len;
     unsigned char       flags;
+
+#ifdef LLONG_MAX
     unsigned long long  val;
+#else
+    unsigned long       val;
+#endif
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -168,7 +173,11 @@ static int pbinary_check(void)
 
         if (g_options.timestamp != EL_TS_OFF)
         {
+#   ifdef LLONG_MAX
             unsigned long long tmp;
+#   else
+            unsigned long      tmp;
+#   endif
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
             len = el_decode_number(msg, &tmp);
@@ -194,7 +203,11 @@ static int pbinary_check(void)
 
             if (g_options.timestamp_fractions)
             {
+#   ifdef LLONG_MAX
                 unsigned long long usec;
+#   else
+                unsigned long      usec;
+#   endif
                 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
                 len = el_decode_number(msg, &usec);
