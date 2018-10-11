@@ -274,8 +274,6 @@ AS_IF([test "x$enable_binary_logs" = "xyes"],
     AS_IF([test "x$enable_out_file" = "xyes"],
     [
         AC_DEFINE([ENABLE_BINARY_LOGS], [1], [Enable printing binary logs])
-        AC_CHECK_FUNCS([memcpy],,
-            AC_MSG_ERROR(not found, needed by --enable-binary-logs))
     ],
     # else
     [
