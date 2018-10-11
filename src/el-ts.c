@@ -3,7 +3,6 @@
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ========================================================================== */
 
-
 /* ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
@@ -21,7 +20,6 @@
 #include "el-private.h"
 
 #include <time.h>
-
 
 /* ==========================================================================
     returns seconds and nanoseconds calculated from clock() function
@@ -295,6 +293,11 @@ size_t el_timestamp
     }
 
 #else  /* ENABLE_TIMESTAMP */
+
+    (void)options;
+    (void)b;
+    (void)binary;
     return 0;
+
 #endif /* ENABLE_TIMESTAMP */
 }

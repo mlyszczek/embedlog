@@ -10,6 +10,41 @@
 #ifndef EL_PRIVATE_H
 #define EL_PRIVATE_H 1
 
+
+/* ==========================================================================
+         ____              __                        __               __
+        / __/___   ____ _ / /_ __  __ _____ ___     / /_ ___   _____ / /_
+       / /_ / _ \ / __ `// __// / / // ___// _ \   / __// _ \ / ___// __/
+      / __//  __// /_/ // /_ / /_/ // /   /  __/  / /_ /  __/(__  )/ /_
+     /_/   \___/ \__,_/ \__/ \__,_//_/    \___/   \__/ \___//____/ \__/
+
+   ========================================================================== */
+
+
+#if HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
+#if PREFER_PORTABLE_SNPRINTF
+#   include <stddef.h>
+#   include <stdarg.h>
+    int snprintf(char *str, size_t str_m, const char *fmt, ...);
+    int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
+#else
+    /* this is needed for vsnprintf when using system implementation
+     * and stdio.h file. When portable snprintf is used, this is not
+     * needed as vsnprintf is defined manually right up.
+     */
+#   define _XOPEN_SOURCE 500
+#endif
+
+#if ENABLE_TIMESTAMP
+#   if ENABLE_REALTIME || ENABLE_MONOTONIC
+#       define _POSIX_C_SOURCE 199309L
+#   endif
+#endif
+
+
 /* ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
@@ -19,9 +54,6 @@
 
    ========================================================================== */
 
-#if HAVE_CONFIG_H
-#   include "config.h"
-#endif
 
 #include "embedlog.h"
 #include "valid.h"
@@ -31,6 +63,7 @@
 #endif
 
 #include <limits.h>
+
 
 /* ==========================================================================
                   __        __            __
