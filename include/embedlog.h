@@ -70,7 +70,7 @@ enum el_output
     EL_OUT_NET    = 0x0008,
     EL_OUT_TTY    = 0x0010,
     EL_OUT_CUSTOM = 0x0020,
-    EL_OUT_ALL    = 0x003f,
+    EL_OUT_ALL    = 0x003f
 };
 
 enum el_level
