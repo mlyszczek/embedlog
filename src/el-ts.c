@@ -17,6 +17,14 @@
 #   include "config.h"
 #endif
 
+#if ENABLE_TIMESTAMP
+#   if ENABLE_REALTIME || ENABLE_MONOTONIC
+#       ifndef _POSIX_C_SOURCE
+#           define _POSIX_C_SOURCE 199309L
+#       endif
+#   endif
+#endif
+
 #include "el-private.h"
 
 #include <time.h>

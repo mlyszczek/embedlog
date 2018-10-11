@@ -42,6 +42,12 @@
 #   include "config.h"
 #endif
 
+#if HAVE_FSYNC && HAVE_FILENO
+#   ifndef _POSIX_C_SOURCE
+#       define _POSIX_C_SOURCE 1
+#   endif
+#endif
+
 #include "el-private.h"
 
 #if HAVE_UNISTD_H

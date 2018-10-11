@@ -26,8 +26,13 @@
 #endif
 
 #if PREFER_PORTABLE_SNPRINTF
+    /* in case we use portable sprintf.c, declare function we use,
+     * som compiler don't scream at us
+     */
+
 #   include <stddef.h>
 #   include <stdarg.h>
+
     int snprintf(char *str, size_t str_m, const char *fmt, ...);
     int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
 #else
@@ -35,12 +40,8 @@
      * and stdio.h file. When portable snprintf is used, this is not
      * needed as vsnprintf is defined manually right up.
      */
-#   define _XOPEN_SOURCE 500
-#endif
-
-#if ENABLE_TIMESTAMP
-#   if ENABLE_REALTIME || ENABLE_MONOTONIC
-#       define _POSIX_C_SOURCE 199309L
+#   ifndef _XOPEN_SOURCE
+#       define _XOPEN_SOURCE 500
 #   endif
 #endif
 
