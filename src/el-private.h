@@ -108,8 +108,10 @@
 #   endif
 #endif
 
-/* ONLCR flag on FreeBSD needs __BSD_VISIBLE defined and solaris
- * need __EXTENSIONS__
+/* ONLCR flag is quite messy, different systems needs different
+ * definition for it to be seen by source, and some systems don't
+ * need any definition by default. This is short (and surely
+ * incomplete) list of OSes that needs it for proper compilation
  */
 #if ENABLE_OUT_TTY
 #   if HAVE_TERMIOS_H
@@ -117,9 +119,21 @@
 #           ifndef __BSD_VISIBLE
 #           define __BSD_VISIBLE 1
 #           endif
+#       elif __NetBSD__
+#           ifndef _NETBSD_SOURCE
+#           define _NETBSD_SOURCE 1
+#           endif
 #       elif sun || __sun
 #           ifndef __EXTENSIONS__
 #           define __EXTENSIONS__ 1
+#           endif
+#       elif __QNX__ || __QNXNTO__
+#           ifndef _QNX_SOURCE
+#           define _QNX_SOURCE 1
+#           endif
+#       elif __DragonFly__ || __minix
+#           ifndef _XOPEN_SOURCE
+#           define _XOPEN_SOURCE 500
 #           endif
 #       endif
 #   endif
