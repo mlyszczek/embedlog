@@ -44,17 +44,6 @@
    ========================================================================== */
 
 
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#if !NEED_SNPRINTF_ONLY && !PREFER_PORTABLE_SNPRINTF
-    /* if portable snprintf is not used, define _XOPEN_SOURCE to include
-     * snprintf() and vsnprintf() functions
-     */
-#   define _XOPEN_SOURCE 500
-#endif
-
 #include "el-private.h"
 
 #include <errno.h>

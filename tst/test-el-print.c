@@ -14,6 +14,8 @@
    ========================================================================== */
 
 
+#include "el-private.h"
+
 #include <rb.h>
 #include <string.h>
 #include <ctype.h>
@@ -25,8 +27,6 @@
 #include "mtest.h"
 #include "stdlib.h"
 #include "embedlog.h"
-
-#include "el-private.h"
 
 
 /* ==========================================================================

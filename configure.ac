@@ -17,23 +17,6 @@ AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
 
-###
-# solaris is weird, if _XOPEN_SOURCE is set to 500, you CANNOT compile
-# code with anything than c89, yes c99 compiler will error out, so
-# for solaris system we force -std=c89 flag
-#
-# TODO: determin flag name for c89 standard for other non-gnu compatible
-# compilers, for now this must be enough
-#
-
-
-case ${host_os} in
-    solaris*)
-        CFLAGS="-std=c89 ${CFLAGS}"
-        ;;
-esac
-
-
 AC_SEARCH_LIBS([pow], [m])
 
 ###

@@ -38,10 +38,6 @@
    ========================================================================== */
 
 
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "el-private.h"
 
 #include <ctype.h>

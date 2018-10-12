@@ -14,7 +14,7 @@
    ========================================================================== */
 
 
-#include "config.h"
+#include "el-private.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -31,7 +31,6 @@
 #include <stdlib.h>
 
 #include "mtest.h"
-#include "el-private.h"
 
 #if ENABLE_BINARY_LOGS
 

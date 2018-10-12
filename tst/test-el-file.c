@@ -14,7 +14,7 @@
    ========================================================================== */
 
 
-#include "config.h"
+#include "el-private.h"
 
 #include <dirent.h>
 #include <errno.h>
