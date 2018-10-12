@@ -43,9 +43,14 @@
 #endif
 
 #if HAVE_FSYNC && HAVE_FILENO
-#   ifndef _POSIX_C_SOURCE
-#       define _POSIX_C_SOURCE 1
-#   endif
+#   define _POSIX_C_SOURCE 1
+#endif
+
+#if !NEED_SNPRINTF_ONLY && !PREFER_PORTABLE_SNPRINTF
+    /* if portable snprintf is not used, define _XOPEN_SOURCE to include
+     * snprintf() and vsnprintf() functions
+     */
+#   define _XOPEN_SOURCE 500
 #endif
 
 #include "el-private.h"

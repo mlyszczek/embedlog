@@ -17,6 +17,34 @@
 #   include "config.h"
 #endif
 
+/* features definitions, order must from higher posix standard to
+ * lowest one to avoid redefinitions
+ */
+
+/* clock_gettime() was defined in 199303 issue of posix
+ * but some systems need posix = 200112 for the feature
+ */
+#if ENABLE_TIMESTAMP
+#   if ENABLE_REALTIME || ENABLE_MONOTONIC
+#       if __FreeBSD__ || __QNX__ || __QNXNTO__
+#           define _POSIX_C_SOURCE 200112L
+#       endif
+#   endif
+#endif
+
+/* gmtime_r() was defined in posix issue 1, but these systems
+ * define them in issue 199506
+ */
+#if ENABLE_TIMESTAMP
+#   if __DragonFly__
+#       ifndef _POSIX_C_SOURCE
+#           define _POSIX_C_SOURCE 199506L
+#       endif
+#   endif
+#endif
+
+/* clock_gettime() was defined in 199303 issue of posix
+ */
 #if ENABLE_TIMESTAMP
 #   if ENABLE_REALTIME || ENABLE_MONOTONIC
 #       ifndef _POSIX_C_SOURCE
@@ -25,9 +53,18 @@
 #   endif
 #endif
 
+/* gmtime_r() was defined in posix issue 1
+ */
+#if ENABLE_TIMESTAMP
+#   ifndef _POSIX_C_SOURCE
+#       define _POSIX_C_SOURCE 1
+#   endif
+#endif
+
 #include "el-private.h"
 
 #include <time.h>
+
 
 /* ==========================================================================
     returns seconds and nanoseconds calculated from clock() function

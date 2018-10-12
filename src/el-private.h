@@ -12,41 +12,6 @@
 
 
 /* ==========================================================================
-         ____              __                        __               __
-        / __/___   ____ _ / /_ __  __ _____ ___     / /_ ___   _____ / /_
-       / /_ / _ \ / __ `// __// / / // ___// _ \   / __// _ \ / ___// __/
-      / __//  __// /_/ // /_ / /_/ // /   /  __/  / /_ /  __/(__  )/ /_
-     /_/   \___/ \__,_/ \__/ \__,_//_/    \___/   \__/ \___//____/ \__/
-
-   ========================================================================== */
-
-
-#if HAVE_CONFIG_H
-#   include "config.h"
-#endif
-
-#if PREFER_PORTABLE_SNPRINTF
-    /* in case we use portable sprintf.c, declare function we use,
-     * som compiler don't scream at us
-     */
-
-#   include <stddef.h>
-#   include <stdarg.h>
-
-    int snprintf(char *str, size_t str_m, const char *fmt, ...);
-    int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
-#else
-    /* this is needed for vsnprintf when using system implementation
-     * and stdio.h file. When portable snprintf is used, this is not
-     * needed as vsnprintf is defined manually right up.
-     */
-#   ifndef _XOPEN_SOURCE
-#       define _XOPEN_SOURCE 500
-#   endif
-#endif
-
-
-/* ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -55,6 +20,22 @@
 
    ========================================================================== */
 
+
+#if HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
+#if PREFER_PORTABLE_SNPRINTF || NEED_SNPRINTF_ONLY
+    /* in case we use portable sprintf.c, declare function we use,
+     * so compiler don't scream at us
+     */
+
+#   include <stddef.h>
+#   include <stdarg.h>
+
+    int snprintf(char *str, size_t str_m, const char *fmt, ...);
+    int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
+#endif
 
 #include "embedlog.h"
 #include "valid.h"
