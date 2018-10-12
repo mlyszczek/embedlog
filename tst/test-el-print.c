@@ -126,28 +126,28 @@ static int print_check(void)
 #if ENABLE_COLORS_EXTENDED
     static const char  *color[] =
     {
-        "\e[91m",  /* fatal             light red */
-        "\e[31m",  /* alert             red */
-        "\e[95m",  /* critical          light magenta */
-        "\e[35m",  /* error             magenta */
-        "\e[93m",  /* warning           light yellow */
-        "\e[92m",  /* notice            light green */
-        "\e[32m",  /* information       green */
-        "\e[34m",  /* debug             blue */
-        "\e[0m"    /* remove all formats */
+        "\033[91m",  /* fatal             light red */
+        "\033[31m",  /* alert             red */
+        "\033[95m",  /* critical          light magenta */
+        "\033[35m",  /* error             magenta */
+        "\033[93m",  /* warning           light yellow */
+        "\033[92m",  /* notice            light green */
+        "\033[32m",  /* information       green */
+        "\033[34m",  /* debug             blue */
+        "\033[0m"    /* remove all formats */
     };
 #else
     static const char  *color[] =
     {
-        "\e[31m",  /* fatal             light red */
-        "\e[31m",  /* alert             red */
-        "\e[35m",  /* critical          light magenta */
-        "\e[35m",  /* error             magenta */
-        "\e[33m",  /* warning           light yellow */
-        "\e[32m",  /* notice            light green */
-        "\e[32m",  /* information       green */
-        "\e[34m",  /* debug             blue */
-        "\e[0m"    /* remove all formats */
+        "\033[31m",  /* fatal             light red */
+        "\033[31m",  /* alert             red */
+        "\033[35m",  /* critical          light magenta */
+        "\033[35m",  /* error             magenta */
+        "\033[33m",  /* warning           light yellow */
+        "\033[32m",  /* notice            light green */
+        "\033[32m",  /* information       green */
+        "\033[34m",  /* debug             blue */
+        "\033[0m"    /* remove all formats */
     };
 #endif
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
