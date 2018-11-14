@@ -32,7 +32,7 @@ cd "${project}-${git_version}"
 
 version="$(grep "AC_INIT(" "configure.ac" | cut -f3 -d\[ | cut -f1 -d\])"
 ./autogen.sh
-./configure --prefix=/usr
+CFLAGS="-I/usr/bofc/include" LDFLAGS="-L/usr/bofc/lib" ./configure --prefix=/usr
 make check
 
 mkdir "${workdir}/root"
