@@ -61,7 +61,13 @@ sed -i "s/@{ABI_VERSION}/${abi_version}/" "debian/control.template"
 mv "debian/changelog.template" "debian/changelog"
 mv "debian/control.template" "debian/control"
 
+export CFLAGS="-I/usr/bofc/include"
+export LDFLAGS="-L/usr/bofc/lib"
 debuild -us -uc || exit 1
+
+# unsed, so it these don't pollute gcc, when we built test program
+unset CFLAGS
+unset LDFLAGS
 
 ###
 # verifying
