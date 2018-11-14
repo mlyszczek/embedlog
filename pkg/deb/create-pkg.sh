@@ -97,7 +97,7 @@ fi
 
 ./testprog || failed=1
 
-dpkg -r "lib${project}${abi_version}" "$lib{project}-dev" || exit 1
+dpkg -r "lib${project}${abi_version}" "lib${project}-dev" || exit 1
 
 if [ ${failed} -eq 1 ]
 then
