@@ -1,0 +1,28 @@
+Source: embedlog
+Section: devel
+Priority: optional
+Maintainer: Michał Łyszczek <michal.lyszczek@bofc.pl>
+Build-Depends: debhelper (>=10), autotools-dev, dh-autoreconf
+Standards-Version: 3.9.8
+Vcs-Git: https://git.kurwinet.pl/embedlog
+Vcs-browser: https://git.kurwinet.pl/embedlog
+Homepage: https://embedlog.kurwinet.pl
+
+Package: embedlog${ABI_VERSION}
+Section: libs
+Pre-Depends: ${misc:Pre-Depends}
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: embedlog is a highly portable c89 complaint logger (with
+  additional features for users with c99 compilers and/or POSIX systems).
+  This library is designed mainly for embedded devices, but can also be
+  used in high level OSes like Linux.
+
+Package: embedlog-dev
+Section: libdevel
+Depends: embedlog${ABI_VERSION} (= ${binary:Version}), ${misc:Depends}
+Architecture: any
+Description: embedlog is a highly portable c89 complaint logger (with
+  additional features for users with c99 compilers and/or POSIX systems).
+  This library is designed mainly for embedded devices, but can also be
+  used in high level OSes like Linux.
