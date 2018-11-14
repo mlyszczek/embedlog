@@ -105,6 +105,10 @@ fi
 
 dpkg -r "lib${project}${abi_version}" "lib${project}-dev" || exit 1
 
+# run test prog again, but now fail if there is no error, testprog
+# should fail as there is no library in te system any more
+./testprog && failed=1
+
 if [ ${failed} -eq 1 ]
 then
     exit 1

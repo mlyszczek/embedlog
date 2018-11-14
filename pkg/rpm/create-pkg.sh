@@ -95,6 +95,10 @@ else
     yum -y remove "${project}" "${project}-devel"
 fi
 
+# run test prog again, but now fail if there is no error, testprog
+# should fail as there is no library in te system any more
+/tmp/${project}-test && failed=1
+
 if [ ${failure} -eq 1 ]
 then
     exit 1
