@@ -1,4 +1,4 @@
-embedlog (@{VERSION}) @{CODENAME}; urgency=low
+libembedlog (@{VERSION}) @{CODENAME}; urgency=low
 
     * embedlog package
 

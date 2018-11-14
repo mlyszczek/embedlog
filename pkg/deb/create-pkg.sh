@@ -78,8 +78,8 @@ do
     lintian ${d} || exit 1
 done
 
-dpkg -i "${project}${abi_version}_${version}_${arch}.deb" || exit 1
-dpkg -i "${project}-dev_${version}_${arch}.deb" || exit 1
+dpkg -i "lib${project}${abi_version}_${version}_${arch}.deb" || exit 1
+dpkg -i "lib${project}-dev_${version}_${arch}.deb" || exit 1
 
 failed=0
 gcc ${project}/pkg/test.c -o testprog -lembedlog || failed=1
@@ -97,7 +97,7 @@ fi
 
 ./testprog || failed=1
 
-dpkg -r "${project}${abi_version}" "${project}-dev" || exit 1
+dpkg -r "lib${project}${abi_version}" "$lib{project}-dev" || exit 1
 
 if [ ${failed} -eq 1 ]
 then
@@ -106,23 +106,23 @@ fi
 
 if [ -n "${scp_server}" ]
 then
-    dbgsym_pkg="${project}${abi_version}-dbgsym_${version}_${arch}.deb"
+    dbgsym_pkg="lib${project}${abi_version}-dbgsym_${version}_${arch}.deb"
 
     if [ ! -f "${dbgsym_pkg}" ]
     then
         # on some systems packages with debug symbols are created with
         # ddeb extension and not deb
-        dbgsym_pkg="${project}${abi_version}-dbgsym_${version}_${arch}.ddeb"
+        dbgsym_pkg="lib${project}${abi_version}-dbgsym_${version}_${arch}.ddeb"
     fi
 
     echo "copying data to ${scp_server}:${project}/${host_os}/${arch}"
-    scp "${project}-dev_${version}_${arch}.deb" \
+    scp "lib${project}-dev_${version}_${arch}.deb" \
         "${dbgsym_pkg}" \
-        "${project}${abi_version}_${version}_${arch}.deb" \
-        "${project}_${version}.dsc" \
-        "${project}_${version}.tar.xz" \
-        "${project}_${version}_${arch}.build" \
-        "${project}_${version}_${arch}.buildinfo" \
-        "${project}_${version}_${arch}.changes" \
+        "lib${project}${abi_version}_${version}_${arch}.deb" \
+        "lib${project}_${version}.dsc" \
+        "lib${project}_${version}.tar.xz" \
+        "lib${project}_${version}_${arch}.build" \
+        "lib${project}_${version}_${arch}.buildinfo" \
+        "lib${project}_${version}_${arch}.changes" \
         "${scp_server}:${project}/${host_os}/${arch}" || exit 1
 fi
