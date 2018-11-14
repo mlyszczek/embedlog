@@ -8,7 +8,7 @@ Vcs-Git: https://git.kurwinet.pl/embedlog
 Vcs-browser: https://git.kurwinet.pl/embedlog
 Homepage: https://embedlog.kurwinet.pl
 
-Package: embedlog${ABI_VERSION}
+Package: embedlog@{ABI_VERSION}
 Section: libs
 Pre-Depends: ${misc:Pre-Depends}
 Architecture: any
@@ -20,7 +20,7 @@ Description: embedlog is a highly portable c89 complaint logger (with
 
 Package: embedlog-dev
 Section: libdevel
-Depends: embedlog${ABI_VERSION} (= ${binary:Version}), ${misc:Depends}
+Depends: embedlog@{ABI_VERSION} (= ${binary:Version}), ${misc:Depends}
 Architecture: any
 Description: embedlog is a highly portable c89 complaint logger (with
   additional features for users with c99 compilers and/or POSIX systems).
