@@ -66,7 +66,7 @@ removepkg "${project}"
 
 # run test prog again, but now fail if there is no error, testprog
 # should fail as there is no library in te system any more
-"${workdir}/testprog" || failed=1
+"${workdir}/testprog" && failed=1
 
 if [ ${failed} -eq 1 ]
 then
