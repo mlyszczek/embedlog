@@ -432,7 +432,7 @@ static void test_prepare(void)
     el_option(EL_OPT_OUTPUT, EL_OPT_OUT_CUSTOM);
     memset(logbuf, 0, sizeof(logbuf));
     expected_logs = rb_new(1024, sizeof(struct log_message),
-        O_NONTHREAD | O_NONBLOCK);
+        O_NONBLOCK);
 }
 
 
