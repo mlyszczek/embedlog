@@ -11,4 +11,7 @@ www:
 analyze:
 	make analyze -C src
 
-.PHONY: www
+examples:
+	make examples -C examples
+
+.PHONY: examples www
