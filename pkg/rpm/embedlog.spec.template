@@ -1,0 +1,68 @@
+Name:           embedlog
+Version:        @{VERSION}
+Release:        1
+Summary:        highly portable c89 complaint logger
+
+Group:          System Environment/Libraries
+License:        BSD
+URL:            https://embedlog.kurwinet.pl
+Source0:        https://git.kurwinet.pl/embedlog/snapshot/embedlog-%{version}.tar.gz
+Vendor:         Bits of Code
+Packager:       Michał Łyszczek <michal.lyszczek@bofc.pl>
+
+BuildRequires:  automake autoconf libtool
+
+%description
+embedlog is a highly portable c89 complaint logger (with
+additional features for users with c99 compilers and/or POSIX systems).
+This library is designed mainly for embedded devices, but can also be
+used in high level OSes like Linux.
+
+%package devel
+Summary:        embedlog development package
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+
+%description devel
+embedlog development package containing headers and manuals
+
+%prep
+%setup -q -n embedlog-@{GIT_VERSION}
+
+# debug packge macro, it is commented by default as rhel and centos
+# automatically build debug package, but open suse does not. Change it to
+# "@debug_package" (just change that @ to percent %% character)
+# when debug symbols are not automatically installed
+
+# __DEBUG_PACKAGE__
+
+%build
+./autogen.sh
+%configure
+make %{?_smp_mflags}
+
+%install
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-,root,root,-)
+%doc AUTHORS LICENSE readme.md
+%{_libdir}/libembedlog.so.@{ABI_VERSION}
+%{_libdir}/libembedlog.so.@{LIB_VERSION}
+
+%files devel
+%defattr(-,root,root,-)
+%{_includedir}/embedlog.h
+%{_libdir}/libembedlog.so
+%{_libdir}/libembedlog.a
+%{_libdir}/libembedlog.la
+%{_mandir}/*/*
+
+%changelog
