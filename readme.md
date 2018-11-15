@@ -77,6 +77,13 @@ operating system tests
 * x86_64-builder-linux-gnu-4.9 ![test-result-svg][x64lg]
 * x86_64-builder-linux-musl-4.9 ![test-result-svg][x64lm]
 * x86_64-builder-linux-uclibc-4.9 ![test-result-svg][x64lu]
+* x86_64-bofc-debian-9 ![test-result-svg][x64debian9]
+* x86_64-bofc-centos-7 ![test-result-svg][x64centos7]
+* x86_64-bofc-fedora-28 ![test-result-svg][x64fedora28]
+* x86_64-bofc-opensuse-15 ![test-result-svg][x64suse15]
+* x86_64-bofc-rhel-7 ![test-result-svg][x64rhel7]
+* x86_64-bofc-slackware-14.2 ![test-result-svg][x64slackware142]
+* x86_64-bofc-ubuntu-18.04 ![test-result-svg][x64ubuntu1804]
 
 machine tests
 -------------
@@ -278,6 +285,13 @@ See also
 [x64ss]: http://ci.embedlog.kurwinet.pl/badges/x86_64-builder-solaris-tests.svg
 [prhpux]: http://ci.embedlog.kurwinet.pl/badges/parisc-polarhome-hpux-tests.svg
 [p4aix]: http://ci.embedlog.kurwinet.pl/badges/power4-polarhome-aix-tests.svg
+[x64debian9]: http://ci.embedlog.kurwinet.pl/badges/x86_64-debian-9-tests.svg
+[x64centos7]: http://ci.embedlog.kurwinet.pl/badges/x86_64-centos-7-tests.svg
+[x64fedora28]: http://ci.embedlog.kurwinet.pl/badges/x86_64-fedora-28-tests.svg
+[x64suse15]: http://ci.embedlog.kurwinet.pl/badges/x86_64-opensuse-15-tests.svg
+[x64rhel7]: http://ci.embedlog.kurwinet.pl/badges/x86_64-rhel-7-tests.svg
+[x64slackware142]: http://ci.embedlog.kurwinet.pl/badges/x86_64-slackware-142-tests.svg
+[x64ubuntu1804]: http://ci.embedlog.kurwinet.pl/badges/x86_64-ubuntu-1804-tests.svg
 
 [fsan]: http://ci.embedlog.kurwinet.pl/badges/fsanitize-address.svg
 [fsleak]: http://ci.embedlog.kurwinet.pl/badges/fsanitize-leak.svg
