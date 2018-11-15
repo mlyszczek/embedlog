@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+
+%:
+	dh $@ --list-missing --with autoreconf
+
+override_dh_auto_test:
+	$(MAKE) check
