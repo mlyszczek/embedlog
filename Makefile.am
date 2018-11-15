@@ -8,4 +8,7 @@ www:
 	./man2html.sh
 	make www -C www
 
-.PHONY: www
+examples:
+	make examples -C examples
+
+.PHONY: examples www
