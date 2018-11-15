@@ -1,0 +1,4 @@
+usr/lib/*/*.so
+usr/include/embedlog.h
+usr/share/man/man3/*
+usr/share/man/man7/*
