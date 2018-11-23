@@ -129,40 +129,6 @@ static int el_print_line
 
 
 /* ==========================================================================
-                                        __     __ _
-                         ____   __  __ / /_   / /(_)_____
-                        / __ \ / / / // __ \ / // // ___/
-                       / /_/ // /_/ // /_/ // // // /__
-                      / .___/ \__,_//_.___//_//_/ \___/
-                     /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
-   ========================================================================== */
-
-
-/* ==========================================================================
-    same as el_opmemory but uses default options object
-   ========================================================================== */
-
-
-int el_pmemory
-(
-    const char      *file,     /* file name where log is printed */
-    size_t           num,      /* line number where log is printed */
-    enum el_level    level,    /* log level to print message with */
-    const void      *mem,      /* memory location to print */
-    size_t           mlen      /* number of bytes to print */
-)
-{
-    return el_opmemory(file, num, level, &g_options, mem, mlen);
-}
-
-
-/* ==========================================================================
     Function prints byte from memory location in a nice format.
 
     Single line of data printed will be formated  like  this  (please  note,
@@ -180,17 +146,26 @@ int el_pmemory
     '  ' (2 spaces).  Next bytes are counted from formula 3*EL_MEM_LINE_SIZE
     (3 bytes are for 2 hex characters and a space).  Next there is  2  bytes
     for space,  and  EL_MEM_LINE_SIZE  bytes  for  character  representation
+
+    If table is set to 1, table will be printed, and message will look like:
+
+    ------  -----------------------------------------------  ----------------
+    offset  hex                                              ascii
+    ------  -----------------------------------------------  ----------------
+    0xNNNN  HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH  CCCCCCCCCCCCCCCC
+    ------  -----------------------------------------------  ----------------
    ========================================================================== */
 
 
-int el_opmemory
+static int el_pmem
 (
     const char         *file,     /* file name where log is printed */
     size_t              num,      /* line number where log is printed */
     enum el_level       level,    /* log level to print message with */
     struct el_options  *options,  /* options defining printing style */
     const void         *mem,      /* memory location to print */
-    size_t              mlen      /* number of bytes to print */
+    size_t              mlen,     /* number of bytes to print */
+    int                 table     /* print table? or not to print table? */
 )
 {
     /*
@@ -231,21 +206,23 @@ int el_opmemory
      * ------  -----------------------------------------------  ----------------
      */
 
-    rv = 0;
-    rv |= el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
-        EL_MEM_OFFSET_LEN - 2, separator,
-        EL_MEM_HEX_LEN - 1, separator,
-        EL_MEM_CHAR_LEN, separator);
+    if (table)
+    {
+        rv = 0;
+        rv |= el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
+            EL_MEM_OFFSET_LEN - 2, separator,
+            EL_MEM_HEX_LEN - 1, separator,
+            EL_MEM_CHAR_LEN, separator);
 
-    rv |= el_oprint(file, num, level, options, "%-*s%-*s%s",
-        EL_MEM_OFFSET_LEN, "offset",
-        EL_MEM_HEX_LEN + 1, "hex", "ascii");
+        rv |= el_oprint(file, num, level, options, "%-*s%-*s%s",
+            EL_MEM_OFFSET_LEN, "offset",
+            EL_MEM_HEX_LEN + 1, "hex", "ascii");
 
-    rv |= el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
-        EL_MEM_OFFSET_LEN - 2, separator,
-        EL_MEM_HEX_LEN - 1, separator,
-        EL_MEM_CHAR_LEN, separator);
-
+        rv |= el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
+            EL_MEM_OFFSET_LEN - 2, separator,
+            EL_MEM_HEX_LEN - 1, separator,
+            EL_MEM_CHAR_LEN, separator);
+    }
 
     /*
      * print all lines that contains EL_MEM_LINE_SIZE bytes, meaning we print
@@ -281,10 +258,102 @@ int el_opmemory
      * ------  -----------------------------------------------  ----------------
      */
 
-    rv |= el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
-        EL_MEM_OFFSET_LEN - 2, separator,
-        EL_MEM_HEX_LEN - 1, separator,
-        EL_MEM_CHAR_LEN, separator);
+    if (table)
+    {
+        rv |= el_oprint(file, num, level, options, "%.*s  %.*s  %.*s",
+            EL_MEM_OFFSET_LEN - 2, separator,
+            EL_MEM_HEX_LEN - 1, separator,
+            EL_MEM_CHAR_LEN, separator);
+    }
 
     return rv;
+}
+
+
+/* ==========================================================================
+                                        __     __ _
+                         ____   __  __ / /_   / /(_)_____
+                        / __ \ / / / // __ \ / // // ___/
+                       / /_/ // /_/ // /_/ // // // /__
+                      / .___/ \__,_//_.___//_//_/ \___/
+                     /_/
+               ____                     __   _
+              / __/__  __ ____   _____ / /_ (_)____   ____   _____
+             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
+            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
+           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+
+   ========================================================================== */
+
+
+/* ==========================================================================
+    same as el_pmem and prints table
+   ========================================================================== */
+
+
+int el_opmemory_table
+(
+    const char         *file,     /* file name where log is printed */
+    size_t              num,      /* line number where log is printed */
+    enum el_level       level,    /* log level to print message with */
+    struct el_options  *options,  /* options defining printing style */
+    const void         *mem,      /* memory location to print */
+    size_t              mlen      /* number of bytes to print */
+)
+{
+    return el_pmem(file, num, level, &g_options, mem, mlen, 1);
+}
+
+
+/* ==========================================================================
+    same as el_opmemory_table but uses default option object
+   ========================================================================== */
+
+
+int el_pmemory_table
+(
+    const char      *file,     /* file name where log is printed */
+    size_t           num,      /* line number where log is printed */
+    enum el_level    level,    /* log level to print message with */
+    const void      *mem,      /* memory location to print */
+    size_t           mlen      /* number of bytes to print */
+)
+{
+    return el_opmemory_table(file, num, level, &g_options, mem, mlen);
+}
+
+/* ==========================================================================
+    Same as el_pmem and prints no table
+   ========================================================================== */
+
+
+int el_opmemory
+(
+    const char         *file,     /* file name where log is printed */
+    size_t              num,      /* line number where log is printed */
+    enum el_level       level,    /* log level to print message with */
+    struct el_options  *options,  /* options defining printing style */
+    const void         *mem,      /* memory location to print */
+    size_t              mlen      /* number of bytes to print */
+)
+{
+    return el_pmem(file, num, level, options, mem, mlen, 0);
+}
+
+
+/* ==========================================================================
+    same as el_opmemory but uses default option object
+   ========================================================================== */
+
+
+int el_pmemory
+(
+    const char      *file,     /* file name where log is printed */
+    size_t           num,      /* line number where log is printed */
+    enum el_level    level,    /* log level to print message with */
+    const void      *mem,      /* memory location to print */
+    size_t           mlen      /* number of bytes to print */
+)
+{
+    return el_opmemory(file, num, level, &g_options, mem, mlen);
 }

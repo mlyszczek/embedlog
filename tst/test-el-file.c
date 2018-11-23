@@ -1602,10 +1602,10 @@ static void file_sync_level(void)
     mt_fok(el_print(ELD, s1));
     mt_fail(file_synced == 0);
 
-    mt_fok(el_pmemory(ELI, s8, sizeof(s8)));
+    mt_fok(el_pmemory_table(ELI, s8, sizeof(s8)));
     mt_fail(file_synced == 0);
 
-    mt_fok(el_pmemory(ELF, s8, sizeof(s8)));
+    mt_fok(el_pmemory_table(ELF, s8, sizeof(s8)));
     mt_fail(file_synced == 1);
 }
 

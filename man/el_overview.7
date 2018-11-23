@@ -83,6 +83,9 @@ enum el_level " level ", const char *" fmt ", va_list " ap ")"
 .BI "int el_pmemory(const char *" file ", size_t " line ", \
 enum el_level " level ", const void *" memory ", size_t " mlen ")"
 .br
+.BI "int el_pmemory_table(const char *" file ", size_t " line ", \
+enum el_level " level ", const void *" memory ", size_t " mlen ")
+.br
 .BI "int el_perror(const char *" file ", size_t " line ", \
 enum el_level " level ", const char *" fmt ", " ... ")"
 .br
@@ -119,6 +122,10 @@ enum el_level " level ", struct el_options *" options ", \
 const char *" fmt ", va_list " ap ")"
 .br
 .BI "int el_opmemory(const char *" file ", size_t " line ", \
+enum el_level " level ", struct el_options *" options ", \
+const void *" memory ", size_t " mlen ")"
+.br
+.BI "int el_opmemory_table(const char *" file ", size_t " line ", \
 enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .br
@@ -253,6 +260,8 @@ for more details.
 .BR el_vprint (3),
 .BR el_perror (3),
 .BR el_pmemory (3),
+.BR el_pmemory_table (3),
+.BR el_opmemory_table (3),
 .BR el_oinit (3),
 .BR el_ocleanup (3),
 .BR el_ooption (3),
