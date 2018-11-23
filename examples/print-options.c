@@ -12,7 +12,6 @@ int main(void)
     struct el_options  opts;
 
     el_init();
-    el_option(EL_OUT, EL_OUT_STDERR);
 
     el_option(EL_PRINT_LEVEL, 0);
     el_print(ELI, "We can disable information about log level\b");

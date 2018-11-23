@@ -234,11 +234,8 @@ for more details.
 
     int main(void)
     {
-        /* initialize library */
+        /* initialize library, default output is stderr */
         el_init();
-
-        /* tell logger to print onto stderr */
-        el_option(EL_OUT, EL_OUT_STDERR);
 
         /* print message with info severity */
         el_print(ELI, "answer is %d", 42);

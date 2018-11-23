@@ -13,7 +13,6 @@
 int main(void)
 {
     el_init();
-    el_option(EL_OUT, EL_OUT_STDERR);
     el_print(ELN, "embedlog works!");
     el_cleanup();
     return 0;

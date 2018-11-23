@@ -92,7 +92,7 @@ static void options_init(void)
 
 
     memset(&default_options, 0, sizeof(default_options));
-    default_options.outputs             = 0;
+    default_options.outputs             = EL_OUT_STDERR;
     default_options.level               = EL_INFO;
     default_options.file_sync_level     = EL_FATAL;
     default_options.level_current_msg   = EL_DBG;

@@ -8,17 +8,11 @@
 int main(void)
 {
     /*
-     * first we nned to initialize logger to known state
+     * first we nned to initialize logger to known state, embedlog
+     * will print to stdout by default
      */
 
     el_init();
-
-    /*
-     * to use logger you need to enable at least one output, without it logs
-     * will be printed to /dev/null
-     */
-
-    el_option(EL_OUT, EL_OUT_STDERR);
 
     /*
      * now we can simply print messages like we would do it with ordinary

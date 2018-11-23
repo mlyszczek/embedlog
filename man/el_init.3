@@ -86,16 +86,13 @@ Note: error handling has been ommited for clarity sake
         el_init();
         el_oinit(&opts);
 
-        /* make default logger to print to stderr */
-        el_option(EL_OUT, EL_OUT_STDERR);
-
-        /* make opts to print to file */
-        el_ooption(&opts, EL_OUT, EL_OUT_STDERR);
+        /* make opts to print to file and stderr */
+        el_ooption(&opts, EL_OUT, EL_OUT_FILE | EL_OUT_STDERR);
         el_ooption(&opts, EL_FPATH, "/tmp/test.log");
 
         /* print messages */
         el_print(ELI, "will print to stderr");
-        el_oprint(ELI, &opts, "will print to file /tmp/test.log");
+        el_oprint(ELI, &opts, "will print to file /tmp/test.log and stderr");
 
         /* cleanup after any initialization code (like fopen) */
         el_ocleanup(&opts);
