@@ -437,7 +437,7 @@ int el_ocleanup
 {
     VALID(EINVAL, options);
 
-    g_options.outputs = 0;
+    options->outputs = 0;
 #if ENABLE_OUT_FILE
     el_file_cleanup(options);
 #endif

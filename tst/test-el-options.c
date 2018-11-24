@@ -470,6 +470,68 @@ static void options_einval(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+static void options_global_options_after_options_cleanup(void)
+{
+    struct el_options  default_options; /* expected default options */
+    struct el_options  options;         /* custom options to init */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    memset(&default_options, 0, sizeof(default_options));
+#if ENABLE_OUT_STDERR
+    default_options.outputs             = EL_OUT_STDERR;
+#else
+    default_options.outputs             = 0;
+#endif
+    default_options.level               = EL_INFO;
+    default_options.file_sync_level     = EL_FATAL;
+    default_options.level_current_msg   = EL_DBG;
+    default_options.colors              = 0;
+    default_options.timestamp           = EL_TS_OFF;
+    default_options.timestamp_timer     = EL_TS_TM_TIME;
+    default_options.timestamp_fractions = EL_TS_FRACT_OFF;
+    default_options.print_log_level     = 1;
+    default_options.print_newline       = 1;
+    default_options.custom_puts         = NULL;
+    default_options.serial_fd           = -1;
+
+    default_options.finfo               = 0;
+    default_options.frotate_number      = 0;
+    default_options.fcurrent_rotate     = 0;
+    default_options.frotate_size        = 0;
+    default_options.fpos                = 0;
+    default_options.file                = NULL;
+    default_options.file_sync_every     = 32768;
+    default_options.fname               = NULL;
+
+
+    el_init();
+    el_oinit(&options);
+    el_option(EL_OUT, EL_OUT_STDERR);
+    el_ooption(&options, EL_OUT, EL_OUT_STDERR);
+    mt_fail(memcmp(&g_options, &default_options, sizeof(default_options)) == 0);
+#if ENABLE_OUT_STDERR
+    mt_fail(g_options.outputs == EL_OUT_STDERR);
+    mt_fail(options.outputs == EL_OUT_STDERR);
+#else
+    mt_fail(g_options.outputs == 0);
+    mt_fail(options.outputs == 0);
+#endif
+
+    el_ocleanup(&options);
+
+    /* global options should not be altered when el_ocleanup is called
+     */
+
+    mt_fail(memcmp(&g_options, &default_options, sizeof(default_options)) == 0);
+    mt_fail(options.outputs == 0);
+}
+
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -499,4 +561,5 @@ void el_options_test_group(void)
     mt_run(options_ooption_test);
     mt_run(options_einval);
     mt_run(options_prefix);
+    mt_run(options_global_options_after_options_cleanup);
 }
