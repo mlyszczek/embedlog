@@ -99,7 +99,7 @@ AS_IF([test "x$enable_out_file" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_FILE], [1], [Enable printing to file])
     AC_CHECK_FUNCS(access stat fsync fileno)
-    AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
+    AC_CHECK_FUNCS([fopen fclose remove rename],,
         AC_MSG_ERROR(not found, needed by --enable-out-file))
 ])
 
@@ -136,7 +136,7 @@ AM_CONDITIONAL([ENABLE_OUT_CUSTOM], [test "x$enable_out_custom" = "xyes"])
 AS_IF([test "x$enable_out_custom" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_CUSTOM], [1], [Enable printing to custom])
-    AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
+    AC_CHECK_FUNCS([fopen fclose remove rename],,
         AC_MSG_ERROR(not found, needed by --enable-out-custom))
 ])
 
@@ -274,8 +274,6 @@ AS_IF([test "x$enable_binary_logs" = "xyes"],
     AS_IF([test "x$enable_out_file" = "xyes"],
     [
         AC_DEFINE([ENABLE_BINARY_LOGS], [1], [Enable printing binary logs])
-        AC_CHECK_FUNCS([memcpy],,
-            AC_MSG_ERROR(not found, needed by --enable-binary-logs))
     ],
     # else
     [
