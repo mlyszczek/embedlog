@@ -14,6 +14,7 @@ Implemented features are:
     * syslog (very limited, works on *nuttx* for now)
     * directly to serial device (like /dev/ttyS0)
     * standard error (stderr)
+    * standard output (stdout)
     * file (with optional log rotate, and syncing to prevent data loss)
     * automatic file reopening on unexpected events (file deletion, SD remount)
     * custom routine - can be anything **embedlog** just calls custom function
@@ -151,8 +152,8 @@ enable these settings later in runtime.
 --enable-out-stderr (default: enable)
 -------------------------------------
 
-When set, library will be able to print logs to standard error output. Nothing
-fancy.
+When set, library will be able to print logs to standard error output (stderr)
+and standard output (stdout). Nothing fancy.
 
 --enable-out-file (default: enable)
 -----------------------------------

@@ -208,6 +208,14 @@ static void options_output(void)
         }
 #endif
 
+#ifndef ENABLE_OUT_STDERR
+        if (i & EL_OUT_STDOUT)
+        {
+            ok = 0;
+        }
+#endif
+
+
 #ifndef ENABLE_OUT_SYSLOG
         if (i & EL_OUT_SYSLOG)
         {

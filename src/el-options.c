@@ -82,6 +82,10 @@ static const int VALID_OUTS = 0
     | EL_OUT_STDERR
 #endif
 
+#if ENABLE_OUT_STDERR
+    | EL_OUT_STDOUT
+#endif
+
 #if ENABLE_OUT_SYSLOG
     | EL_OUT_SYSLOG
 #endif

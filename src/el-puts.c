@@ -95,6 +95,13 @@ int el_oputs
     }
 #endif
 
+#if ENABLE_OUT_STDERR
+    if (options->outputs & EL_OUT_STDOUT)
+    {
+        rv |= fputs(s, stdout) == EOF ? -1 : 0;
+    }
+#endif
+
 #if ENABLE_OUT_SYSLOG
     if (options->outputs & EL_OUT_SYSLOG)
     {

@@ -75,12 +75,12 @@ AC_SUBST(COVERAGE_LDFLAGS)
 
 
 AC_ARG_ENABLE([out-stderr],
-    AS_HELP_STRING([--enable-out-stderr], [Enable printing to stderr]),
+    AS_HELP_STRING([--enable-out-stderr], [Enable printing to stderr and stdout]),
     [], [enable_out_stderr="yes"])
 
 AS_IF([test "x$enable_out_stderr" = "xyes"],
 [
-    AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr])
+    AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr and stdout])
     AC_CHECK_FUNCS([fputs],,
         AC_MSG_ERROR(not found, needed by --enable-out-stderr))
 ])

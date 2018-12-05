@@ -65,12 +65,13 @@ enum el_output
 {
     EL_OUT_NONE   = 0x0000,
     EL_OUT_STDERR = 0x0001,
-    EL_OUT_SYSLOG = 0x0002,
-    EL_OUT_FILE   = 0x0004,
-    EL_OUT_NET    = 0x0008,
-    EL_OUT_TTY    = 0x0010,
-    EL_OUT_CUSTOM = 0x0020,
-    EL_OUT_ALL    = 0x003f
+    EL_OUT_STDOUT = 0x0002,
+    EL_OUT_SYSLOG = 0x0004,
+    EL_OUT_FILE   = 0x0008,
+    EL_OUT_NET    = 0x0010,
+    EL_OUT_TTY    = 0x0020,
+    EL_OUT_CUSTOM = 0x0040,
+    EL_OUT_ALL    = 0x007f
 };
 
 enum el_level
@@ -142,7 +143,7 @@ typedef int (*el_custom_puts)(const char *s);
 
 struct el_options
 {
-    unsigned int    outputs:6;
+    unsigned int    outputs:7;
     unsigned int    colors:1;
     unsigned int    timestamp:2;
     unsigned int    timestamp_timer:3;
