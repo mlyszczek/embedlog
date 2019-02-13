@@ -46,7 +46,7 @@ do
     tail -n+3 "${ftmp}" > tmp; mv tmp "${ftmp}"
 
     ## get table of content from file
-    toc="$(sed -n '/<DL>/,/<\/DL>/p' "${ftmp}")"
+    toc="$(sed '/<DL>/,$!d;H;/<\/DL>/!d;s/.*//;x;s/\n//' "${ftmp}")"
 
     toc="$(echo "${toc}" | sed 's/<DL>/<UL class="man-toc">/')"
     toc="$(echo "${toc}" | sed 's/<\/DL>/<\/UL>/')"
@@ -66,14 +66,22 @@ do
     # generate page info at bottom of page
     echo "<p class=\"info left\"><a href=\"http://en.bofc.pl\">bofc.pl</a></p><p class=\"info center\">${version_info}</p><p class=\"info right\">${name}(${n})</p>" >> "${ftmp}"
 
-    # convert all h2 into h1 headings
+    # convert all h2 into h1 headings, man2html generates .SH as h2 and we want
+    # it as h1
     sed -i 's/H2>/H1>/g' "${ftmp}"
+
+    # convert all h3 into h2 headings, man2html generates .SS as h3 and we want
+    # it as h2
+    sed -i 's/H3>/H2>/g' "${ftmp}"
 
     # remove obsolete COMPACT from dl
     sed -i 's/DL COMPACT/DL/g' "${ftmp}"
 
     # change ../man# to ./ as we have all mans in single directory
     sed -i 's/\.\.\/man.\//.\//g' "${ftmp}"
+
+    #remove <P> right before <PRE>
+    perl -i -0pe 's/<P>\n\n<PRE>/<PRE>/g' "${ftmp}"
 
     # move generated file into output directory for further processing
     cp "${ftmp}" "${out}/${m}.html"

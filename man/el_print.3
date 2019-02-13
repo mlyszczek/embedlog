@@ -195,7 +195,7 @@ Example output can look like this.
 We print all ascii table, to present printing of printable and non-printable
 values.
 .PP
-.EX
+.nf
     0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................
     0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................
     0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !"#$%&'()*+,-./
@@ -204,14 +204,14 @@ values.
     0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[\]^_
     0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno
     0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
-.EE
+.fi
 .PP
 .BR el_pmemory_table (3)
 works just like
 .BR el_pmemory (3)
 but also prints table-like header and footer.
 .PP
-.EX
+.nf
     ------  -----------------------------------------------  ----------------
     offset  hex                                              ascii
     ------  -----------------------------------------------  ----------------
@@ -224,7 +224,7 @@ but also prints table-like header and footer.
     0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno
     0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
     ------  -----------------------------------------------  ----------------
-.EE
+.fi
 .PP
 .BR el_pbinary (3)
 is used to log binary data into block device.
@@ -241,11 +241,11 @@ uses specific format to store metadata to save as much space as possible.
 All numerical values in metadata are variadic in size. Order of fields are as
 follows:
 .PP
-.EX
+.nf
     +-------+------------+--------------+-------------+------+
     | flags | ts_seconds | ts_fractions | data_length | data |
     +-------+------------+--------------+-------------+------+
-.EE
+.fi
 .PP
 The only mandatory fields are
 .BR flags ", " data_length " and " data .
@@ -254,7 +254,7 @@ determin what fields are present.
 .B flags
 field is always 1 byte in size and its format is
 .PP
-.EX
+.nf
     +------+-------+-----------------------------------------------------------+
     | bits | value | description                                               |
     +------+-------+-----------------------------------------------------------+
@@ -275,7 +275,7 @@ field is always 1 byte in size and its format is
     +------+-------+-----------------------------------------------------------+
     | 6..7 |  0..3 | reserved                                                  |
     +------+-------+-----------------------------------------------------------+
-.EE
+.fi
 .PP
 .BR ts_seconds ", " ts_fractions " and " data_length
 are numerical values with dynamic size.
@@ -284,7 +284,7 @@ as continuation bit, if that bit is set, program should treat next byte as next
 part of the same numerical value.
 Below is table with example decimal values and it's encoded counterpart.
 .PP
-.EX
+.nf
     +---------------+--------------------------+
     | decimal value | encoded hex value        |
     +---------------+--------------------------+
@@ -304,7 +304,7 @@ Below is table with example decimal values and it's encoded counterpart.
     |    2147483647 | 0xff 0xff 0xff 0xff 0x07 |
     |    4294967295 | 0xff 0xff 0xff 0xff 0x0f |
     +---------------+--------------------------+
-.EE
+.fi
 .PP
 Encoded number are always
 .BR little-endian ,
@@ -345,10 +345,10 @@ It usually is used with
 .B extern
 keyword like
 .PP
-.EX
+.nf
     extern struct el_options   log_foobar;
     #define EL_OPTIONS_OBJECT &log_foobar
-.EE
+.fi
 .PP
 It is real pain in the ass to provide information about file in every print
 function. For that matter very simple macros have been provided.
@@ -379,15 +379,15 @@ and
 into single, short parameter.
 For example instead calling this
 .PP
-.EX
+.nf
     el_print(__FILE__, __LINE__, EL_NOTICE, "notice message number %d", num);
-.EE
+.fi
 .PP
 you can simply call
 .PP
-.EX
+.nf
     el_print(ELN, "notice message number %d", num);
-.EE
+.fi
 .PP
 This solution works both for
 .B c89
@@ -489,4 +489,4 @@ and if file rotation is enabled also from
 .BR el_opmemory_table (3),
 .BR el_ocleanup (3),
 .BR el_ooption (3),
-.BR el_opmemory (3),
+.BR el_opmemory (3).

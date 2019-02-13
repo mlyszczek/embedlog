@@ -57,3 +57,8 @@ ul.man-toc
 {
     clear: both;
 }
+
+h1.first
+{
+    margin-top: 2ch;
+}

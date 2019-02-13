@@ -22,7 +22,7 @@ exec 6>&1
 exec 1<>"${out}"
 
 echo > "${out}"
-echo "<h1>downloads</h1>"
+echo "<h1 class=\"first\">downloads</h1>"
 echo "<p>"
 echo "Below you can find source files and binary packages for various systems."
 echo "<b>(s)</b> right of package name is a gpg signature. You can download"
