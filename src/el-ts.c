@@ -162,22 +162,24 @@ size_t el_timestamp
         return 0;
     }
 
+#   if ENABLE_BINARY_LOGS
+
     if (binary)
     {
         /*
          * put encoded seconds timestamp in buf
          */
 
-#   ifdef LLONG_MAX
+#       ifdef LLONG_MAX
         tl = el_encode_number((unsigned long long)s, (unsigned char *)buf);
-#   else
+#       else
         tl = el_encode_number((unsigned long)s, (unsigned char*)buf);
-#   endif
+#       endif
 
         /*
          * put encoded nano/micro/milli seconds in buf if enabled
          */
-#   if ENABLE_FRACTIONS
+#       if ENABLE_FRACTIONS
 
         switch (options->timestamp_fractions)
         {
@@ -209,11 +211,16 @@ size_t el_timestamp
 
             return 0;
         }
-#else  /* ENABLE_FRACTIONS */
+#       else  /* ENABLE_FRACTIONS */
+
         return tl;
-#endif /* ENABLE_FRACTIONS */
+
+#       endif /* ENABLE_FRACTIONS */
     }
     else
+
+#   endif /* ENABLE_BINARY_LOGS */
+
     {
         /*
          * then convert retrieved time into string timestamp
