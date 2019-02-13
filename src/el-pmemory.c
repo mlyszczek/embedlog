@@ -217,6 +217,8 @@ int el_opmemory
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+    rv = 0;
+
     /*
      * let's first check if logs are enabled for passed level, if not, there is
      * no need to waste cycles on useless string preparation
