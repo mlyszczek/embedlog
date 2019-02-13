@@ -3,31 +3,8 @@
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ========================================================================== */
 
-/* this file contains stuff internal to the library
- *
- * !!!!!!! FUCKING IMPORTANT NOTICE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !!!
- * !!! MAKE SURE THIS FILE IS INCLUDED FIRST IN ALL SOURCE AND TEST FILES
- * !!! OR THINGS WILL GO WEIRD.
- * !!!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- *
- * it's becuase of feature test macros that are defined here and they must
- * be defined before any system files are included
- */
-
 #ifndef EL_PRIVATE_H
 #define EL_PRIVATE_H 1
-
-
-/* ==========================================================================
-      ____              __                        __               __
-     / __/___   ____ _ / /_ __  __ _____ ___     / /_ ___   _____ / /_ _____
-    / /_ / _ \ / __ `// __// / / // ___// _ \   / __// _ \ / ___// __// ___/
-   / __//  __// /_/ // /_ / /_/ // /   /  __/  / /_ /  __/(__  )/ /_ (__  )
-  /_/   \___/ \__,_/ \__/ \__,_//_/    \___/   \__/ \___//____/ \__//____/
-
-   ========================================================================== */
 
 
 #if HAVE_CONFIG_H
@@ -44,99 +21,6 @@
 
     int snprintf(char *str, size_t str_m, const char *fmt, ...);
     int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
-#else
-    /* if portable snprintf is not used, define posix source to include
-     * snprintf() and vsnprintf() functions
-     */
-#   define _POSIX_C_SOURCE 200112L
-#endif
-
-/* features definitions, order must be from higher posix standard to
- * lowest one to avoid redefinitions
- */
-
-/* clock_gettime() was defined in 199303 issue of posix
- * but some systems need posix = 200112 for the feature
- */
-#if ENABLE_TIMESTAMP
-#   if ENABLE_REALTIME || ENABLE_MONOTONIC
-#       if __FreeBSD__ || __QNX__ || __QNXNTO__
-#           ifndef _POSIX_C_SOURCE
-#           define _POSIX_C_SOURCE 200112L
-#           endif
-#       endif
-#   endif
-#endif
-
-/* gmtime_r() was defined in posix issue 1, but these systems
- * define them in issue 199506
- */
-#if ENABLE_TIMESTAMP
-#   if __DragonFly__
-#       ifndef _POSIX_C_SOURCE
-#       define _POSIX_C_SOURCE 199506L
-#       endif
-#   endif
-#endif
-
-/* clock_gettime() was defined in 199303 issue of posix
- */
-#if ENABLE_TIMESTAMP
-#   if ENABLE_REALTIME || ENABLE_MONOTONIC
-#       ifndef _POSIX_C_SOURCE
-#       define _POSIX_C_SOURCE 199309L
-#       endif
-#   endif
-#endif
-
-/* gmtime_r() was defined in posix issue 1
- */
-#if ENABLE_TIMESTAMP
-#   ifndef _POSIX_C_SOURCE
-#   define _POSIX_C_SOURCE 1
-#   endif
-#endif
-
-/* both fsync() and fileno() functions were defined in
- * posix issue 1
- */
-#if ENABLE_OUT_FILE
-#   if HAVE_FSYNC && HAVE_FILENO
-#       ifndef _POSIX_C_SOURCE
-#       define _POSIX_C_SOURCE 1
-#       endif
-#   endif
-#endif
-
-/* ONLCR flag is quite messy, different systems needs different
- * definition for it to be seen by source, and some systems don't
- * need any definition by default. This is short (and surely
- * incomplete) list of OSes that needs it for proper compilation
- */
-#if ENABLE_OUT_TTY
-#   if HAVE_TERMIOS_H
-#       if __FreeBSD__
-#           ifndef __BSD_VISIBLE
-#           define __BSD_VISIBLE 1
-#           endif
-#       elif __NetBSD__
-#           ifndef _NETBSD_SOURCE
-#           define _NETBSD_SOURCE 1
-#           endif
-#       elif sun || __sun
-#           ifndef __EXTENSIONS__
-#           define __EXTENSIONS__ 1
-#           endif
-#       elif __QNX__ || __QNXNTO__
-#           ifndef _QNX_SOURCE
-#           define _QNX_SOURCE 1
-#           endif
-#       elif __DragonFly__ || __minix
-#           ifndef _XOPEN_SOURCE
-#           define _XOPEN_SOURCE 500
-#           endif
-#       endif
-#   endif
 #endif
 
 
