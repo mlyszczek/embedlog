@@ -301,7 +301,7 @@ int el_opmemory_table
     size_t              mlen      /* number of bytes to print */
 )
 {
-    return el_pmem(file, num, level, &g_options, mem, mlen, 1);
+    return el_pmem(file, num, level, options, mem, mlen, 1);
 }
 
 
