@@ -1,3 +1,4 @@
+include Makefile.am.coverage
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS = include src tst man examples www
