@@ -14,15 +14,15 @@ Pre-Depends: ${misc:Pre-Depends}
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: embedlog is a highly portable c89 complaint logger (with
-  additional features for users with c99 compilers and/or POSIX systems).
-  This library is designed mainly for embedded devices, but can also be
-  used in high level OSes like Linux.
+ additional features for users with c99 compilers and/or POSIX systems).
+ This library is designed mainly for embedded devices, but can also be
+ used in high level OSes like Linux.
 
 Package: libembedlog-dev
 Section: libdevel
 Depends: libembedlog@{ABI_VERSION} (= ${binary:Version}), ${misc:Depends}
 Architecture: any
 Description: embedlog is a highly portable c89 complaint logger (with
-  additional features for users with c99 compilers and/or POSIX systems).
-  This library is designed mainly for embedded devices, but can also be
-  used in high level OSes like Linux.
+ additional features for users with c99 compilers and/or POSIX systems).
+ This library is designed mainly for embedded devices, but can also be
+ used in high level OSes like Linux.

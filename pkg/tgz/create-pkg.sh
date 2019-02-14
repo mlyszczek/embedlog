@@ -33,7 +33,7 @@ cd "${project}-${git_version}"
 version="$(grep "AC_INIT(" "configure.ac" | cut -f3 -d\[ | cut -f1 -d\])"
 ./autogen.sh
 CFLAGS="-I/usr/bofc/include" LDFLAGS="-L/usr/bofc/lib" ./configure --prefix=/usr
-make check
+LD_LIBRARY_PATH=/usr/bofc/lib make check
 
 mkdir "${workdir}/root"
 mkdir "${workdir}/root/install"
@@ -41,7 +41,7 @@ DESTDIR="${workdir}/root" make install
 
 [ -f "pkg/tgz/doinst.sh" ] && cp "pkg/tgz/doinst.sh" "${workdir}/root/install"
 cd "${workdir}/root"
-find . \( -name *.3 -or -name *.7 \) | xargs gzip
+find usr/share/man \( -name *.3 -or -name *.7 \) | xargs gzip
 makepkg -l y -c n "${workdir}/${project}-${version}-${arch}-${revision}.tgz"
 installpkg "${workdir}/${project}-${version}-${arch}-${revision}.tgz"
 

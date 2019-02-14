@@ -8,7 +8,7 @@ then
     echo "usage: ${0} <version> <arch> <host_os>"
     echo ""
     echo "where:"
-    echo "    <version>         git tag version to build (without prefix v)"
+    echo "    <version>         git branch, tag or commit to build"
     echo "    <arch>            target architecture"
     echo "    <host_os>         target os (debian9, debian8 etc)"
     echo ""
@@ -61,7 +61,7 @@ sed -i "s/@{ABI_VERSION}/${abi_version}/" "debian/control.template"
 mv "debian/changelog.template" "debian/changelog"
 mv "debian/control.template" "debian/control"
 
-export CFLAGS="-I/usr/bofc/include"
+export CFLAGS="-I/usr/bofc/include -g"
 export LDFLAGS="-L/usr/bofc/lib"
 debuild -us -uc || exit 1
 

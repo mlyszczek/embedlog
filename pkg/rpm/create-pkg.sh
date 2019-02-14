@@ -72,8 +72,8 @@ else
         "RPMS/${arch}/${project}-devel-${pkg_version}-${rel_version}.${arch}.rpm"
 fi
 
-failure=0
-gcc "BUILD/${project}-${git_version}/pkg/test.c" -lembedlog -o /tmp/${project}-test || failure=1
+failed=0
+gcc "BUILD/${project}-${git_version}/pkg/test.c" -lembedlog -o /tmp/${project}-test || failed=1
 
 if ldd /tmp/${project}-test | grep "\/usr\/bofc"
 then
@@ -86,7 +86,7 @@ then
     failed=1
 fi
 
-/tmp/${project}-test || failure=1
+/tmp/${project}-test || failed=1
 
 if type zypper >/dev/null
 then
@@ -99,7 +99,7 @@ fi
 # should fail as there is no library in te system any more
 /tmp/${project}-test && failed=1
 
-if [ ${failure} -eq 1 ]
+if [ ${failed} -eq 1 ]
 then
     exit 1
 fi
