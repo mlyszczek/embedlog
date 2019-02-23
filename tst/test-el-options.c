@@ -176,12 +176,12 @@ static void options_file_sync_level_set(void)
     {
         if (i <= EL_DBG)
         {
-            mt_fail(el_option(EL_FILE_SYNC_LEVEL, i) == 0);
+            mt_fail(el_option(EL_FSYNC_LEVEL, i) == 0);
             mt_fail(g_options.file_sync_level == i);
         }
         else
         {
-            mt_ferr(el_option(EL_FILE_SYNC_LEVEL, i), EINVAL);
+            mt_ferr(el_option(EL_FSYNC_LEVEL, i), EINVAL);
             mt_fail(g_options.file_sync_level == EL_DBG);
         }
     }

@@ -157,7 +157,7 @@ static int el_vooption
         options->level = value_int;
         return 0;
 
-    case EL_FILE_SYNC_LEVEL:
+    case EL_FSYNC_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int <= 7);
         options->file_sync_level = value_int;
@@ -302,7 +302,7 @@ static int el_vooption
         options->frotate_size = value_long;
         return 0;
 
-    case EL_FILE_SYNC_EVERY:
+    case EL_FSYNC_EVERY:
         value_long = va_arg(ap, long);
         VALID(EINVAL, value_long >= 0);
         options->file_sync_every = value_long;

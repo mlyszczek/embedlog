@@ -104,8 +104,8 @@ enum el_option
     EL_FPATH,
     EL_FROTATE_NUMBER,
     EL_FROTATE_SIZE,
-    EL_FILE_SYNC_EVERY,
-    EL_FILE_SYNC_LEVEL,
+    EL_FSYNC_EVERY,
+    EL_FSYNC_LEVEL,
 
     EL_OPT_ERROR /* internal use only */
 };

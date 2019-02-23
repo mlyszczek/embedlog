@@ -503,7 +503,7 @@ Value is less than 1
 .   RE
 .RE
 .PP
-.BI "EL_FILE_SYNC_EVERY (" long " size)"
+.BI "EL_FSYNC_EVERY (" long " size)"
 .RS
 Simply writing data to file descriptor is not enough, metadata also has to be
 synced or you are facing data loose on unexpected power loose.
@@ -526,13 +526,13 @@ Value is less than 0
 .   RE
 .RE
 .PP
-.BI "EL_FILE_SYNC_LEVEL (" enum " " el_level " level)"
+.BI "EL_FSYNC_LEVEL (" enum " " el_level " level)"
 .RS
 If level of printed message is
 .   I level
 or less (that is higher priority), it will be synced to disk every single time
 regardless of
-.   B EL_FILE_SYNC_EVERY
+.   B EL_FSYNC_EVERY
 option.
 Messages with level
 .   B EL_FATAL

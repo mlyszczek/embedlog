@@ -126,7 +126,7 @@ static void test_prepare(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FPATH, WORKDIR"/log");
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     file_synced = 0;
 }
 
@@ -211,7 +211,7 @@ static void file_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FPATH, WORKDIR"/log");
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log", s9 s8));
@@ -232,7 +232,7 @@ static void file_reopen_different_file(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FPATH, WORKDIR"/log-another");
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log", s9));
@@ -295,7 +295,7 @@ static void file_write_after_failed_open(void)
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
 
     rmdir(WORKDIR);
     mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
@@ -320,7 +320,7 @@ static void file_write_after_failed_open_to_existing_file(void)
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
 
     rmdir(WORKDIR);
     mt_ferr(el_option(EL_FPATH, WORKDIR"/log"), ENOENT);
@@ -410,7 +410,7 @@ static void file_print_after_cleanup(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FPATH, WORKDIR"/log");
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_cleanup();
     mt_ferr(el_puts("whatev"), ENODEV);
     unlink(WORKDIR"/log");
@@ -427,7 +427,7 @@ static void file_print_without_setting_file(void)
     el_option(EL_OUT, EL_OUT_FILE);
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 0);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     mt_ferr(el_puts("no file set"), EBADF);
     el_cleanup();
 }
@@ -517,7 +517,7 @@ static void file_rotate_1_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 1);
     el_option(EL_FPATH, WORKDIR"/log");
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s5 s8));
@@ -660,7 +660,7 @@ static void file_rotate_2_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 2);
     el_option(EL_FPATH, WORKDIR"/log");
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
 
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s9));
@@ -842,7 +842,7 @@ static void file_rotate_5_reopen(void)
     el_option(EL_FROTATE_SIZE, 16);
     el_option(EL_FROTATE_NUMBER, 5);
     el_option(EL_FPATH, WORKDIR"/log");
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
 
     el_puts(s9);
     el_puts(s8);
@@ -966,7 +966,7 @@ static void file_rotate_directory_deleted(void)
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
     mt_fok(el_option(EL_FPATH, WORKDIR"/log"));
@@ -998,7 +998,7 @@ static void file_rotate_directory_reappear_after_delete(void)
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
     mt_fok(el_option(EL_FPATH, WORKDIR"/log"));
@@ -1044,7 +1044,7 @@ static void file_rotate_write_after_failed_open(void)
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
 
@@ -1071,7 +1071,7 @@ static void file_rotate_write_after_failed_open_to_existing_file(void)
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
 
@@ -1104,7 +1104,7 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes(void
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
 
@@ -1143,7 +1143,7 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes2(voi
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
 
@@ -1183,7 +1183,7 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes3(voi
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
 
@@ -1223,7 +1223,7 @@ static void file_rotate_and_directory_reappear(void)
 
     el_init();
     el_option(EL_OUT, EL_OUT_FILE);
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     el_option(EL_FROTATE_SIZE, 3);
     el_option(EL_FROTATE_NUMBER, 5);
     mt_fok(el_option(EL_FPATH, WORKDIR"/log"));
@@ -1526,7 +1526,7 @@ static void file_rotate_fail(void)
 
 static void file_sync_always(void)
 {
-    el_option(EL_FILE_SYNC_EVERY, 0);
+    el_option(EL_FSYNC_EVERY, 0);
     mt_fok(el_puts(s8));
     mt_fail(file_synced == 1);
 }
@@ -1538,7 +1538,7 @@ static void file_sync_always(void)
 
 static void file_sync_periodic(void)
 {
-    el_option(EL_FILE_SYNC_EVERY, 8);
+    el_option(EL_FSYNC_EVERY, 8);
     mt_fok(el_puts(s5));
     mt_fail(file_synced == 0);
     mt_fok(el_puts(s3));
@@ -1564,8 +1564,8 @@ static void file_sync_periodic(void)
 
 static void file_sync_level(void)
 {
-    el_option(EL_FILE_SYNC_EVERY, 1024);
-    el_option(EL_FILE_SYNC_LEVEL, EL_ERROR);
+    el_option(EL_FSYNC_EVERY, 1024);
+    el_option(EL_FSYNC_LEVEL, EL_ERROR);
     el_option(EL_LEVEL, EL_DBG);
     mt_fok(el_print(ELW, s8));
     mt_fail(file_synced == 0);

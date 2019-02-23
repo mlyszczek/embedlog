@@ -389,7 +389,7 @@ static void test_prepare(void)
     el_option(EL_TS_FRACT, EL_TS_FRACT_OFF);
     el_option(EL_PRINT_LEVEL, 0);
     el_option(EL_FROTATE_NUMBER, 0);
-    el_option(EL_FILE_SYNC_EVERY, 1024);
+    el_option(EL_FSYNC_EVERY, 1024);
     el_option(EL_FPATH, logpath);
     truncate_test = 0;
     expected_logs = rb_new(1024, sizeof(struct log_message), 0);
