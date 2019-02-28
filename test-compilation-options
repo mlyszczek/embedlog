@@ -12,3 +12,4 @@
 --disable-colors
 --disable-prefix
 --disable-reentrant
+--disable-funcinfo

@@ -319,6 +319,23 @@ AS_IF([test "x$enable_finfo" = "xyes"],
 
 
 ###
+# --enable-funcinfo
+#
+
+
+AC_ARG_ENABLE([funcinfo],
+    AS_HELP_STRING([--enable-funcinfo], [Enable printing function info with log]),
+    [], [enable_funcinfo="yes"])
+
+AS_IF([test "x$enable_funcinfo" = "xyes"],
+[
+    AC_DEFINE([ENABLE_FUNCINFO], [1], [Enable printing function info with log])
+    AC_CHECK_FUNCS([strncat strlen sprintf],,
+        AC_MSG_ERROR(not found, needed by --enable-funcinfo))
+])
+
+
+###
 # --enable-colors
 #
 
@@ -408,6 +425,17 @@ AC_ARG_VAR([EL_FLEN_MAX], [Maximum size of file info in message])
 AS_IF([test "x$EL_FLEN_MAX" = x], [EL_FLEN_MAX="32"])
 AC_DEFINE_UNQUOTED([EL_FLEN_MAX], [$EL_FLEN_MAX], [Maximum size of file info in message])
 
+
+###
+# EL_FUNCLEN_MAX
+#
+
+
+AC_ARG_VAR([EL_FUNCLEN_MAX], [Maximum size of file info in message])
+AS_IF([test "x$EL_FUNCLEN_MAX" = x], [EL_FUNCLEN_MAX="32"])
+AC_DEFINE_UNQUOTED([EL_FUNCLEN_MAX], [$EL_FUNCLEN_MAX], [Maximum size of file info in message])
+
+
 ###
 # EL_MEM_LINE_SIZE
 #
@@ -457,6 +485,7 @@ echo "clock_monotonic timestamp... : $enable_monotonic"
 echo "clock() timestamp........... : $enable_clock"
 echo "print prefix with each msg.. : $enable_prefix"
 echo "print file info with log.... : $enable_finfo"
+echo "print function info with log : $enable_funcinfo"
 echo "force portable snprintf..... : $enable_portable_snprintf"
 echo "binary logs................. : $enable_binary_logs"
 echo "colorize output............. : $enable_colors"
@@ -464,6 +493,7 @@ echo "extended colors............. : $enable_colors_extended"
 echo "reentrant functions......... : $enable_reentrant"
 echo "maximum prefix length....... : $EL_PREFIX_MAX"
 echo "maximum file length......... : $EL_FLEN_MAX"
+echo "maximum function namelength. : $EL_FUNCLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
 echo "maximum path length......... : $MAX_PATH"
 echo "pmemory line size........... : $EL_MEM_LINE_SIZE"

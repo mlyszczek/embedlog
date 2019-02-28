@@ -44,6 +44,7 @@ struct log_message
 {
     const char  *file;
     size_t       line;
+    const char  *func;
     int          level;
     const char  *msg;
 };
@@ -276,6 +277,7 @@ static int print_check(void)
         if (g_options.finfo && expected.file != NULL && expected.line != 0)
         {
             char  expected_file[8192];
+            char  f_func_info_separator;
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -311,7 +313,15 @@ static int print_check(void)
 
             i = 0;
 
-            while (*msg != ']')
+            /* when funcinfo is enabled, there should be ':' instead
+             * of closing bracked as print will look like this:
+             *
+             * [file.c:2:foo()] instead of [file.c:2]
+             */
+
+            f_func_info_separator = g_options.funcinfo ? ':' : ']';
+
+            while (*msg != f_func_info_separator)
             {
                 tmp[i] = *msg;
                 if (i++ == EL_PRE_FINFO_LINE_MAX_LEN)
@@ -331,7 +341,7 @@ static int print_check(void)
 
             }
 
-            msg++;  /* skip ']' character */
+            msg++;  /* skip ']' or ':' character */
             tmp[i] = '\0';
 
             if ((size_t)atoi(tmp) != expected.line)
@@ -342,10 +352,65 @@ static int print_check(void)
 
                 return -1;
             }
+
+        }
+
+        /* check for function information
+         */
+
+        if (g_options.funcinfo && expected.func != NULL)
+        {
+            if (g_options.finfo == 0 || expected.file == NULL ||
+                    expected.line == 0)
+            {
+                /* file info was not printed, so check for opening
+                 * '[' character
+                 */
+
+                if (*msg++ != '[')
+                {
+                    return -1;
+                }
+            }
+
+            i = 0;
+
+            /* search until we hit appended "()"
+             */
+
+            while (*msg != '(')
+            {
+                tmp[i] = *msg++;
+                if (i++ == EL_FUNCLEN_MAX)
+                {
+                    /* function is too long or ending (
+                     * is missing
+                     */
+
+                    return -1;
+                }
+            }
+
+            tmp[i] = '\0';
+            if (strcmp(tmp, expected.func) != 0)
+            {
+                /* function is different than what we expected
+                */
+
+                return -1;
+            }
+
+            /* check closing stuff, we should see ()]
+             */
+
+            IS_CHAR('(');
+            IS_CHAR(')');
+            IS_CHAR(']');
         }
 
         if ((g_options.finfo && expected.file != NULL && expected.line != 0) ||
-             g_options.timestamp != EL_TS_OFF)
+             g_options.timestamp != EL_TS_OFF ||
+            (g_options.funcinfo && expected.func != NULL))
         {
             /*
              * prefix or timestamp information  is  enabled,  in  that  case
@@ -461,6 +526,7 @@ static void add_log
 (
     const char    *file,
     size_t         line,
+    const char    *func,
     enum el_level  level,
     const char    *msg
 )
@@ -471,10 +537,11 @@ static void add_log
 
     expected.file = file;
     expected.line = line;
+    expected.func = func;
     expected.level = level;
     expected.msg = msg;
     rb_write(expected_logs, &expected, 1);
-    el_print(file, line, level, msg);
+    el_print(file, line, func, level, msg);
 }
 
 
@@ -790,6 +857,7 @@ static void print_mix_of_everything(void)
     int timestamp;
     int printlevel;
     int finfo;
+    int funcinfo;
     int colors;
     int prefix;
     int fract;
@@ -804,6 +872,7 @@ static void print_mix_of_everything(void)
     for (colors = 0;                colors <= 1;                  ++colors)
     for (prefix = 0;                prefix <= 1;                  ++prefix)
     for (finfo = 0;                 finfo <= 1;                   ++finfo)
+    for (funcinfo = 0;              funcinfo <= 1;                ++funcinfo)
     for (nl = 0;                    nl <= 1;                      ++nl)
     {
         test_prepare();
@@ -812,6 +881,7 @@ static void print_mix_of_everything(void)
         el_option(EL_PRINT_LEVEL, printlevel);
         el_option(EL_PRINT_NL, nl);
         el_option(EL_FINFO, finfo);
+        el_option(EL_FUNCINFO, funcinfo);
         el_option(EL_COLORS, colors);
         el_option(EL_PREFIX, prefix ? "prefix" : NULL);
 
@@ -958,7 +1028,7 @@ static void print_truncate_with_all_options(void)
     msg[sizeof(msg) - 4] = '0';
 
     add_log(ELI, "not truncated");
-    add_log(finfo, fline, EL_FATAL, msg);
+    add_log(finfo, fline, "print_truncate_with_all_options", EL_FATAL, msg);
 
     msg[sizeof(msg) - 3] = '\0';
 
@@ -994,7 +1064,8 @@ static void print_level_not_high_enough(void)
 static void print_finfo_path(void)
 {
     el_option(EL_FINFO, 1);
-    add_log("source/code/file.c", 10, EL_ALERT, "some message");
+    add_log("source/code/file.c", 10, "print_finfo_path", EL_ALERT,
+            "some message");
     mt_fok(print_check());
 }
 
@@ -1006,7 +1077,7 @@ static void print_finfo_path(void)
 static void print_nofinfo(void)
 {
     el_option(EL_FINFO, 1);
-    add_log(NULL, 0, EL_ALERT, "no file info");
+    add_log(NULL, 0, NULL, EL_ALERT, "no file info");
     mt_fok(print_check());
 }
 

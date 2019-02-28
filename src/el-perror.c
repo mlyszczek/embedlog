@@ -57,6 +57,7 @@ static int el_ovperror
 (
     const char         *file,     /* file name where log is printed */
     size_t              num,      /* line number where log is printed */
+    const char         *func,     /* function name to print */
     enum el_level       level,    /* log level to print message with */
     struct el_options  *options,  /* options defining printing style */
     const char         *fmt,      /* message format (see printf (3)) */
@@ -80,10 +81,10 @@ static int el_ovperror
          * otherwise only errno message will be printed
          */
 
-        rc |= el_ovprint(file, num, level, options, fmt, ap);
+        rc |= el_ovprint(file, num, func, level, options, fmt, ap);
     }
 
-    rc |= el_oprint(file, num, level, options,
+    rc |= el_oprint(file, num, func, level, options,
         "errno num: %lu, strerror: %s", e, strerror(e));
 
     /*
@@ -122,6 +123,7 @@ int el_perror
 (
     const char    *file,   /* file name where log is printed */
     size_t         num,    /* line number where log is printed */
+    const char    *func,   /* function name to print */
     enum el_level  level,  /* log level to print message with */
     const char    *fmt,    /* message format (see printf (3)) */
                    ...     /* additional parameters for fmt */
@@ -133,7 +135,7 @@ int el_perror
 
 
     va_start(ap, fmt);
-    rc = el_ovperror(file, num, level, &g_options, fmt, ap);
+    rc = el_ovperror(file, num, func, level, &g_options, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -149,6 +151,7 @@ int el_operror
 (
     const char        *file,      /* file name where log is printed */
     size_t             num,       /* line number where log is printed*/
+    const char        *func,      /* function name to print */
     enum el_level      level,     /* log level to print message with */
     struct el_options  *options,  /* options defining printing style */
     const char        *fmt,       /* message format (see printf (3)) */
@@ -161,7 +164,7 @@ int el_operror
 
 
     va_start(ap, fmt);
-    rc = el_ovperror(file, num, level, options, fmt, ap);
+    rc = el_ovperror(file, num, func, level, options, fmt, ap);
     va_end(ap);
 
     return rc;

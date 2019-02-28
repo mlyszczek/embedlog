@@ -16,49 +16,53 @@ extern "C" {
 #endif
 
 #ifdef NOFINFO
-#   define ELF NULL, 0, EL_FATAL
-#   define ELA NULL, 0, EL_ALERT
-#   define ELC NULL, 0, EL_CRIT
-#   define ELE NULL, 0, EL_ERROR
-#   define ELW NULL, 0, EL_WARN
-#   define ELN NULL, 0, EL_NOTICE
-#   define ELI NULL, 0, EL_INFO
-#   define ELD NULL, 0, EL_DBG
+#   define ELF NULL, 0, NULL, EL_FATAL
+#   define ELA NULL, 0, NULL, EL_ALERT
+#   define ELC NULL, 0, NULL, EL_CRIT
+#   define ELE NULL, 0, NULL, EL_ERROR
+#   define ELW NULL, 0, NULL, EL_WARN
+#   define ELN NULL, 0, NULL, EL_NOTICE
+#   define ELI NULL, 0, NULL, EL_INFO
+#   define ELD NULL, 0, NULL, EL_DBG
 
-#   define OELF NULL, 0, EL_FATAL, EL_OPTIONS_OBJECT
-#   define OELA NULL, 0, EL_ALERT, EL_OPTIONS_OBJECT
-#   define OELC NULL, 0, EL_CRIT, EL_OPTIONS_OBJECT
-#   define OELE NULL, 0, EL_ERROR, EL_OPTIONS_OBJECT
-#   define OELW NULL, 0, EL_WARN, EL_OPTIONS_OBJECT
-#   define OELN NULL, 0, EL_NOTICE, EL_OPTIONS_OBJECT
-#   define OELI NULL, 0, EL_INFO, EL_OPTIONS_OBJECT
-#   define OELD NULL, 0, EL_DBG, EL_OPTIONS_OBJECT
+#   define OELF NULL, 0, NULL, EL_FATAL, EL_OPTIONS_OBJECT
+#   define OELA NULL, 0, NULL, EL_ALERT, EL_OPTIONS_OBJECT
+#   define OELC NULL, 0, NULL, EL_CRIT, EL_OPTIONS_OBJECT
+#   define OELE NULL, 0, NULL, EL_ERROR, EL_OPTIONS_OBJECT
+#   define OELW NULL, 0, NULL, EL_WARN, EL_OPTIONS_OBJECT
+#   define OELN NULL, 0, NULL, EL_NOTICE, EL_OPTIONS_OBJECT
+#   define OELI NULL, 0, NULL, EL_INFO, EL_OPTIONS_OBJECT
+#   define OELD NULL, 0, NULL, EL_DBG, EL_OPTIONS_OBJECT
 #else
-#   define ELF __FILE__, __LINE__, EL_FATAL
-#   define ELA __FILE__, __LINE__, EL_ALERT
-#   define ELC __FILE__, __LINE__, EL_CRIT
-#   define ELE __FILE__, __LINE__, EL_ERROR
-#   define ELW __FILE__, __LINE__, EL_WARN
-#   define ELN __FILE__, __LINE__, EL_NOTICE
-#   define ELI __FILE__, __LINE__, EL_INFO
-#   define ELD __FILE__, __LINE__, EL_DBG
+#   define ELF __FILE__, __LINE__, EL_FUNC_NAME, EL_FATAL
+#   define ELA __FILE__, __LINE__, EL_FUNC_NAME, EL_ALERT
+#   define ELC __FILE__, __LINE__, EL_FUNC_NAME, EL_CRIT
+#   define ELE __FILE__, __LINE__, EL_FUNC_NAME, EL_ERROR
+#   define ELW __FILE__, __LINE__, EL_FUNC_NAME, EL_WARN
+#   define ELN __FILE__, __LINE__, EL_FUNC_NAME, EL_NOTICE
+#   define ELI __FILE__, __LINE__, EL_FUNC_NAME, EL_INFO
+#   define ELD __FILE__, __LINE__, EL_FUNC_NAME, EL_DBG
 
-#   define OELF __FILE__, __LINE__, EL_FATAL, EL_OPTIONS_OBJECT
-#   define OELA __FILE__, __LINE__, EL_ALERT, EL_OPTIONS_OBJECT
-#   define OELC __FILE__, __LINE__, EL_CRIT, EL_OPTIONS_OBJECT
-#   define OELE __FILE__, __LINE__, EL_ERROR, EL_OPTIONS_OBJECT
-#   define OELW __FILE__, __LINE__, EL_WARN, EL_OPTIONS_OBJECT
-#   define OELN __FILE__, __LINE__, EL_NOTICE, EL_OPTIONS_OBJECT
-#   define OELI __FILE__, __LINE__, EL_INFO, EL_OPTIONS_OBJECT
-#   define OELD __FILE__, __LINE__, EL_DBG, EL_OPTIONS_OBJECT
+#   define OELF __FILE__, __LINE__, EL_FUNC_NAME, EL_FATAL, EL_OPTIONS_OBJECT
+#   define OELA __FILE__, __LINE__, EL_FUNC_NAME, EL_ALERT, EL_OPTIONS_OBJECT
+#   define OELC __FILE__, __LINE__, EL_FUNC_NAME, EL_CRIT, EL_OPTIONS_OBJECT
+#   define OELE __FILE__, __LINE__, EL_FUNC_NAME, EL_ERROR, EL_OPTIONS_OBJECT
+#   define OELW __FILE__, __LINE__, EL_FUNC_NAME, EL_WARN, EL_OPTIONS_OBJECT
+#   define OELN __FILE__, __LINE__, EL_FUNC_NAME, EL_NOTICE, EL_OPTIONS_OBJECT
+#   define OELI __FILE__, __LINE__, EL_FUNC_NAME, EL_INFO, EL_OPTIONS_OBJECT
+#   define OELD __FILE__, __LINE__, EL_FUNC_NAME, EL_DBG, EL_OPTIONS_OBJECT
 #endif
 
 #if (__STDC_VERSION__ >= 199901L)
+    /* options for c99 users, they can affort more */
+#   define EL_FUNC_NAME __func__
 #   ifdef NDEBUG
 #       define EL_DEBUG(...) ((void)0)
 #   else
 #       define EL_DEBUG(...) el_print(ELD, __VA_ARGS__)
 #   endif
+#else
+#   define EL_FUNC_NAME NULL
 #endif
 
 enum el_output
@@ -97,6 +101,7 @@ enum el_option
     EL_PRINT_LEVEL,
     EL_PRINT_NL,
     EL_FINFO,
+    EL_FUNCINFO,
     EL_CUSTOM_PUTS,
     EL_TTY_DEV,
     EL_PREFIX,
@@ -151,6 +156,7 @@ struct el_options
     unsigned int    print_log_level:1;
     unsigned int    print_newline:1;
     unsigned int    finfo:1;
+    unsigned int    funcinfo:1;
     unsigned int    level:3;
     unsigned int    level_current_msg:3;
     unsigned int    file_sync_level:3;
@@ -173,16 +179,16 @@ int el_init(void);
 int el_cleanup(void);
 int el_option(int option, ...);
 int el_puts(const char *string);
-int el_print(const char *file, size_t line, enum el_level level,
-        const char *fmt, ...);
-int el_vprint(const char *file, size_t line, enum el_level level,
-        const char *fmt, va_list ap);
-int el_pmemory(const char *file, size_t line, enum el_level level,
-        const void *memory, size_t mlen);
-int el_pmemory_table(const char *file, size_t line, enum el_level level,
-        const void *memory, size_t mlen);
-int el_perror(const char *file, size_t line, enum el_level level,
-        const char *fmt, ...);
+int el_print(const char *file, size_t line, const char *func,
+        enum el_level level, const char *fmt, ...);
+int el_vprint(const char *file, size_t line, const char *func,
+        enum el_level level, const char *fmt, va_list ap);
+int el_pmemory(const char *file, size_t line, const char *func,
+        enum el_level level, const void *memory, size_t mlen);
+int el_pmemory_table(const char *file, size_t line, const char *func,
+        enum el_level level, const void *memory, size_t mlen);
+int el_perror(const char *file, size_t line, const char *func,
+        enum el_level level, const char *fmt, ...);
 int el_putb(const void *memory, size_t mlen);
 int el_pbinary(enum el_level level, const void *memory, size_t mlen);
 
@@ -190,16 +196,19 @@ int el_oinit(struct el_options *options);
 int el_ocleanup(struct el_options *options);
 int el_ooption(struct el_options *options, int option, ...);
 int el_oputs(struct el_options *options, const char *string);
-int el_oprint(const char *file, size_t line, enum el_level level,
-        struct el_options *options, const char *fnt, ...);
-int el_ovprint(const char *file, size_t line, enum el_level level,
-        struct el_options *options, const char *fmt, va_list ap);
-int el_opmemory(const char *file, size_t line, enum el_level level,
-        struct el_options *options, const void *memory, size_t mlen);
-int el_opmemory_table(const char *file, size_t line, enum el_level level,
-        struct el_options *options, const void *memory, size_t mlen);
-int el_operror(const char *file, size_t line, enum el_level level,
-        struct el_options *options, const char *fmt, ...);
+int el_oprint(const char *file, size_t line, const char *func,
+        enum el_level level, struct el_options *options, const char *fnt, ...);
+int el_ovprint(const char *file, size_t line, const char *func,
+        enum el_level level, struct el_options *options, const char *fmt,
+        va_list ap);
+int el_opmemory(const char *file, size_t line, const char *func,
+        enum el_level level, struct el_options *options, const void *memory,
+        size_t mlen);
+int el_opmemory_table(const char *file, size_t line, const char *func,
+        enum el_level level, struct el_options *options, const void *memory,
+        size_t mlen);
+int el_operror(const char *file, size_t line, const char *func,
+        enum el_level level, struct el_options *options, const char *fmt, ...);
 int el_oputb(struct el_options *options, const void *memory, size_t mlen);
 int el_opbinary(enum el_level level, struct el_options *options,
         const void *memory, size_t mlen);

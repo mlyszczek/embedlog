@@ -26,6 +26,7 @@ Implemented features are:
     * CLOCK_MONOTONIC (requires POSIX)
     * configurable precision of fraction of seconds (mili, micro, nano)
 * print location of printed log (file and line)
+* print function name of printed log (required at least c99)
 * 8 predefinied log levels (total rip off from syslog(2))
 * colorful output (ansi colors) for easy error spotting
 * print memory block in wireshark-like output
@@ -218,6 +219,13 @@ when you want to merge logs from multiple files into on big file of logs.
 
 When enabled, information about line and file name from where log originated
 will be added to each message.
+
+--enable-funcinfo (default: disable)
+------------------------------------
+
+When enabled, information about function name from where log originated
+will be added to each message. This uses *__func__* so you need compiler
+that supports that. It was added in *c99* standard.
 
 --enable-colors (default: enable)
 ---------------------------------

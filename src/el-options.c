@@ -261,6 +261,30 @@ static int el_vooption
 
 #   endif /* ENABLE_FINFO */
 
+#   if ENABLE_FUNCINFO
+
+    case EL_FUNCINFO:
+
+#       if (__STDC_VERSION__ < 199901L)
+
+        /* funcinfo is only supported on c99 compilers
+         */
+
+        errno = ENOSYS;
+        return -1;
+
+#       else /* __STDC_VERSION__ < 199901L */
+
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
+        options->funcinfo = value_int;
+        return 0;
+
+#       endif /* __STDC_VERSION__ < 199901L */
+
+#   endif /* ENABLE_FUNCINFO */
+
 #   if ENABLE_OUT_FILE
 
     case EL_FPATH:

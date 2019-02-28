@@ -7,6 +7,13 @@
 
 #define EL_OPTIONS_OBJECT &opts
 
+void like_this() { el_print(ELN, "yup, I really like this!"); }
+void or_this()   { el_print(ELN, "this I like too"); }
+void too_long_function_to_present_trimming_but_it_could_be_impossible()
+{
+    el_print(ELN, "trimmed (I hope) function name");
+}
+
 int main(void)
 {
     struct el_options  opts;
@@ -46,6 +53,12 @@ int main(void)
     el_option(EL_TS, EL_TS_OFF);
     el_print(ELF, "no time information, if your heart desire it");
     el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
+
+    el_option(EL_FUNCINFO, 1);
+    el_print(ELN, "logs can contain function name from which they were called");
+    like_this();
+    or_this();
+    too_long_function_to_present_trimming_but_it_could_be_impossible();
 
     el_option(EL_FINFO, 1);
     el_print(ELF, "log location is very usefull for debuging");

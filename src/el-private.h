@@ -194,6 +194,29 @@ extern struct el_options g_options;
 
 
 /* ==========================================================================
+    Maximum length of function field, 2 are added for appended "()" to
+    indicate function. 1 is added in case function is printed with
+    file info, in such case we will be adding ':' character also. This
+    May look like this:
+
+        [source-file.c:1337:foo()]
+
+    or if finfo is disabled
+
+        [foo()]
+
+    EL_FUNCLEN_MAX is defined during compilation.
+   ========================================================================== */
+
+
+#if ENABLE_FUNCINFO
+#   define EL_PRE_FUNCINFO_LEN ((EL_FUNCLEN_MAX) + 2 + 1)
+#else
+#   define EL_PRE_FUNCINFO_LEN 0
+#endif
+
+
+/* ==========================================================================
     log level preamble string length. Preamble is always "c/" where c is one
     of 'e, w, i, d" depending on the log level. 3 characters are reserved in
     a situation where another preamble (like timestamp)  is  printed  before
@@ -207,7 +230,7 @@ extern struct el_options g_options;
 /* ==========================================================================
     maximum length of preamble which may look like this
 
-        [2017-05-24 14:43:10.123456][source-file.c:12345] e/prefix
+        [2017-05-24 14:43:10.123456][source-file.c:12345:function()] e/prefix
    ========================================================================== */
 
 

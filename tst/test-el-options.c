@@ -105,6 +105,7 @@ static void options_init(void)
     default_options.custom_puts         = NULL;
     default_options.serial_fd           = -1;
 
+    default_options.funcinfo            = 0;
     default_options.finfo               = 0;
     default_options.frotate_number      = 0;
     default_options.fcurrent_rotate     = 0;
@@ -407,6 +408,10 @@ static void options_opt_timestamp_timer(void)
 }
 
 
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void options_opt_timestamp_fraction(void)
 {
     int i;
@@ -502,6 +507,7 @@ static void options_global_options_after_options_cleanup(void)
     default_options.custom_puts         = NULL;
     default_options.serial_fd           = -1;
 
+    default_options.funcinfo            = 0;
     default_options.finfo               = 0;
     default_options.frotate_number      = 0;
     default_options.fcurrent_rotate     = 0;
@@ -527,6 +533,28 @@ static void options_global_options_after_options_cleanup(void)
     mt_fail(options.outputs == 0);
 }
 
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void options_set_funcinfo(void)
+{
+#if ENABLE_FUNCINFO && (__STDC_VERSION__ >= 199901L)
+    mt_fok(el_option(EL_FUNCINFO, 0));
+    mt_fail(g_options.funcinfo == 0);
+    mt_fok(el_option(EL_FUNCINFO, 1));
+    mt_fail(g_options.funcinfo == 1);
+
+    mt_ferr(el_option(EL_FUNCINFO, 2), EINVAL);
+    mt_ferr(el_option(EL_FUNCINFO, 3), EINVAL);
+#else
+    mt_ferr(el_option(EL_FUNCINFO, 0), ENOSYS);
+    mt_ferr(el_option(EL_FUNCINFO, 1), ENOSYS);
+    mt_ferr(el_option(EL_FUNCINFO, 2), ENOSYS);
+    mt_ferr(el_option(EL_FUNCINFO, 3), ENOSYS);
+#endif
+}
 
 /* ==========================================================================
              __               __
@@ -559,4 +587,5 @@ void el_options_test_group(void)
     mt_run(options_einval);
     mt_run(options_prefix);
     mt_run(options_global_options_after_options_cleanup);
+    mt_run(options_set_funcinfo);
 }

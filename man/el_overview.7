@@ -74,20 +74,22 @@ Library implements following functions:
 .br
 .BI "int el_putb(const void *" memory ", size_t " mlen ")"
 .br
-.BI "int el_print(const char *" file ", size_t " line ", \
+.BI "int el_print(const char *" file ", size_t " line ", const char *" func ", \
 enum el_level " level ", const char *" fmt ", " ... ")"
 .br
-.BI "int el_vprint(const char *" file ", size_t " line ", \
+.BI "int el_vprint(const char *" file ", size_t " line ", const char *" func ", \
 enum el_level " level ", const char *" fmt ", va_list " ap ")"
 .br
+.BI "int el_perror(const char *" file ", size_t " line ", \
+const char *" func ", enum el_level " level ", const char *" fmt ", " ... ")"
+.br
 .BI "int el_pmemory(const char *" file ", size_t " line ", \
-enum el_level " level ", const void *" memory ", size_t " mlen ")"
+const char *" func ", enum el_level " level ", const void *" memory ", \
+size_t " mlen ")
 .br
 .BI "int el_pmemory_table(const char *" file ", size_t " line ", \
-enum el_level " level ", const void *" memory ", size_t " mlen ")
-.br
-.BI "int el_perror(const char *" file ", size_t " line ", \
-enum el_level " level ", const char *" fmt ", " ... ")"
+const char *" func ", enum el_level " level ", const void *" memory ", \
+size_t " mlen ")
 .br
 .BI "int el_pbinary(enum el_level " level ", const void *" memory ", \
 size_t " mlen ")
@@ -114,24 +116,24 @@ for more information.
 size_t " mlen ")"
 .br
 .BI "int el_oprint(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
-const char * "fnt ", " ... ")"
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" fmt ", " ... ")"
 .br
 .BI "int el_ovprint(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const char *" fmt ", va_list " ap ")"
 .br
+.BI "int el_operror(const char *" file ", size_t " line ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" fmt ", " ... ")"
+.br
 .BI "int el_opmemory(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .br
 .BI "int el_opmemory_table(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
-.br
-.BI "int el_operror(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
-const char *" fmt ", " ... ")"
 .br
 .BI "int el_opbinary(enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
@@ -170,7 +172,7 @@ Awailable macros are:
 So instead of calling
 .PP
 .EX
-    el_print(__FILE__, __LINE__, EL_NOTICE, "Notice message");
+    el_print(__FILE__, __LINE__, EL_FUNC_NAME, EL_NOTICE, "Notice message");
 .EE
 .PP
 You can simply call it like
@@ -209,7 +211,7 @@ for more info about that.
 So instead of calling
 .PP
 .EX
-    el_oprint(__FILE__, __LINE__, EL_NOTICE, &g_log_object, "Notice message");
+    el_oprint(__FILE__, __LINE__, EL_FUNC_NAME, EL_NOTICE, &g_log_object, "Notice message");
 .EE
 or
 .EX
@@ -224,7 +226,7 @@ You can simply call it like
 .SH EXAMPLE
 .PP
 Initial setup is very trivial.
-One should call init function and set at least one output.
+One should call init function and it will print to stderr by default.
 Output can also be customized with proper options, see
 .BR el_option (3)
 for more details.

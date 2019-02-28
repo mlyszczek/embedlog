@@ -16,20 +16,22 @@
 .br
 .BI "int el_putb(const void *" memory ", size_t " mlen ")"
 .br
-.BI "int el_print(const char *" file ", size_t " line ", \
+.BI "int el_print(const char *" file ", size_t " line ", const char *" func ", \
 enum el_level " level ", const char *" fmt ", " ... ")"
 .br
-.BI "int el_vprint(const char *" file ", size_t " line ", \
+.BI "int el_vprint(const char *" file ", size_t " line ", const char *" func ", \
 enum el_level " level ", const char *" fmt ", va_list " ap ")"
 .br
 .BI "int el_perror(const char *" file ", size_t " line ", \
-enum el_level " level ", const char *" fmt ", " ... ")"
+const char *" func ", enum el_level " level ", const char *" fmt ", " ... ")"
 .br
 .BI "int el_pmemory(const char *" file ", size_t " line ", \
-enum el_level " level ", const void *" memory ", size_t " mlen ")
+const char *" func ", enum el_level " level ", const void *" memory ", \
+size_t " mlen ")
 .br
 .BI "int el_pmemory_table(const char *" file ", size_t " line ", \
-enum el_level " level ", const void *" memory ", size_t " mlen ")
+const char *" func ", enum el_level " level ", const void *" memory ", \
+size_t " mlen ")
 .br
 .BI "int el_pbinary(enum el_level " level ", const void *" memory", \
 size_t " mlen ")
@@ -40,59 +42,59 @@ size_t " mlen ")
 size_t " mlen ")"
 .br
 .BI "int el_oprint(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const char *" fmt ", " ... ")"
 .br
 .BI "int el_ovprint(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const char *" fmt ", va_list " ap ")"
 .br
 .BI "int el_operror(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const char *" fmt ", " ... ")"
 .br
 .BI "int el_opmemory(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .br
 .BI "int el_opmemory_table(const char *" file ", size_t " line ", \
-enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .br
 .BI "int el_opbinary(enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
 .PP
-.BI "#define ELF " __FILE__ ", " __LINE__ ", " EL_FATAL
+.BI "#define ELF " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_FATAL
 .br
-.BI "#define ELA " __FILE__ ", " __LINE__ ", " EL_ALERT
+.BI "#define ELA " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_ALERT
 .br
-.BI "#define ELC " __FILE__ ", " __LINE__ ", " EL_CRIT
+.BI "#define ELC " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_CRIT
 .br
-.BI "#define ELE " __FILE__ ", " __LINE__ ", " EL_ERROR
+.BI "#define ELE " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_ERROR
 .br
-.BI "#define ELW " __FILE__ ", " __LINE__ ", " EL_WARN
+.BI "#define ELW " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_WARN
 .br
-.BI "#define ELN " __FILE__ ", " __LINE__ ", " EL_NOTICE
+.BI "#define ELN " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_NOTICE
 .br
-.BI "#define ELI " __FILE__ ", " __LINE__ ", " EL_INFO
+.BI "#define ELI " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_INFO
 .br
-.BI "#define ELD " __FILE__ ", " __LINE__ ", " EL_DBG
+.BI "#define ELD " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_DBG
 .PP
-.BI "#define OELF " __FILE__ ", " __LINE__ ", " EL_FATAL ", " EL_OPTIONS_OBJECT
+.BI "#define OELF " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_FATAL ", " EL_OPTIONS_OBJECT
 .br
-.BI "#define OELA " __FILE__ ", " __LINE__ ", " EL_ALERT ", " EL_OPTIONS_OBJECT
+.BI "#define OELA " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_ALERT ", " EL_OPTIONS_OBJECT
 .br
-.BI "#define OELC " __FILE__ ", " __LINE__ ", " EL_CRIT ", " EL_OPTIONS_OBJECT
+.BI "#define OELC " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_CRIT ", " EL_OPTIONS_OBJECT
 .br
-.BI "#define OELE " __FILE__ ", " __LINE__ ", " EL_ERROR ", " EL_OPTIONS_OBJECT
+.BI "#define OELE " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_ERROR ", " EL_OPTIONS_OBJECT
 .br
-.BI "#define OELW " __FILE__ ", " __LINE__ ", " EL_WARN ", " EL_OPTIONS_OBJECT
+.BI "#define OELW " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_WARN ", " EL_OPTIONS_OBJECT
 .br
-.BI "#define OELN " __FILE__ ", " __LINE__ ", " EL_NOTICE ", " EL_OPTIONS_OBJECT
+.BI "#define OELN " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_NOTICE ", " EL_OPTIONS_OBJECT
 .br
-.BI "#define OELI " __FILE__ ", " __LINE__ ", " EL_INFO ", " EL_OPTIONS_OBJECT
+.BI "#define OELI " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_INFO ", " EL_OPTIONS_OBJECT
 .br
-.BI "#define OELD " __FILE__ ", " __LINE__ ", " EL_DBG ", " EL_OPTIONS_OBJECT
+.BI "#define OELD " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_DBG ", " EL_OPTIONS_OBJECT
 .PP
 .BI "#define EL_DEBUG(" ... ") el_print(ELD, __VA_ARGS__)
 .PP
@@ -139,9 +141,12 @@ function behaves similar to standard
 function from the standard library, but it adds (if enabled) additional
 information, such as
 .I file
-and
+name,
 .I line
-number from where log is printed, log
+number or
+.I func
+name
+from where log has been printed, log
 .IR level ,
 and timestamp of the message.
 .I fmt
@@ -380,7 +385,7 @@ into single, short parameter.
 For example instead calling this
 .PP
 .nf
-    el_print(__FILE__, __LINE__, EL_NOTICE, "notice message number %d", num);
+    el_print(__FILE__, __LINE__, EL_FUNC_NAME, EL_NOTICE, "notice message number %d", num);
 .fi
 .PP
 you can simply call
@@ -401,8 +406,10 @@ If user defines
 .B NOFINFO
 in his project, all
 .B __FILE__
-and
+,
 .B __LINE__
+and
+.B EL_FUNC_NAME
 will be unconditionally set to
 .B NULL
 and
@@ -422,6 +429,17 @@ This is not possible on
 .B c89
 compiller due to absence of variadic variables in
 preprocesor macros.
+.PP
+.B EL_FUNC_NAME
+will work only on
+.B c99
+compilers, where
+.B __func__
+is defined, on
+.B c89
+compilers function name won't be printed, and setting
+.B EL_FUNCINFO
+won't help it.
 .SH RETURN VALUE
 .PP
 All functions return 0 when whole message has been successfuly printed to all
