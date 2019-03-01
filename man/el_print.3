@@ -191,6 +191,11 @@ Function accepts pointer to
 and
 .I mlen
 number of bytes caller wants to print.
+If
+.I mlen
+is 0, function won't print anything and will return
+.B EINVAL
+error.
 Function doesn't care what is under passed address, memory block may contain
 strings with null characters '\\0', integers, floats or even
 .B struct
