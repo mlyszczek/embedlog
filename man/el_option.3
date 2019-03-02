@@ -389,6 +389,23 @@ Input argument is different than 1 or 0
 .   RE
 .RE
 .PP
+.BI "EL_FUNCINFO (" int " funcinfo)"
+.RS
+If set to 1, adds information about function from which message has been
+printed in format [funcname()] or if
+.   B EL_FINFO
+is enabled [some_file.c:123:funcname()].
+Settint this to 0 will result in no function information.
+.   PP
+.   B ERRORS
+.   RS
+.       B EINVAL
+.       RS
+Input argument is different than 1 or 0
+.       RE
+.   RE
+.RE
+.PP
 .B EL_CUSTOM_PUTS (
 .I int (*el_custom_puts)(const char *s)
 .B )
