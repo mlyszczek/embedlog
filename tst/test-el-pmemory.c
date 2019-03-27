@@ -68,10 +68,11 @@ static char  logbuf[1024 * 1024];  /* output simulation */
 
 static int print_to_buffer
 (
-    const char  *s
+    const char  *s,
+    void        *user
 )
 {
-    strcat(logbuf, s);
+    strcat(user, s);
     return 0;
 }
 
@@ -83,7 +84,7 @@ static int print_to_buffer
 static void test_prepare(void)
 {
     el_init();
-    el_option(EL_CUSTOM_PUTS, print_to_buffer);
+    el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
     el_option(EL_PRINT_LEVEL, 0);
     el_option(EL_OUT, EL_OUT_CUSTOM);
     logbuf[0] = '\0';

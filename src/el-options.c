@@ -354,6 +354,7 @@ static int el_vooption
 
     case EL_CUSTOM_PUTS:
         options->custom_puts = va_arg(ap, el_custom_puts);
+        options->custom_puts_user = va_arg(ap, void *);
         return 0;
 
 #   endif /* ENABLE_OUT_CUSTOM */

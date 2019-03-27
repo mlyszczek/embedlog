@@ -144,7 +144,7 @@ enum el_option_timestamp_fractions
     EL_TS_FRACT_ERROR /* internal use onsly */
 };
 
-typedef int (*el_custom_puts)(const char *s);
+typedef int (*el_custom_puts)(const char *s, void *user);
 
 struct el_options
 {
@@ -173,6 +173,7 @@ struct el_options
     const char     *fname;
     const char     *prefix;
     el_custom_puts  custom_puts;
+    void           *custom_puts_user;
 };
 
 int el_init(void);

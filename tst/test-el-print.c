@@ -96,10 +96,11 @@ static struct rb  *expected_logs;        /* array of expected logs */
 
 static int print_to_buffer
 (
-    const char *s
+    const char *s,
+    void       *user
 )
 {
-    strcat(logbuf, s);
+    strcat(user, s);
     return 0;
 }
 
@@ -554,7 +555,7 @@ static void add_log
 static void test_prepare(void)
 {
     el_init();
-    el_option(EL_CUSTOM_PUTS, print_to_buffer);
+    el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
     el_option(EL_PRINT_LEVEL, 0);
     el_option(EL_OUT, EL_OUT_CUSTOM);
     memset(logbuf, 0, sizeof(logbuf));

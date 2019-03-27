@@ -133,7 +133,7 @@ int el_oputs
 #if ENABLE_OUT_CUSTOM
     if (options->outputs & EL_OUT_CUSTOM && options->custom_puts)
     {
-        rv |= options->custom_puts(s);
+        rv |= options->custom_puts(s, options->custom_puts_user);
     }
 #endif
 

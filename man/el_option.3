@@ -407,13 +407,19 @@ Input argument is different than 1 or 0
 .RE
 .PP
 .B EL_CUSTOM_PUTS (
-.I int (*el_custom_puts)(const char *s)
+.IB "int (*" el_custom_puts ")(const char *s, void *user)" ,
+.IB void\  *user
 .B )
 .RS
 Sets function pointer for custom message print.
 Function will receive complete messsage to print, just as it would be printed to
 ie. stderr or another facility.
-Function cannot fail, if NULL is passed, custom function won't be called.
+.I user
+pointer can be used to pass own logger object where data shall be sent.
+For example it may contain pointer to
+.B el_options
+struct, if you don't use global options struct.
+Function cannot fail. If NULL is passed, custom function won't be called.
 It is still mandatory to enable custom printing with
 .   BR el_option (3)
 .RE
