@@ -192,6 +192,7 @@ int el_perror(const char *file, size_t line, const char *func,
         enum el_level level, const char *fmt, ...);
 int el_putb(const void *memory, size_t mlen);
 int el_pbinary(enum el_level level, const void *memory, size_t mlen);
+const struct el_options *el_get_options(void);
 
 int el_oinit(struct el_options *options);
 int el_ocleanup(struct el_options *options);

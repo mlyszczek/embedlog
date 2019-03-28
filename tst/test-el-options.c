@@ -556,6 +556,21 @@ static void options_set_funcinfo(void)
 #endif
 }
 
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void options_get_global_options(void)
+{
+    const struct el_options *opts;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    opts = el_get_options();
+    mt_fail(opts == &g_options);
+}
+
+
 /* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
@@ -588,4 +603,5 @@ void el_options_test_group(void)
     mt_run(options_prefix);
     mt_run(options_global_options_after_options_cleanup);
     mt_run(options_set_funcinfo);
+    mt_run(options_get_global_options);
 }

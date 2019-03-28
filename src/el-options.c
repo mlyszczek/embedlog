@@ -541,3 +541,18 @@ int el_ooption
 
     return rc;
 }
+
+
+/* ==========================================================================
+    Returns const pointer to global options struct used by all el_ functions
+    that don't take options object.
+   ========================================================================== */
+
+
+const struct el_options *el_get_options
+(
+    void
+)
+{
+    return (const struct el_options *)&g_options;
+}

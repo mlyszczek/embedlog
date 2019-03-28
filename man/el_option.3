@@ -9,6 +9,8 @@
 .PP
 .BI "int el_option(enum el_option " option ", " ... ")"
 .br
+.B const struct el_options *el_get_options(void)
+.br
 .BI "int el_ooption(struct el_options *" options ", \
 enum el_option " option ", " ... ")"
 .SH DESCRIPTION
@@ -16,6 +18,12 @@ enum el_option " option ", " ... ")"
 .BR el_option (3)
 allows user to configure logger's internal options, to tune logging to users
 needs.
+.PP
+.BR el_get_options (3)
+allows user to get pointer to global embedlog object - that is used by all
+embedlog functions that don't accept
+.I options
+object - to directly read its options.
 .SH OPTIONS
 .PP
 Below is a list of
