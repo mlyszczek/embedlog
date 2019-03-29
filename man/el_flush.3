@@ -1,0 +1,80 @@
+.TH "el_flush" "3" "28 February 2019 (v0.5.0)" "bofc.pl"
+.SH NAME
+.PP
+.BR el_flush ,\  el_oflush
+- flush logs from all buffers to underlying devices.
+.SH SYNOPSIS
+.PP
+.BI "#include <embedlog.h>"
+.PP
+.BI "int el_flush(void)"
+.br
+.BI "int el_oflush(struct el_options *" options ")"
+.SH DESCRIPTION
+.PP
+.B embedlog
+(and underlying drivers, operating systems, libraries etc) to improve
+performance, may buffer message before commiting changes to actual device.
+And it's ok, there is really no need to waste resources every time you want to
+log 50 bytes of debug print on commiting message physically to the drive - or
+send via network.
+It's much more common to buffer messages in RAM until certain ammount of bytes
+are ready to send - and then send a bunch of data in one quick burst.
+But that behaviour is not always desired, like in situation in which we know we
+won't be printing logs for long time.
+For such situation explicit flush may in order.
+.PP
+.BR el_flush (3)
+flushes logs from all buffers to underlying device.
+For example, when logs are printed to file, logs are written through buffered
+.B stdio
+functions, which may result in some logs never being actually put into block
+device in case of abnormal application crash - that of course depends on
+settings like
+.BR EL_FSYNC_EVERY .
+This function will do everything what is in its power to make sure logs landed
+on underlying device.
+This applies to files, but also to logs with network output.
+.PP
+.BR el_oflush (3)
+works just the same, but accepts custom
+.I options
+as argument.
+.SH RETURN VALUE
+.PP
+Functions return 0 upon successful flush or -1 on errors.
+When -1 was returned there is no guarantee that data has landed on underlying
+device.
+.SH ERRORS
+.PP
+.BR el_flush (3)
+and
+.BR el_oflush (3)
+may return errors from functions like:
+.BR fflush (),\  fileno (),\  fsync (),\  fseek (),\  ftell (),\  fopen ()
+and/or
+.BR fclose ().
+.PP
+.BR el_oflush (3)
+may additionally return:
+.TP
+.B EINVAL
+Passed options object is not valid
+.SH SEE ALSO
+.PP
+.BR el_init (3),
+.BR el_overview (7),
+.BR el_option (3),
+.BR el_puts (3),
+.BR el_print (3),
+.BR el_vprint (3),
+.BR el_perror (3),
+.BR el_pmemory (3),
+.BR el_pmemory_table (3),
+.BR el_opmemory_table (3),
+.BR el_ooption (3),
+.BR el_oputs (3),
+.BR el_oprint (3),
+.BR el_ovprint (3),
+.BR el_operror (3),
+.BR el_opmemory (3).

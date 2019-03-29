@@ -94,6 +94,8 @@ size_t " mlen ")
 .BI "int el_pbinary(enum el_level " level ", const void *" memory ", \
 size_t " mlen ")
 .br
+.BI "int el_flush(void)"
+.br
 .B const struct el_options *el_get_options(void)
 .PP
 Each functions has its equivalent function but accepting
@@ -139,6 +141,8 @@ const void *" memory ", size_t " mlen ")"
 .br
 .BI "int el_opbinary(enum el_level " level ", struct el_options *" options ", \
 const void *" memory ", size_t " mlen ")"
+.br
+.BI "int el_oflush(struct el_options *" options ")"
 .PP
 For more information about a function open manual page with functions name from
 section 3 (ie. for el_oputs, you'd open
@@ -257,6 +261,8 @@ for more details.
 .BR el_cleanup (3),
 .BR el_option (3),
 .BR el_puts (3),
+.BR el_flush (3),
+.BR el_oflish (3),
 .BR el_print (3),
 .BR el_vprint (3),
 .BR el_perror (3),

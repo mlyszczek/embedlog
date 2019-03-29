@@ -292,6 +292,7 @@ int el_file_open(struct el_options *options);
 int el_file_puts(struct el_options *options, const char *s);
 int el_file_putb(struct el_options *options, const void *mem, size_t mlen);
 void el_file_cleanup(struct el_options *options);
+int el_file_flush(struct el_options *options);
 #endif
 
 
