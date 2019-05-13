@@ -65,6 +65,10 @@ extern "C" {
 #   define EL_FUNC_NAME NULL
 #endif
 
+/* enum values, new enums can be added, but values of already
+ * existing enums *must* stay unchanged, to keep ABI stable!
+ */
+
 enum el_output
 {
     EL_OUT_NONE   = 0x0000,
@@ -80,68 +84,88 @@ enum el_output
 
 enum el_level
 {
-    EL_FATAL,
-    EL_ALERT,
-    EL_CRIT,
-    EL_ERROR,
-    EL_WARN,
-    EL_NOTICE,
-    EL_INFO,
-    EL_DBG
+    EL_FATAL  = 0,
+    EL_ALERT  = 1,
+    EL_CRIT   = 2,
+    EL_ERROR  = 3,
+    EL_WARN   = 4,
+    EL_NOTICE = 5,
+    EL_INFO   = 6,
+    EL_DBG    = 7
 };
 
 enum el_option
 {
-    EL_LEVEL,
-    EL_OUT,
-    EL_COLORS,
-    EL_TS,
-    EL_TS_TM,
-    EL_TS_FRACT,
-    EL_PRINT_LEVEL,
-    EL_PRINT_NL,
-    EL_FINFO,
-    EL_FUNCINFO,
-    EL_CUSTOM_PUTS,
-    EL_TTY_DEV,
-    EL_PREFIX,
+    EL_LEVEL          = 0,
+    EL_OUT            = 1,
+    EL_COLORS         = 2,
+    EL_TS             = 3,
+    EL_TS_TM          = 4,
+    EL_TS_FRACT       = 5,
+    EL_PRINT_LEVEL    = 6,
+    EL_PRINT_NL       = 7,
+    EL_FINFO          = 8,
+    EL_FUNCINFO       = 9,
+    EL_CUSTOM_PUTS    = 10,
+    EL_TTY_DEV        = 11,
+    EL_PREFIX         = 12,
 
-    EL_FPATH,
-    EL_FROTATE_NUMBER,
-    EL_FROTATE_SIZE,
-    EL_FSYNC_EVERY,
-    EL_FSYNC_LEVEL,
+    EL_FPATH          = 13,
+    EL_FROTATE_NUMBER = 14,
+    EL_FROTATE_SIZE   = 15,
+    EL_FSYNC_EVERY    = 16,
+    EL_FSYNC_LEVEL    = 17,
 
-    EL_OPT_ERROR /* internal use only */
+    /* internal use only, should represent number of options, if
+     * you add option, increment this by one (or by the number of
+     * options you add).
+     */
+
+    EL_OPT_ERROR      = 18
 };
 
 enum el_option_timestamp
 {
-    EL_TS_OFF,
-    EL_TS_SHORT,
-    EL_TS_LONG,
+    EL_TS_OFF   = 0,
+    EL_TS_SHORT = 1,
+    EL_TS_LONG  = 2,
 
-    EL_TS_ERROR /* internal use only */
+    /* internal use only, should represent number of options, if
+     * you add option, increment this by one (or by the number of
+     * options you add).
+     */
+
+    EL_TS_ERROR = 3
 };
 
 enum el_option_timestamp_timer
 {
-    EL_TS_TM_TIME,
-    EL_TS_TM_CLOCK,
-    EL_TS_TM_REALTIME,
-    EL_TS_TM_MONOTONIC,
+    EL_TS_TM_TIME      = 0,
+    EL_TS_TM_CLOCK     = 1,
+    EL_TS_TM_REALTIME  = 2,
+    EL_TS_TM_MONOTONIC = 3,
 
-    EL_TS_TM_ERROR /* internal use only */
+    /* internal use only, should represent number of options, if
+     * you add option, increment this by one (or by the number of
+     * options you add).
+     */
+
+    EL_TS_TM_ERROR     = 4
 };
 
 enum el_option_timestamp_fractions
 {
-    EL_TS_FRACT_OFF,
-    EL_TS_FRACT_MS,
-    EL_TS_FRACT_US,
-    EL_TS_FRACT_NS,
+    EL_TS_FRACT_OFF   = 0,
+    EL_TS_FRACT_MS    = 1,
+    EL_TS_FRACT_US    = 2,
+    EL_TS_FRACT_NS    = 3,
 
-    EL_TS_FRACT_ERROR /* internal use onsly */
+    /* internal use only, should represent number of options, if
+     * you add option, increment this by one (or by the number of
+     * options you add).
+     */
+
+    EL_TS_FRACT_ERROR = 4
 };
 
 typedef int (*el_custom_puts)(const char *s, void *user);
