@@ -278,6 +278,21 @@ extern struct el_options g_options;
 
 
 /* ==========================================================================
+    ALL_OUTS is a mask of all implemented outputs. This is mask for *all*
+    implemented outputs - it doesn't matter if it's enabled during
+    compilation or not. This is used to return EINVAL value when user
+    provides any output that is not on that list (if specified output is on
+    that list but was not compiled, it will return ENODEV and it's done in
+    another check). This is basically an bitwise OR of all fields in enum
+    el_output
+   ========================================================================== */
+
+
+#define ALL_OUTS (EL_OUT_STDERR | EL_OUT_STDOUT | EL_OUT_SYSLOG | \
+    EL_OUT_FILE | EL_OUT_NET | EL_OUT_TTY | EL_OUT_CUSTOM)
+
+
+/* ==========================================================================
                ____                     __   _
               / __/__  __ ____   _____ / /_ (_)____   ____   _____
              / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/

@@ -196,13 +196,21 @@ static void options_file_sync_level_set(void)
 static void options_output(void)
 {
     int i;
+    int valid_outs = ALL_OUTS;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    for (i = 0; i != EL_OUT_ALL; ++i)
+    for (i = 0; i != ALL_OUTS + 100; ++i)
     {
         int ok = 1;
 
+        if (i > ALL_OUTS)
+        {
+            mt_ferr(el_option(EL_OUT, i), EINVAL);
+            continue;
+        }
+
 #ifndef ENABLE_OUT_STDERR
+        valid_outs &= ~EL_OUT_STDERR;
         if (i & EL_OUT_STDERR)
         {
             ok = 0;
@@ -210,6 +218,7 @@ static void options_output(void)
 #endif
 
 #ifndef ENABLE_OUT_STDERR
+        valid_outs &= ~EL_OUT_STDOUT;
         if (i & EL_OUT_STDOUT)
         {
             ok = 0;
@@ -218,6 +227,7 @@ static void options_output(void)
 
 
 #ifndef ENABLE_OUT_SYSLOG
+        valid_outs &= ~EL_OUT_SYSLOG;
         if (i & EL_OUT_SYSLOG)
         {
             ok = 0;
@@ -225,6 +235,7 @@ static void options_output(void)
 #endif
 
 #ifndef ENABLE_OUT_FILE
+        valid_outs &= ~EL_OUT_FILE;
         if (i & EL_OUT_FILE)
         {
             ok = 0;
@@ -232,6 +243,7 @@ static void options_output(void)
 #endif
 
 #ifndef ENABLE_OUT_NET
+        valid_outs &= ~EL_OUT_NET;
         if (i & EL_OUT_NET)
         {
             ok = 0;
@@ -239,6 +251,7 @@ static void options_output(void)
 #endif
 
 #ifndef ENABLE_OUT_TTY
+        valid_outs &= ~EL_OUT_TTY;
         if (i & EL_OUT_TTY)
         {
             ok = 0;
@@ -246,6 +259,7 @@ static void options_output(void)
 #endif
 
 #ifndef ENABLE_OUT_CUSTOM
+        valid_outs &= ~EL_OUT_CUSTOM;
         if (i & EL_OUT_CUSTOM)
         {
             ok = 0;
@@ -261,7 +275,8 @@ static void options_output(void)
         mt_ferr(el_option(EL_OUT, i), ENODEV);
     }
 
-    mt_ferr(el_option(EL_OUT, EL_OUT_ALL + 7), EINVAL);
+    mt_fok(el_option(EL_OUT, EL_OUT_ALL));
+    mt_fail(g_options.outputs == valid_outs);
 }
 
 
