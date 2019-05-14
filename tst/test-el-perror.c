@@ -143,22 +143,21 @@ static void perror_user_message(void)
    ========================================================================== */
 
 
-static void perror_custom_options_user_message(void)
+static void perror_custom_el_user_message(void)
 {
-    struct el_options  opts;
+    struct el  el;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_oinit(&opts);
-    el_ooption(&opts, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
-    el_ooption(&opts, EL_PRINT_LEVEL, 0);
-    el_ooption(&opts, EL_OUT, EL_OUT_CUSTOM);
+    el_oinit(&el);
+    el_ooption(&el, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+    el_ooption(&el, EL_PRINT_LEVEL, 0);
+    el_ooption(&el, EL_OUT, EL_OUT_CUSTOM);
 
     errno = 1;
-    el_operror(ELF, &opts, "additional message");
+    el_operror(ELF, &el, "additional message");
     mt_fok(strncmp(logbuf, "additional message\n"
         "errno num: 1, strerror: ", 43));
-
 }
 
 
@@ -179,5 +178,5 @@ void el_perror_test_group(void)
 
     mt_run(perror_no_message);
     mt_run(perror_user_message);
-    mt_run(perror_custom_options_user_message);
+    mt_run(perror_custom_el_user_message);
 }

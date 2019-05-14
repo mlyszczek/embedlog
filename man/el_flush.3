@@ -9,7 +9,7 @@
 .PP
 .BI "int el_flush(void)"
 .br
-.BI "int el_oflush(struct el_options *" options ")"
+.BI "int el_oflush(struct el *" el ")"
 .SH DESCRIPTION
 .PP
 .B embedlog
@@ -38,8 +38,8 @@ This applies to files, but also to logs with network output.
 .PP
 .BR el_oflush (3)
 works just the same, but accepts custom
-.I options
-as argument.
+.I el
+object as argument.
 .SH RETURN VALUE
 .PP
 Functions return 0 upon successful flush or -1 on errors.
@@ -59,7 +59,7 @@ and/or
 may additionally return:
 .TP
 .B EINVAL
-Passed options object is not valid
+Passed el object is not valid
 .SH SEE ALSO
 .PP
 .BR el_init (3),

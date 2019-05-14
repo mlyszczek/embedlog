@@ -170,7 +170,7 @@ enum el_option_timestamp_fractions
 
 typedef int (*el_custom_puts)(const char *s, void *user);
 
-struct el_options
+struct el
 {
     unsigned int    outputs:7;
     unsigned int    colors:1;
@@ -216,30 +216,30 @@ int el_perror(const char *file, size_t line, const char *func,
         enum el_level level, const char *fmt, ...);
 int el_putb(const void *memory, size_t mlen);
 int el_pbinary(enum el_level level, const void *memory, size_t mlen);
-const struct el_options *el_get_options(void);
+const struct el *el_get_el(void);
 int el_flush(void);
 
-int el_oinit(struct el_options *options);
-int el_ocleanup(struct el_options *options);
-int el_ooption(struct el_options *options, int option, ...);
-int el_oputs(struct el_options *options, const char *string);
+int el_oinit(struct el *el);
+int el_ocleanup(struct el *el);
+int el_ooption(struct el *el, int option, ...);
+int el_oputs(struct el *el, const char *string);
 int el_oprint(const char *file, size_t line, const char *func,
-        enum el_level level, struct el_options *options, const char *fnt, ...);
+        enum el_level level, struct el *el, const char *fnt, ...);
 int el_ovprint(const char *file, size_t line, const char *func,
-        enum el_level level, struct el_options *options, const char *fmt,
+        enum el_level level, struct el *el, const char *fmt,
         va_list ap);
 int el_opmemory(const char *file, size_t line, const char *func,
-        enum el_level level, struct el_options *options, const void *memory,
+        enum el_level level, struct el *el, const void *memory,
         size_t mlen);
 int el_opmemory_table(const char *file, size_t line, const char *func,
-        enum el_level level, struct el_options *options, const void *memory,
+        enum el_level level, struct el *el, const void *memory,
         size_t mlen);
 int el_operror(const char *file, size_t line, const char *func,
-        enum el_level level, struct el_options *options, const char *fmt, ...);
-int el_oputb(struct el_options *options, const void *memory, size_t mlen);
-int el_opbinary(enum el_level level, struct el_options *options,
+        enum el_level level, struct el *el, const char *fmt, ...);
+int el_oputb(struct el *el, const void *memory, size_t mlen);
+int el_opbinary(enum el_level level, struct el *el,
         const void *memory, size_t mlen);
-int el_oflush(struct el_options *options);
+int el_oflush(struct el *el);
 
 #ifdef __cplusplus
 }

@@ -159,7 +159,7 @@ static int print_check(void)
     {
         slevel = expected.level > EL_DBG ? EL_DBG : expected.level;
 
-        if (expected.level > g_options.level)
+        if (expected.level > g_el.level)
         {
             /*
              * log should not have been printed due to current log level
@@ -170,7 +170,7 @@ static int print_check(void)
             continue;
         }
 
-        if (g_options.colors)
+        if (g_el.colors)
         {
             if (strncmp(msg, color[slevel], 5) != 0)
             {
@@ -192,7 +192,7 @@ static int print_check(void)
          * check printing timestamp
          */
 
-        if (g_options.timestamp == EL_TS_LONG)
+        if (g_el.timestamp == EL_TS_LONG)
         {
             IS_CHAR('[');
             IS_DIGIT();
@@ -215,11 +215,11 @@ static int print_check(void)
             IS_DIGIT();
             IS_DIGIT();
 
-            if (g_options.timestamp_fractions)
+            if (g_el.timestamp_fractions)
             {
                 IS_CHAR('.');
 
-                for (i = 0; i != 3 * g_options.timestamp_fractions; ++i)
+                for (i = 0; i != 3 * g_el.timestamp_fractions; ++i)
                 {
                     IS_DIGIT();
                 }
@@ -228,11 +228,11 @@ static int print_check(void)
             IS_CHAR(']');
 
         }
-        else if (g_options.timestamp == EL_TS_SHORT)
+        else if (g_el.timestamp == EL_TS_SHORT)
         {
             IS_CHAR('[');
 
-            if (g_options.timestamp_fractions)
+            if (g_el.timestamp_fractions)
             {
                 while (*msg != '.')
                 {
@@ -241,7 +241,7 @@ static int print_check(void)
 
                 ++msg; /* skip the '.' character */
 
-                for (i = 0; i != 3 * g_options.timestamp_fractions; ++i)
+                for (i = 0; i != 3 * g_el.timestamp_fractions; ++i)
                 {
                     IS_DIGIT();
                 }
@@ -256,7 +256,7 @@ static int print_check(void)
 
             IS_CHAR(']');
         }
-        else if (g_options.timestamp == EL_TS_OFF)
+        else if (g_el.timestamp == EL_TS_OFF)
         {
             /*
              * we check for nothing here
@@ -275,7 +275,7 @@ static int print_check(void)
          * check printing file information
          */
 
-        if (g_options.finfo && expected.file != NULL && expected.line != 0)
+        if (g_el.finfo && expected.file != NULL && expected.line != 0)
         {
             char  expected_file[8192];
             char  f_func_info_separator;
@@ -320,7 +320,7 @@ static int print_check(void)
              * [file.c:2:foo()] instead of [file.c:2]
              */
 
-            f_func_info_separator = g_options.funcinfo ? ':' : ']';
+            f_func_info_separator = g_el.funcinfo ? ':' : ']';
 
             while (*msg != f_func_info_separator)
             {
@@ -359,9 +359,9 @@ static int print_check(void)
         /* check for function information
          */
 
-        if (g_options.funcinfo && expected.func != NULL)
+        if (g_el.funcinfo && expected.func != NULL)
         {
-            if (g_options.finfo == 0 || expected.file == NULL ||
+            if (g_el.finfo == 0 || expected.file == NULL ||
                     expected.line == 0)
             {
                 /* file info was not printed, so check for opening
@@ -409,9 +409,9 @@ static int print_check(void)
             IS_CHAR(']');
         }
 
-        if ((g_options.finfo && expected.file != NULL && expected.line != 0) ||
-             g_options.timestamp != EL_TS_OFF ||
-            (g_options.funcinfo && expected.func != NULL))
+        if ((g_el.finfo && expected.file != NULL && expected.line != 0) ||
+             g_el.timestamp != EL_TS_OFF ||
+            (g_el.funcinfo && expected.func != NULL))
         {
             /*
              * prefix or timestamp information  is  enabled,  in  that  case
@@ -428,7 +428,7 @@ static int print_check(void)
          * check printing log level
          */
 
-        if (g_options.print_log_level)
+        if (g_el.print_log_level)
         {
             if (*msg++ != levelstr[slevel])
             {
@@ -445,13 +445,13 @@ static int print_check(void)
          * check for prefix
          */
 
-        if (g_options.prefix)
+        if (g_el.prefix)
         {
             char expected_prefix[EL_PREFIX_LEN + 1] = {0};
             size_t expected_prefix_len;
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-            strncat(expected_prefix, g_options.prefix, EL_PREFIX_LEN);
+            strncat(expected_prefix, g_el.prefix, EL_PREFIX_LEN);
             expected_prefix_len = strlen(expected_prefix);
 
             if (strncmp(expected_prefix, msg, expected_prefix_len) != 0)
@@ -471,7 +471,7 @@ static int print_check(void)
 
         msg += msglen;
 
-        if (g_options.colors)
+        if (g_el.colors)
         {
             if (strncmp(msg, color[8], 4) != 0)
             {
@@ -489,7 +489,7 @@ static int print_check(void)
             msg += 4;
         }
 
-        if (g_options.print_newline)
+        if (g_el.print_newline)
         {
             if (*msg != '\n')
             {

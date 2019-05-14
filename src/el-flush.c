@@ -50,53 +50,53 @@ int el_flush
     void
 )
 {
-    return el_oflush(&g_options);
+    return el_oflush(&g_el);
 }
 
 
 /* ==========================================================================
-    Same as el_flush() but takes options as argument
+    Same as el_flush() but takes el object as argument
    ========================================================================== */
 
 
 int el_oflush
 (
-    struct el_options  *options    /* options defining printing style */
+    struct el  *el   /* options defining printing style */
 )
 {
-    int                 rv;        /* return value from function */
+    int         rv;  /* return value from function */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    VALID(EINVAL, options);
-    VALID(ENODEV, options->outputs != 0);
+    VALID(EINVAL, el);
+    VALID(ENODEV, el->outputs != 0);
 
     rv = 0;
 
 #if ENABLE_OUT_STDERR
-    if (options->outputs & EL_OUT_STDERR)
+    if (el->outputs & EL_OUT_STDERR)
     {
         rv |= fflush(stderr);
     }
 #endif
 
 #if ENABLE_OUT_STDERR
-    if (options->outputs & EL_OUT_STDOUT)
+    if (el->outputs & EL_OUT_STDOUT)
     {
         rv |= fflush(stdout);
     }
 #endif
 
 #if ENABLE_OUT_FILE
-    if (options->outputs & EL_OUT_FILE)
+    if (el->outputs & EL_OUT_FILE)
     {
-        rv |= el_file_flush(options);
+        rv |= el_file_flush(el);
     }
 #endif
 
 #if 0
-    if (options->outputs & EL_OUT_NET)
+    if (el->outputs & EL_OUT_NET)
     {
-        el_net_flush(options);
+        el_net_flush(el);
     }
 #endif
 

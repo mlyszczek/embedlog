@@ -57,7 +57,7 @@
    ========================================================================== */
 
 
-struct el_options g_options;
+struct el g_el;
 
 
 /* ==========================================================================
@@ -125,7 +125,7 @@ static const int VALID_OUTS = 0
 
 
 /* ==========================================================================
-    sets 'option' with 'ap' values in 'options' object.
+    sets 'option' with 'ap' values in 'el' object.
 
     errno
             EINVAL      option is invalid
@@ -136,14 +136,14 @@ static const int VALID_OUTS = 0
 
 static int el_vooption
 (
-    struct el_options  *options,  /* options object to set option to */
-    enum el_option      option,   /* option to set */
-    va_list             ap        /* option value(s) */
+    struct el      *el,          /* el object to set option to */
+    enum el_option  option,      /* option to set */
+    va_list         ap           /* option value(s) */
 )
 {
-    int          value_int;       /* ap value treated as integer */
-    long         value_long;      /* ap value treated as long */
-    const char  *value_str;       /* ap value treated as string */
+    int             value_int;   /* ap value treated as integer */
+    long            value_long;  /* ap value treated as long */
+    const char     *value_str;   /* ap value treated as string */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -154,13 +154,13 @@ static int el_vooption
     case EL_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int <= 7);
-        options->level = value_int;
+        el->level = value_int;
         return 0;
 
     case EL_FSYNC_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int <= 7);
-        options->file_sync_level = value_int;
+        el->file_sync_level = value_int;
         return 0;
 
     case EL_OUT:
@@ -168,28 +168,28 @@ static int el_vooption
         value_int = value_int == EL_OUT_ALL ? VALID_OUTS : value_int;
         VALID(EINVAL, (value_int & ~ALL_OUTS) == 0x00);
         VALID(ENODEV, (value_int & ~VALID_OUTS) == 0x00);
-        options->outputs = value_int;
+        el->outputs = value_int;
         return 0;
 
     case EL_PRINT_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
-        options->print_log_level = value_int;
+        el->print_log_level = value_int;
         return 0;
 
     case EL_PRINT_NL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
-        options->print_newline = value_int;
+        el->print_newline = value_int;
         return 0;
 
 #   if ENABLE_PREFIX
 
     case EL_PREFIX:
         value_str = va_arg(ap, const char *);
-        options->prefix = value_str;
+        el->prefix = value_str;
         return 0;
 
 #   endif /* ENABLE_PREFIX */
@@ -204,7 +204,7 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
-        options->colors = value_int;
+        el->colors = value_int;
         return 0;
 
 #   endif /* ENABLE_COLORS */
@@ -215,7 +215,7 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_ERROR);
 
-        options->timestamp = value_int;
+        el->timestamp = value_int;
         return 0;
 
 #       if ENABLE_FRACTIONS
@@ -224,7 +224,7 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_FRACT_ERROR);
 
-        options->timestamp_fractions = value_int;
+        el->timestamp_fractions = value_int;
         return 0;
 
 #       endif /* ENABLE_FRACTIONS */
@@ -246,7 +246,7 @@ static int el_vooption
         VALID(ENODEV, value_int != EL_TS_TM_CLOCK);
 #       endif
 
-        options->timestamp_timer = value_int;
+        el->timestamp_timer = value_int;
         return 0;
 
 #   endif /* ENABLE_TIMESTAMP */
@@ -257,7 +257,7 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
-        options->finfo = value_int;
+        el->finfo = value_int;
         return 0;
 
 #   endif /* ENABLE_FINFO */
@@ -279,7 +279,7 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
-        options->funcinfo = value_int;
+        el->funcinfo = value_int;
         return 0;
 
 #       endif /* __STDC_VERSION__ < 199901L */
@@ -291,8 +291,8 @@ static int el_vooption
     case EL_FPATH:
         value_str = va_arg(ap, const char *);
         VALID(EINVAL, value_str);
-        options->fname = value_str;
-        return el_file_open(options);
+        el->fname = value_str;
+        return el_file_open(el);
 
     case EL_FROTATE_NUMBER:
     {
@@ -302,10 +302,10 @@ static int el_vooption
 
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int >= 0);
-        previous_frotate = options->frotate_number;
-        options->frotate_number = value_int;
+        previous_frotate = el->frotate_number;
+        el->frotate_number = value_int;
 
-        if (previous_frotate == 0 && options->file)
+        if (previous_frotate == 0 && el->file)
         {
             /*
              * user turned on file rotation  when  file  is  already  opened
@@ -315,7 +315,7 @@ static int el_vooption
              * reopening
              */
 
-            return el_file_open(options);
+            return el_file_open(el);
         }
 
         return 0;
@@ -324,13 +324,13 @@ static int el_vooption
     case EL_FROTATE_SIZE:
         value_long = va_arg(ap, long);
         VALID(EINVAL, value_long >= 1);
-        options->frotate_size = value_long;
+        el->frotate_size = value_long;
         return 0;
 
     case EL_FSYNC_EVERY:
         value_long = va_arg(ap, long);
         VALID(EINVAL, value_long >= 0);
-        options->file_sync_every = value_long;
+        el->file_sync_every = value_long;
         return 0;
 
 #   endif  /* ENABLE_OUT_FILE */
@@ -346,7 +346,7 @@ static int el_vooption
 
         VALID(EINVAL, value_str);
 
-        return el_tty_open(options, value_str, speed);
+        return el_tty_open(el, value_str, speed);
     }
 
 #   endif /* ENABLE_OUT_TTY */
@@ -354,8 +354,8 @@ static int el_vooption
 #   if ENABLE_OUT_CUSTOM
 
     case EL_CUSTOM_PUTS:
-        options->custom_puts = va_arg(ap, el_custom_puts);
-        options->custom_puts_user = va_arg(ap, void *);
+        el->custom_puts = va_arg(ap, el_custom_puts);
+        el->custom_puts_user = va_arg(ap, void *);
         return 0;
 
 #   endif /* ENABLE_OUT_CUSTOM */
@@ -393,7 +393,7 @@ static int el_vooption
 
 
 /* ==========================================================================
-    initializes global options to default state
+    initializes global el object to default state
    ========================================================================== */
 
 
@@ -402,34 +402,34 @@ int el_init
     void
 )
 {
-    return el_oinit(&g_options);
+    return el_oinit(&g_el);
 }
 
 
 /* ==========================================================================
-    Sets options object to sane values
+    Sets el object to sane values
 
     errno
-            EINVAL      options is invalid (null)
+            EINVAL      el is invalid (null)
    ========================================================================== */
 
 
 int el_oinit
 (
-    struct el_options  *options  /* options object */
+    struct el  *el  /* el object */
 )
 {
-    VALID(EINVAL, options);
+    VALID(EINVAL, el);
 
-    memset(options, 0, sizeof(struct el_options));
-    options->outputs = EL_OUT_STDERR;
-    options->print_log_level = 1;
-    options->print_newline = 1;
-    options->level = EL_INFO;
-    options->level_current_msg = EL_DBG;
-    options->file_sync_level = EL_FATAL;
-    options->serial_fd = -1;
-    options->file_sync_every = 32768;
+    memset(el, 0, sizeof(struct el));
+    el->outputs = EL_OUT_STDERR;
+    el->print_log_level = 1;
+    el->print_newline = 1;
+    el->level = EL_INFO;
+    el->level_current_msg = EL_DBG;
+    el->file_sync_level = EL_FATAL;
+    el->serial_fd = -1;
+    el->file_sync_every = 32768;
     return 0;
 }
 
@@ -444,7 +444,7 @@ int el_cleanup
     void
 )
 {
-    return el_ocleanup(&g_options);
+    return el_ocleanup(&g_el);
 }
 
 
@@ -453,26 +453,26 @@ int el_cleanup
     el_init calls
 
     errno
-            EINVAL      options is invalid (null)
+            EINVAL      el is invalid (null)
    ========================================================================== */
 
 
 int el_ocleanup
 (
-    struct el_options  *options  /* options object */
+    struct el  *el  /* el object */
 )
 {
-    VALID(EINVAL, options);
+    VALID(EINVAL, el);
 
-    options->outputs = 0;
+    el->outputs = 0;
 #if ENABLE_OUT_FILE
-    el_file_cleanup(options);
+    el_file_cleanup(el);
 #endif
 
 #if ENABLE_OUT_TTY
-    if (options->serial_fd != -1)
+    if (el->serial_fd != -1)
     {
-        el_tty_close(options);
+        el_tty_close(el);
     }
 #endif
 
@@ -488,16 +488,16 @@ int el_ocleanup
 
 int el_log_allowed
 (
-    struct el_options  *options,   /* options object */
-    enum el_level       level      /* log level to check */
+    struct el      *el,    /* el object */
+    enum el_level   level  /* log level to check */
 )
 {
-    return options->level >= (int)level;
+    return el->level >= (int)level;
 }
 
 
 /* ==========================================================================
-    el_ooptions but for default g_options object
+    same as el_ooption but for default g_el object
    ========================================================================== */
 
 
@@ -512,7 +512,7 @@ int el_option
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     va_start(ap, (int)option);
-    rc = el_vooption(&g_options, option, ap);
+    rc = el_vooption(&g_el, option, ap);
     va_end(ap);
 
     return rc;
@@ -520,24 +520,24 @@ int el_option
 
 
 /* ==========================================================================
-    same as el_vooptions but accepts variadic arguments
+    same as el_voel but accepts variadic arguments
    ========================================================================== */
 
 
 int el_ooption
 (
-    struct el_options  *options,  /* options object to set option to */
-    int                 option,   /* option to set */
-                        ...       /* option value(s) */
+    struct el  *el,       /* el object to set option to */
+    int         option,   /* option to set */
+                ...       /* option value(s) */
 )
 {
-    va_list             ap;       /* variadic arguments */
-    int                 rc;       /* return code from el_voooption */
+    va_list     ap;       /* variadic arguments */
+    int         rc;       /* return code from el_voooption */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     va_start(ap, option);
-    rc = el_vooption(options, option, ap);
+    rc = el_vooption(el, option, ap);
     va_end(ap);
 
     return rc;
@@ -545,15 +545,15 @@ int el_ooption
 
 
 /* ==========================================================================
-    Returns const pointer to global options struct used by all el_ functions
-    that don't take options object.
+    Returns const pointer to global el struct used by all el_ functions
+    that don't take el object.
    ========================================================================== */
 
 
-const struct el_options *el_get_options
+const struct el *el_get_el
 (
     void
 )
 {
-    return (const struct el_options *)&g_options;
+    return (const struct el *)&g_el;
 }

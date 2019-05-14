@@ -54,7 +54,7 @@
    ========================================================================== */
 
 
-extern struct el_options g_options;
+extern struct el g_el;
 
 
 /* ==========================================================================
@@ -303,22 +303,22 @@ extern struct el_options g_options;
 
 
 #if ENABLE_OUT_FILE
-int el_file_open(struct el_options *options);
-int el_file_puts(struct el_options *options, const char *s);
-int el_file_putb(struct el_options *options, const void *mem, size_t mlen);
-void el_file_cleanup(struct el_options *options);
-int el_file_flush(struct el_options *options);
+int el_file_open(struct el *el);
+int el_file_puts(struct el *el, const char *s);
+int el_file_putb(struct el *el, const void *mem, size_t mlen);
+void el_file_cleanup(struct el *el);
+int el_file_flush(struct el *el);
 #endif
 
 
 #if ENABLE_OUT_TTY
-int el_tty_open(struct el_options *options, const char *dev, unsigned int speed);
-int el_tty_puts(struct el_options *options, const char *s);
-int el_tty_close(struct el_options *options);
+int el_tty_open(struct el *el, const char *dev, unsigned int speed);
+int el_tty_puts(struct el *el, const char *s);
+int el_tty_close(struct el *el);
 #endif
 
-int el_log_allowed(struct el_options *options, enum el_level level);
-size_t el_timestamp(struct el_options *options, void *buf, int binary);
+int el_log_allowed(struct el *el, enum el_level level);
+size_t el_timestamp(struct el *el, void *buf, int binary);
 
 #if LLONG_MAX
 size_t el_encode_number(unsigned long long number, void *out);

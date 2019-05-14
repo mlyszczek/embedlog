@@ -13,7 +13,7 @@ calls.
 .PP
 .BI "int el_cleanup(void)"
 .br
-.BI "int el_ocleanup(struct el_options *" options ")"
+.BI "int el_ocleanup(struct el *" el ")"
 .SH DESCRIPTION
 .PP
 .BR el_cleanup (3)
@@ -23,8 +23,8 @@ After clean up, library calls cannot be used without initialization.
 .PP
 .BR el_ocleanup (3)
 works just the same, but accepts custom
-.I options
-as argument.
+.I el
+object as argument.
 .SH RETURN VALUE
 .PP
 Functions return 0 upon successful cleanup or -1 on errors.
@@ -38,7 +38,7 @@ function cannot fail.
 may return:
 .TP
 .B EINVAL
-Passed options object is not valid
+Passed el object is not valid
 .SH SEE ALSO
 .PP
 .BR el_init (3),

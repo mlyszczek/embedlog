@@ -97,19 +97,19 @@ static void el_ts_clock_gettime
 
 size_t el_timestamp
 (
-    struct el_options  *options,  /* options defining printing style */
-    void               *b,        /* buffer where timestamp will be stored */
-    int                 binary    /* 1 if timestamp should be binary */
+    struct el  *el,     /* el defining printing style */
+    void       *b,      /* buffer where timestamp will be stored */
+    int         binary  /* 1 if timestamp should be binary */
 )
 {
 #if ENABLE_TIMESTAMP
-    time_t              s;        /* timestamp seconds */
-    long                ns;       /* timestamp nanoseconds */
-    size_t              tl;       /* timestamp length */
-    char               *buf;      /* b threated as known type */
+    time_t      s;      /* timestamp seconds */
+    long        ns;     /* timestamp nanoseconds */
+    size_t      tl;     /* timestamp length */
+    char       *buf;    /* b threated as known type */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (options->timestamp == EL_TS_OFF)
+    if (el->timestamp == EL_TS_OFF)
     {
         /*
          * user doesn't want us to print timestamp, that's fine
@@ -124,7 +124,7 @@ size_t el_timestamp
      * first we get seconds and nanoseconds from proper timer
      */
 
-    switch (options->timestamp_timer)
+    switch (el->timestamp_timer)
     {
 #   if ENABLE_REALTIME
 
@@ -181,7 +181,7 @@ size_t el_timestamp
          */
 #       if ENABLE_FRACTIONS
 
-        switch (options->timestamp_fractions)
+        switch (el->timestamp_fractions)
         {
         case EL_TS_FRACT_OFF:
             /*
@@ -226,7 +226,7 @@ size_t el_timestamp
          * then convert retrieved time into string timestamp
          */
 
-        if (options->timestamp == EL_TS_LONG)
+        if (el->timestamp == EL_TS_LONG)
         {
             struct tm   tm;   /* timestamp splitted */
             struct tm  *tmp;  /* timestamp splitted pointer */
@@ -260,7 +260,7 @@ size_t el_timestamp
          * if requested, add proper fractions of seconds
          */
 #   if ENABLE_FRACTIONS
-        switch (options->timestamp_fractions)
+        switch (el->timestamp_fractions)
         {
         case EL_TS_FRACT_OFF:
             /*
@@ -298,7 +298,7 @@ size_t el_timestamp
 
 #else  /* ENABLE_TIMESTAMP */
 
-    (void)options;
+    (void)el;
     (void)b;
     (void)binary;
     return 0;

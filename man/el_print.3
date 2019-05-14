@@ -36,32 +36,32 @@ size_t " mlen ")
 .BI "int el_pbinary(enum el_level " level ", const void *" memory", \
 size_t " mlen ")
 .PP
-.BI "int el_oputs(struct el_options *" options ", const char *" message ")"
+.BI "int el_oputs(struct el *" el ", const char *" message ")"
 .br
-.BI "int el_oputb(struct el_options *" options ", const void *" memory ", \
+.BI "int el_oputb(struct el *" el ", const void *" memory ", \
 size_t " mlen ")"
 .br
 .BI "int el_oprint(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const char *" fmt ", " ... ")"
 .br
 .BI "int el_ovprint(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const char *" fmt ", va_list " ap ")"
 .br
 .BI "int el_operror(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const char *" fmt ", " ... ")"
 .br
 .BI "int el_opmemory(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const void *" memory ", size_t " mlen ")"
 .br
 .BI "int el_opmemory_table(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const void *" memory ", size_t " mlen ")"
 .br
-.BI "int el_opbinary(enum el_level " level ", struct el_options *" options ", \
+.BI "int el_opbinary(enum el_level " level ", struct el *" el ", \
 const void *" memory ", size_t " mlen ")"
 .PP
 .BI "#define ELF " __FILE__ ", " __LINE__ ", " EL_FUNC_NAME ", " EL_FATAL
@@ -323,7 +323,9 @@ that is first byte is always the least significant byte.
 .B data
 is be whatever you want of any size.
 .BR el_pbinary (3)
-uses only timestamp and log level, rest of the options are simply ignores.
+uses only timestamp and log level, rest of the options in
+.I el
+are simply ignores.
 .PP
 .BR el_print (3),
 .BR el_vprint (3),
@@ -335,7 +337,7 @@ are filtered based on their
 .IR level .
 .PP
 All of above functions have their counterpart that also accepts custom
-.I options
+.I el
 object.
 This is useful if we want for example, print logs into one file, and program
 queries into another.
@@ -356,7 +358,7 @@ It usually is used with
 keyword like
 .PP
 .nf
-    extern struct el_options   log_foobar;
+    extern struct el  log_foobar;
     #define EL_OPTIONS_OBJECT &log_foobar
 .fi
 .PP
@@ -420,7 +422,7 @@ will be unconditionally set to
 and
 .B 0
 and no file information will be printed - even if it was enabled with
-.BR el_options (3).
+.BR el_option (3).
 .PP
 If user has access to
 .B c99

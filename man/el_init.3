@@ -2,29 +2,29 @@
 .SH NAME
 .PP
 .B el_init
-- initializes library and options for printing.
+- initializes library and el for printing.
 .SH SYNOPSIS
 .PP
 .B "#include <embedlog.h>"
 .PP
 .BI "int el_init(void)"
 .br
-.BI "int el_oinit(struct options *" options ")"
+.BI "int el_oinit(struct el *" el ")"
 .SH DESCRIPTION
 .PP
 There are two types of functions in
 .BR embedlog.
 Functions that use global static structure inside library, these functions don't
 accept
-.I options
-argument.
+.I el
+argument with options.
 .PP
-Another type are functions that accept
-.I options
+Another type are functions that accept additional
+.I el
 argument. These functions are prefixed with
 .BR el_o .
 .PP
-All functions (options or not) are "line" thread-safe (provided that
+All functions (el_o or not) are "line" thread-safe (provided that
 .B \-\-enable\-reentrant
 is turned on).
 That means library buffers whole line before it calls
@@ -47,19 +47,19 @@ implementation in your operating system.
 .BR el_init (3)
 initializes static global option structure. This option structure is used by all
 functions that don't accept
-.I options
-parameter.
+.I el
+object parameter.
 If you want to use only one instance of
 .BR embedlog ,
 this is the function you want to use.
 .PP
 .BR el_oinit (3)
 initializes only
-.I options
-structure passed to it.
+.I el
+struct passed to it.
 Functions that accepts
-.I options
-may be used.
+.I el
+object may be used.
 If you want to have multiple embedlog instances (ie. one for program logs,
 and one for queries) that stores logs differently - this is the function you
 want to use.
@@ -69,8 +69,8 @@ Both functions will return 0 upon success and -1 on errors.
 .SH ERRORS
 .TP
 .B EINVAL
-.I options
-is invalid (null).
+.I el
+object is invalid (null).
 .SH EXAMPLE
 .PP
 Note: error handling has been ommited for clarity sake
@@ -80,22 +80,22 @@ Note: error handling has been ommited for clarity sake
 
     int main(void)
     {
-        struct el_options opts;
+        struct el el;
 
-        /* initialize both default and opts */
+        /* initialize both default and custom el objects */
         el_init();
-        el_oinit(&opts);
+        el_oinit(&el);
 
-        /* make opts to print to file and stderr */
-        el_ooption(&opts, EL_OUT, EL_OUT_FILE | EL_OUT_STDERR);
-        el_ooption(&opts, EL_FPATH, "/tmp/test.log");
+        /* make el to print to file and stderr */
+        el_ooption(&el, EL_OUT, EL_OUT_FILE | EL_OUT_STDERR);
+        el_ooption(&el, EL_FPATH, "/tmp/test.log");
 
         /* print messages */
         el_print(ELI, "will print to stderr");
-        el_oprint(ELI, &opts, "will print to file /tmp/test.log and stderr");
+        el_oprint(ELI, &el, "will print to file /tmp/test.log and stderr");
 
         /* cleanup after any initialization code (like fopen) */
-        el_ocleanup(&opts);
+        el_ocleanup(&el);
         el_cleanup();
 
         return 0;

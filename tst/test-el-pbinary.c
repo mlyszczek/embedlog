@@ -136,7 +136,7 @@ static int pbinary_check(void)
     {
         slevel = expected.level > EL_DBG ? EL_DBG : expected.level;
 
-        if (expected.level > g_options.level)
+        if (expected.level > g_el.level)
         {
             /*
              * log should not have been printed due to current log level
@@ -170,7 +170,7 @@ static int pbinary_check(void)
          * check printing timestamp
          */
 
-        if (g_options.timestamp != EL_TS_OFF)
+        if (g_el.timestamp != EL_TS_OFF)
         {
 #   ifdef LLONG_MAX
             unsigned long long tmp;
@@ -200,7 +200,7 @@ static int pbinary_check(void)
              * fraction of seconds checks makes sense only when ts is set
              */
 
-            if (g_options.timestamp_fractions)
+            if (g_el.timestamp_fractions)
             {
 #   ifdef LLONG_MAX
                 unsigned long long usec;

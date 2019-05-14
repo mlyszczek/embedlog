@@ -96,53 +96,53 @@ size_t " mlen ")
 .br
 .BI "int el_flush(void)"
 .br
-.B const struct el_options *el_get_options(void)
+.B const struct el *el_get_el(void)
 .PP
-Each functions has its equivalent function but accepting
-.I options
-as argument.
+Each functions has its equivalent function that accepts
+.I el
+object as argument.
 This is helpful if we want to have more than one, separated loggers in a single
 program.
 Please see
 .BR el_option (3)
 for more information.
 .PP
-.BI "int el_oinit(struct el_options *" options ")"
+.BI "int el_oinit(struct el *" el ")"
 .br
-.BI "int el_ocleanup(struct el_options *" options ")"
+.BI "int el_ocleanup(struct el *" el ")"
 .br
-.BI "int el_ooption(struct el_options *" options ", enum el_option " option ", \
+.BI "int el_ooption(struct el *" el ", enum el_option " option ", \
 \&...)"
 .br
-.BI "int el_oputs(struct el_options *" options ", const char *" string ")"
+.BI "int el_oputs(struct el *" el ", const char *" string ")"
 .br
-.BI "int el_oputb(struct el_options *" options ", const void *" memory ", \
+.BI "int el_oputb(struct el *" el ", const void *" memory ", \
 size_t " mlen ")"
 .br
 .BI "int el_oprint(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const char *" fmt ", " ... ")"
 .br
 .BI "int el_ovprint(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const char *" fmt ", va_list " ap ")"
 .br
 .BI "int el_operror(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const char *" fmt ", " ... ")"
 .br
 .BI "int el_opmemory(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const void *" memory ", size_t " mlen ")"
 .br
 .BI "int el_opmemory_table(const char *" file ", size_t " line ", \
-const char *" func ", enum el_level " level ", struct el_options *" options ", \
+const char *" func ", enum el_level " level ", struct el *" el ", \
 const void *" memory ", size_t " mlen ")"
 .br
-.BI "int el_opbinary(enum el_level " level ", struct el_options *" options ", \
+.BI "int el_opbinary(enum el_level " level ", struct el *" el ", \
 const void *" memory ", size_t " mlen ")"
 .br
-.BI "int el_oflush(struct el_options *" options ")"
+.BI "int el_oflush(struct el *" el ")"
 .PP
 For more information about a function open manual page with functions name from
 section 3 (ie. for el_oputs, you'd open
@@ -187,8 +187,11 @@ You can simply call it like
     el_print(ELN, "Notice message");
 .EE
 .PP
-There are also equivalent macros for use with functions that also accepts
-.IR options .
+There are also equivalent macros for use with functions that also provides
+.I el
+object, so the can be used with
+.B el_o
+function family.
 To make these work, you need to provide
 .B EL_OPTIONS_OBJECT
 macro.
@@ -233,7 +236,7 @@ You can simply call it like
 .PP
 Initial setup is very trivial.
 One should call init function and it will print to stderr by default.
-Output can also be customized with proper options, see
+Output can also be customized with proper el object, see
 .BR el_option (3)
 for more details.
 .PP

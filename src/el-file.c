@@ -186,21 +186,21 @@ static int el_file_exists
 
 static int el_file_rotate
 (
-    struct el_options  *options
+    struct el     *el
 )
 {
-    unsigned int        i;       /* simple iterator for loop */
+    unsigned int   i;  /* simple iterator for loop */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    if (options->file)
+    if (el->file)
     {
-        fclose(options->file);
-        options->file = NULL;
+        fclose(el->file);
+        el->file = NULL;
     }
 
-    options->fcurrent_rotate++;
-    if (options->fcurrent_rotate == options->frotate_number)
+    el->fcurrent_rotate++;
+    if (el->fcurrent_rotate == el->frotate_number)
     {
         /*
          * it appears we used all rotating slots, reset counter and rename
@@ -214,9 +214,9 @@ static int el_file_rotate
          * disapear making space for new log
          */
 
-        options->fcurrent_rotate = options->frotate_number - 1;
+        el->fcurrent_rotate = el->frotate_number - 1;
 
-        if (options->frotate_number == 1)
+        if (el->frotate_number == 1)
         {
             /*
              * if frotate_number is equal to 1, this means only one file can
@@ -228,7 +228,7 @@ static int el_file_rotate
             goto skip_rotate;
         }
 
-        for (i = 1; i != options->frotate_number; ++i)
+        for (i = 1; i != el->frotate_number; ++i)
         {
             char  old_name[PATH_MAX + 1];  /* ie .2 suffix */
             char  new_name[PATH_MAX + 1];  /* ie .3 suffix */
@@ -241,8 +241,8 @@ static int el_file_rotate
              * here as well
              */
 
-            sprintf(old_name, "%s.%d", options->fname, i);
-            sprintf(new_name, "%s.%d", options->fname, i - 1);
+            sprintf(old_name, "%s.%d", el->fname, i);
+            sprintf(new_name, "%s.%d", el->fname, i - 1);
 
             rename(old_name, new_name);
 
@@ -267,16 +267,16 @@ skip_rotate:
      * passes there, it will pass here as well
      */
 
-    sprintf(options->current_log, "%s.%d",
-        options->fname, options->fcurrent_rotate);
+    sprintf(el->current_log, "%s.%d",
+        el->fname, el->fcurrent_rotate);
 
-    if ((options->file = fopen(options->current_log, "w")) == NULL)
+    if ((el->file = fopen(el->current_log, "w")) == NULL)
     {
-        options->fcurrent_rotate--;
+        el->fcurrent_rotate--;
         return -1;
     }
 
-    options->fpos = 0;
+    el->fpos = 0;
 
     return 0;
 }
@@ -299,34 +299,34 @@ skip_rotate:
 
 
 /* ==========================================================================
-    opens log file specified in options and sets file position, so we can
+    opens log file specified in el and sets file position, so we can
     track it.
    ========================================================================== */
 
 
 int el_file_open
 (
-    struct el_options  *options  /* options with file information */
+    struct el  *el  /* el object with file information */
 )
 {
-    if (options->current_log == NULL)
+    if (el->current_log == NULL)
     {
         /*
          * yes, we need to dynamically allocate memory here. It's because we
-         * need to keep current log privately in each of el_options  objects
+         * need to keep current log privately in each of el_el  objects
          * or there will be problems  in  embedded  systems  that  use  flat
          * memory.  Since when working with files, OS will always make  some
          * dynamic allocation, we will be doing one too.
          */
 
-        if ((options->current_log = malloc(PATH_MAX + 1)) == NULL)
+        if ((el->current_log = malloc(PATH_MAX + 1)) == NULL)
         {
             errno = ENOMEM;
             return -1;
         }
     }
 
-    if (options->file)
+    if (el->file)
     {
         /*
          * to prevent any memory leak in  case  of  double  open,  we  first
@@ -334,11 +334,11 @@ int el_file_open
          * user changes file name using EL_FPATH option,
          */
 
-        fclose(options->file);
-        options->file = NULL;
+        fclose(el->file);
+        el->file = NULL;
     }
 
-    if (options->frotate_number)
+    if (el->frotate_number)
     {
         FILE   *f;      /* opened file */
         int     i;      /* simple interator for loop */
@@ -354,10 +354,10 @@ int el_file_open
          * if there are less files).
          */
 
-        for (i = options->frotate_number - 1; i >= 0; --i)
+        for (i = el->frotate_number - 1; i >= 0; --i)
         {
-            pathl = snprintf(options->current_log, PATH_MAX + 1, "%s.%d",
-                options->fname, i);
+            pathl = snprintf(el->current_log, PATH_MAX + 1, "%s.%d",
+                el->fname, i);
 
             if (pathl > PATH_MAX)
             {
@@ -367,7 +367,7 @@ int el_file_open
                  * could result in some data lose on the disk.
                  */
 
-                options->current_log[0] = '\0';
+                el->current_log[0] = '\0';
                 errno = ENAMETOOLONG;
                 return -1;
             }
@@ -386,7 +386,7 @@ int el_file_open
                  * thus this path is not taken in such case.
                  */
 
-                if (el_file_exists(options->current_log) == 0)
+                if (el_file_exists(el->current_log) == 0)
                 {
                     /*
                      * current log file does not exist, this is not the file
@@ -396,7 +396,7 @@ int el_file_open
                     continue;
                 }
 
-                if (stat(options->current_log, &st) != 0)
+                if (stat(el->current_log, &st) != 0)
                 {
                     /*
                      * error while stating file, probably don't have  access
@@ -405,7 +405,7 @@ int el_file_open
                      * exit with error from stat.
                      */
 
-                    options->current_log[0] = '\0';
+                    el->current_log[0] = '\0';
                     return -1;
                 }
 
@@ -419,7 +419,7 @@ int el_file_open
                      * doesn't botter us later
                      */
 
-                    remove(options->current_log);
+                    remove(el->current_log);
                     continue;
                 }
             }
@@ -429,7 +429,7 @@ int el_file_open
              * a day
              */
 
-            if ((f = fopen(options->current_log, "a")) == NULL)
+            if ((f = fopen(el->current_log, "a")) == NULL)
             {
                 /*
                  * couldn't open file, probably directory doesn't exist,  or
@@ -450,7 +450,7 @@ int el_file_open
 
 #else /* HAVE_STAT */
 
-            if ((f = fopen(options->current_log, "a")) == NULL)
+            if ((f = fopen(el->current_log, "a")) == NULL)
             {
                 /*
                  * if we cannot open file, that means there is some kind  of
@@ -458,7 +458,7 @@ int el_file_open
                  * it's pointless to continue
                  */
 
-                options->current_log[0] = '\0';
+                el->current_log[0] = '\0';
                 return -1;
             }
 
@@ -478,9 +478,9 @@ int el_file_open
                  * simply return from the function
                  */
 
-                options->fcurrent_rotate = i;
-                options->fpos = ftell(f);
-                options->file = f;
+                el->fcurrent_rotate = i;
+                el->fpos = ftell(f);
+                el->file = f;
                 return 0;
             }
 
@@ -494,7 +494,7 @@ int el_file_open
                  */
 
                 fclose(f);
-                remove(options->current_log);
+                remove(el->current_log);
                 continue;
             }
 
@@ -505,9 +505,9 @@ int el_file_open
              * from the function
              */
 
-            options->fcurrent_rotate = i;
-            options->fpos = fsize;
-            options->file = f;
+            el->fcurrent_rotate = i;
+            el->fpos = fsize;
+            el->file = f;
             return 0;
         }
     }
@@ -516,19 +516,19 @@ int el_file_open
      * rotation is disabled, simply open file with append flag
      */
 
-    if (strlen(options->fname) > PATH_MAX)
+    if (strlen(el->fname) > PATH_MAX)
     {
-        options->current_log[0] = '\0';
+        el->current_log[0] = '\0';
         errno = ENAMETOOLONG;
         return -1;
     }
 
-    strcpy(options->current_log, options->fname);
+    strcpy(el->current_log, el->fname);
 
-    if ((options->file = fopen(options->current_log, "a")) == NULL)
+    if ((el->file = fopen(el->current_log, "a")) == NULL)
     {
         /*
-         * we couldn't open file, but don't set clear  options->current_log,
+         * we couldn't open file, but don't set clear  el->current_log,
          * we will try to reopen this file each time we print to file.  This
          * is usefull when user tries to open log file in  not-yet  existing
          * directory.  Error is of course returned to user is aware of  this
@@ -538,8 +538,8 @@ int el_file_open
         return -1;
     }
 
-    fseek(options->file, 0, SEEK_END);
-    options->fpos = ftell(options->file);
+    fseek(el->file, 0, SEEK_END);
+    el->fpos = ftell(el->file);
     return 0;
 }
 
@@ -552,7 +552,7 @@ int el_file_open
 
 int el_file_flush
 (
-    struct el_options    *options   /* printing options */
+    struct el  *el  /* printing options */
 )
 {
     /* file store operation has particular issue.  You can  like,  write
@@ -572,19 +572,19 @@ int el_file_flush
      */
 
 #if HAVE_FSYNC && HAVE_FILENO
-    int fd;  /* systems file descriptor for options->file */
+    int fd;  /* systems file descriptor for el->file */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #endif /* HAVE_FSYNC && HAVE_FILENO */
 
-    VALID(EINVAL, options);
-    VALID(EBADF, options->current_log);
-    VALID(EBADF, options->current_log[0] != '\0');
+    VALID(EINVAL, el);
+    VALID(EBADF, el->current_log);
+    VALID(EBADF, el->current_log[0] != '\0');
 
     /*
      * first flush data from stdio library buffers into kernel
      */
 
-    if (fflush(options->file) != 0)
+    if (fflush(el->file) != 0)
     {
         return -1;
     }
@@ -594,7 +594,7 @@ int el_file_flush
      * and then sync data into block device
      */
 
-    if ((fd = fileno(options->file)) < 0)
+    if ((fd = fileno(el->file)) < 0)
     {
         return -1;
     }
@@ -610,16 +610,16 @@ int el_file_flush
      * about data safety!
      */
 
-    fclose(options->file);
+    fclose(el->file);
 
-    if ((options->file = fopen(options->current_log, "a")) == NULL)
+    if ((el->file = fopen(el->current_log, "a")) == NULL)
     {
         errno = EBADF;
         return -1;
     }
 
-    fseek(options->file, 0, SEEK_END);
-    options->fpos = ftell(options->file);
+    fseek(el->file, 0, SEEK_END);
+    el->fpos = ftell(el->file);
 #endif /* HAVE_FSYNC && HAVE_FILENO */
 
 #ifdef RUN_TESTS
@@ -630,7 +630,7 @@ int el_file_flush
      * don't trigger another flush right after this one
      */
 
-    options->written_after_sync = 0;
+    el->written_after_sync = 0;
     return 0;
 }
 
@@ -643,17 +643,17 @@ int el_file_flush
 
 int el_file_putb
 (
-    struct el_options    *options,  /* printing options */
-    const void           *mem,      /* memory to 'put' into file */
-    size_t                mlen      /* size of buffer 'mlen' */
+    struct el    *el,   /* printing el */
+    const void   *mem,  /* memory to 'put' into file */
+    size_t        mlen  /* size of buffer 'mlen' */
 
 )
 {
     VALID(EINVAL, mem);
     VALID(EINVAL, mlen);
-    VALID(EINVAL, options);
-    VALID(EBADF, options->current_log);
-    VALID(EBADF, options->current_log[0] != '\0');
+    VALID(EINVAL, el);
+    VALID(EBADF, el->current_log);
+    VALID(EBADF, el->current_log[0] != '\0');
 
 
     /*
@@ -661,17 +661,17 @@ int el_file_putb
      * due to error or deliberate acion of user
      */
 
-    if (el_file_exists(options->current_log) == 0 || options->file == NULL)
+    if (el_file_exists(el->current_log) == 0 || el->file == NULL)
     {
-        if (el_file_open(options) != 0)
+        if (el_file_open(el) != 0)
         {
             return -1;
         }
     }
 
-    if (options->frotate_number)
+    if (el->frotate_number)
     {
-        if (options->fpos != 0 && options->fpos + mlen > options->frotate_size)
+        if (el->fpos != 0 && el->fpos + mlen > el->frotate_size)
         {
             /*
              * we get here only when frotate  is  enabled,  and  writing  to
@@ -681,13 +681,13 @@ int el_file_putb
              * files,  we  remove  the oldest one.
              */
 
-            if (el_file_rotate(options) != 0)
+            if (el_file_rotate(el) != 0)
             {
                 return -1;
             }
         }
 
-        if (mlen > options->frotate_size)
+        if (mlen > el->frotate_size)
         {
             /*
              * we can't fit message even in an empty file, in such  case  we
@@ -695,27 +695,27 @@ int el_file_putb
              * configured frotate_size
              */
 
-            mlen = options->frotate_size;
+            mlen = el->frotate_size;
         }
     }
 
-    if (fwrite(mem, mlen, 1, options->file) != 1)
+    if (fwrite(mem, mlen, 1, el->file) != 1)
     {
         return -1;
     }
 
-    options->fpos += mlen;
-    options->written_after_sync += mlen;
+    el->fpos += mlen;
+    el->written_after_sync += mlen;
 
-    if (options->written_after_sync >= options->file_sync_every ||
-        options->level_current_msg <= options->file_sync_level)
+    if (el->written_after_sync >= el->file_sync_every ||
+        el->level_current_msg <= el->file_sync_level)
     {
         /* we either written enough bytes to trigger flush, or log
          * level is high enough it triggers log flush to block
          * device
          */
 
-        return el_file_flush(options);
+        return el_file_flush(el);
     }
 
     return 0;
@@ -729,16 +729,16 @@ int el_file_putb
 
 int el_file_puts
 (
-    struct el_options  *options,  /* printing options */
-    const char         *s         /* string to 'put' into file */
+    struct el   *el,    /* printing options */
+    const char  *s      /* string to 'put' into file */
 )
 {
-    size_t              slen;     /* size of string 's' */
+    size_t       slen;  /* size of string 's' */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     slen = strlen(s);
-    return el_file_putb(options, (unsigned char *)s, slen);
+    return el_file_putb(el, (unsigned char *)s, slen);
 }
 
 
@@ -749,20 +749,20 @@ int el_file_puts
 
 void el_file_cleanup
 (
-    struct el_options  *options  /* file options */
+    struct el  *el  /* file options */
 )
 {
-    if (options->file)
+    if (el->file)
     {
-        fclose(options->file);
+        fclose(el->file);
     }
 
-    options->file = NULL;
+    el->file = NULL;
 
-    if (options->current_log)
+    if (el->current_log)
     {
-        options->current_log[0] = '\0';
-        free(options->current_log);
-        options->current_log = NULL;
+        el->current_log[0] = '\0';
+        free(el->current_log);
+        el->current_log = NULL;
     }
 }

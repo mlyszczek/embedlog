@@ -55,21 +55,21 @@
 
 static int el_ovperror
 (
-    const char         *file,     /* file name where log is printed */
-    size_t              num,      /* line number where log is printed */
-    const char         *func,     /* function name to print */
-    enum el_level       level,    /* log level to print message with */
-    struct el_options  *options,  /* options defining printing style */
-    const char         *fmt,      /* message format (see printf (3)) */
-    va_list             ap        /* additional parameters for fmt */
+    const char    *file,   /* file name where log is printed */
+    size_t         num,    /* line number where log is printed */
+    const char    *func,   /* function name to print */
+    enum el_level  level,  /* log level to print message with */
+    struct el     *el,     /* el defining printing style */
+    const char    *fmt,    /* message format (see printf (3)) */
+    va_list        ap      /* additional parameters for fmt */
 )
 {
-    int                 rc;       /* return code from el_print() */
-    unsigned long       e;        /* errno from upper layer */
+    int            rc;     /* return code from el_print() */
+    unsigned long  e;      /* errno from upper layer */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    VALID(EINVAL, options);
+    VALID(EINVAL, el);
 
     e = errno;
     rc = 0;
@@ -81,10 +81,10 @@ static int el_ovperror
          * otherwise only errno message will be printed
          */
 
-        rc |= el_ovprint(file, num, func, level, options, fmt, ap);
+        rc |= el_ovprint(file, num, func, level, el, fmt, ap);
     }
 
-    rc |= el_oprint(file, num, func, level, options,
+    rc |= el_oprint(file, num, func, level, el,
         "errno num: %lu, strerror: %s", e, strerror(e));
 
     /*
@@ -135,7 +135,7 @@ int el_perror
 
 
     va_start(ap, fmt);
-    rc = el_ovperror(file, num, func, level, &g_options, fmt, ap);
+    rc = el_ovperror(file, num, func, level, &g_el, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -143,28 +143,28 @@ int el_perror
 
 
 /* ==========================================================================
-    el_perror function with custom options
+    el_perror function with custom el
    ========================================================================== */
 
 
 int el_operror
 (
-    const char        *file,      /* file name where log is printed */
-    size_t             num,       /* line number where log is printed*/
-    const char        *func,      /* function name to print */
-    enum el_level      level,     /* log level to print message with */
-    struct el_options  *options,  /* options defining printing style */
-    const char        *fmt,       /* message format (see printf (3)) */
-                       ...        /* additional parameters for fmt */
+    const char    *file,   /* file name where log is printed */
+    size_t         num,    /* line number where log is printed*/
+    const char    *func,   /* function name to print */
+    enum el_level  level,  /* log level to print message with */
+    struct el     *el,     /* el defining printing style */
+    const char    *fmt,    /* message format (see printf (3)) */
+                   ...     /* additional parameters for fmt */
 )
 {
-    int                rc;        /* return code from el_operror() */
-    va_list            ap;     /* argument pointer for variadic variables */
+    int            rc;     /* return code from el_operror() */
+    va_list        ap;     /* argument pointer for variadic variables */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     va_start(ap, fmt);
-    rc = el_ovperror(file, num, func, level, options, fmt, ap);
+    rc = el_ovperror(file, num, func, level, el, fmt, ap);
     va_end(ap);
 
     return rc;

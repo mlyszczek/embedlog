@@ -9,21 +9,21 @@
 .PP
 .BI "int el_option(enum el_option " option ", " ... ")"
 .br
-.B const struct el_options *el_get_options(void)
+.B const struct el *el_get_el(void)
 .br
-.BI "int el_ooption(struct el_options *" options ", \
+.BI "int el_ooption(struct el *" el ", \
 enum el_option " option ", " ... ")"
 .SH DESCRIPTION
 .PP
 .BR el_option (3)
-allows user to configure logger's internal options, to tune logging to users
+allows user to configure logger's internal el object, to tune logging to users
 needs.
 .PP
-.BR el_get_options (3)
+.BR el_get_el (3)
 allows user to get pointer to global embedlog object - that is used by all
 embedlog functions that don't accept
-.I options
-object - to directly read its options.
+.I el
+object - to directly read its fields.
 .SH OPTIONS
 .PP
 Below is a list of
@@ -254,7 +254,7 @@ Input argument is invalid
 .       PP
 .       B ENOSYS
 .       RS
-Timestamp support was not compiled in and setting this options is disabled
+Timestamp support was not compiled in and setting this option is disabled.
 .       RE
 .   RE
 .RE
@@ -332,7 +332,7 @@ Specified timer source was not compiled in and is not available
 .PP
 .BI "EL_TS_FRACT (" enum " " el_option_timestamp_fraction " fraction)
 .RS
-This options controls how to display fractions of seconds.
+This option controls how to display fractions of seconds.
 If high resolution is not needed or not supported, it's best to set this to
 lowest resolution possible.
 Table will show exacly what this is about.
@@ -425,8 +425,8 @@ ie. stderr or another facility.
 .I user
 pointer can be used to pass own logger object where data shall be sent.
 For example it may contain pointer to
-.B el_options
-struct, if you don't use global options struct.
+.B el
+struct, if you don't use global el struct.
 Function cannot fail. If NULL is passed, custom function won't be called.
 It is still mandatory to enable custom printing with
 .   BR el_option (3)

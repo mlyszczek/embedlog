@@ -49,13 +49,13 @@
 
 int el_tty_open
 (
-    struct el_options  *options,  /* store serial file descriptor here */
-    const char         *dev,      /* device to open like /dev/ttyS0 */
-    speed_t             speed     /* serial port baud rate */
+    struct el      *el,    /* store serial file descriptor here */
+    const char     *dev,   /* device to open like /dev/ttyS0 */
+    speed_t         speed  /* serial port baud rate */
 )
 {
-    struct termios      tty;      /* serial port settings */
-    int                 e;        /* holder for errno */
+    struct termios  tty;   /* serial port settings */
+    int             e;     /* holder for errno */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -65,9 +65,9 @@ int el_tty_open
      * socket first
      */
 
-    el_tty_close(options);
+    el_tty_close(el);
 
-    if ((options->serial_fd = open(dev, O_WRONLY | O_NOCTTY | O_SYNC)) < 0)
+    if ((el->serial_fd = open(dev, O_WRONLY | O_NOCTTY | O_SYNC)) < 0)
     {
         return -1;
     }
@@ -92,7 +92,7 @@ int el_tty_open
         return 0;
     }
 
-    if (tcgetattr(options->serial_fd, &tty) != 0)
+    if (tcgetattr(el->serial_fd, &tty) != 0)
     {
         goto error;
     }
@@ -111,7 +111,7 @@ int el_tty_open
     tty.c_cflag &= ~CREAD;  /* disable receiver - we only send data */
     tty.c_oflag |= OPOST | ONLCR;   /* enable output post-processing by OS */
 
-    if (tcsetattr(options->serial_fd, TCSANOW, &tty) != 0)
+    if (tcsetattr(el->serial_fd, TCSANOW, &tty) != 0)
     {
         goto error;
     }
@@ -120,8 +120,8 @@ int el_tty_open
 
 error:
     e = errno;
-    close(options->serial_fd);
-    options->serial_fd = -1;
+    close(el->serial_fd);
+    el->serial_fd = -1;
     errno = e;
     return -1;
 
@@ -140,27 +140,27 @@ error:
 
 int el_tty_close
 (
-    struct el_options  *options  /* options object with serial descriptor */
+    struct el  *el  /* el object with serial descriptor */
 )
 {
-    VALID(EINVAL, options->serial_fd != -1);
+    VALID(EINVAL, el->serial_fd != -1);
 
-    close(options->serial_fd);
-    options->serial_fd = -1;
+    close(el->serial_fd);
+    el->serial_fd = -1;
     return 0;
 }
 
 
 /* ==========================================================================
-    Simply sends string pointed by s to serial port configured in options
+    Simply sends string pointed by s to serial port configured in el
    ========================================================================== */
 
 
 int el_tty_puts
 (
-    struct el_options  *options,  /* options object with serial descriptor */
+    struct el  *el,  /* el object with serial descriptor */
     const char         *s         /* string to send */
 )
 {
-    return write(options->serial_fd, s, strlen(s));
+    return write(el->serial_fd, s, strlen(s));
 }

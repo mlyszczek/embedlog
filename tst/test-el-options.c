@@ -38,8 +38,8 @@
    ========================================================================== */
 
 
-mt_defs_ext();                        /* external variables for mtest */
-extern struct el_options  g_options;  /* global embedlog options */
+mt_defs_ext();           /* external variables for mtest */
+extern struct el  g_el;  /* global embedlog el */
 
 
 /* ==========================================================================
@@ -86,41 +86,41 @@ static void test_cleanup(void)
 
 static void options_init(void)
 {
-    struct el_options          default_options; /* expected default options */
-    struct el_options          options;         /* custom options to init */
+    struct el  default_el;  /* expected default el */
+    struct el  el;          /* custom el to init */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    memset(&default_options, 0, sizeof(default_options));
-    default_options.outputs             = EL_OUT_STDERR;
-    default_options.level               = EL_INFO;
-    default_options.file_sync_level     = EL_FATAL;
-    default_options.level_current_msg   = EL_DBG;
-    default_options.colors              = 0;
-    default_options.timestamp           = EL_TS_OFF;
-    default_options.timestamp_timer     = EL_TS_TM_TIME;
-    default_options.timestamp_fractions = EL_TS_FRACT_OFF;
-    default_options.print_log_level     = 1;
-    default_options.print_newline       = 1;
-    default_options.custom_puts         = NULL;
-    default_options.serial_fd           = -1;
+    memset(&default_el, 0, sizeof(default_el));
+    default_el.outputs             = EL_OUT_STDERR;
+    default_el.level               = EL_INFO;
+    default_el.file_sync_level     = EL_FATAL;
+    default_el.level_current_msg   = EL_DBG;
+    default_el.colors              = 0;
+    default_el.timestamp           = EL_TS_OFF;
+    default_el.timestamp_timer     = EL_TS_TM_TIME;
+    default_el.timestamp_fractions = EL_TS_FRACT_OFF;
+    default_el.print_log_level     = 1;
+    default_el.print_newline       = 1;
+    default_el.custom_puts         = NULL;
+    default_el.serial_fd           = -1;
 
-    default_options.funcinfo            = 0;
-    default_options.finfo               = 0;
-    default_options.frotate_number      = 0;
-    default_options.fcurrent_rotate     = 0;
-    default_options.frotate_size        = 0;
-    default_options.fpos                = 0;
-    default_options.file                = NULL;
-    default_options.file_sync_every     = 32768;
-    default_options.fname               = NULL;
+    default_el.funcinfo            = 0;
+    default_el.finfo               = 0;
+    default_el.frotate_number      = 0;
+    default_el.fcurrent_rotate     = 0;
+    default_el.frotate_size        = 0;
+    default_el.fpos                = 0;
+    default_el.file                = NULL;
+    default_el.file_sync_every     = 32768;
+    default_el.fname               = NULL;
 
-    mt_fail(el_oinit(&options) == 0);
-    mt_fail(memcmp(&options, &default_options, sizeof(options)) == 0);
-    mt_fail(el_ocleanup(&options) == 0);
+    mt_fail(el_oinit(&el) == 0);
+    mt_fail(memcmp(&el, &default_el, sizeof(el)) == 0);
+    mt_fail(el_ocleanup(&el) == 0);
 
     mt_fail(el_init() == 0);
-    mt_fail(memcmp(&g_options, &default_options, sizeof(default_options)) == 0);
+    mt_fail(memcmp(&g_el, &default_el, sizeof(default_el)) == 0);
     mt_fail(el_cleanup() == 0);
 }
 
@@ -152,12 +152,12 @@ static void options_level_set(void)
         if (i <= EL_DBG)
         {
             mt_fail(el_option(EL_LEVEL, i) == 0);
-            mt_fail(g_options.level == i);
+            mt_fail(g_el.level == i);
         }
         else
         {
             mt_ferr(el_option(EL_LEVEL, i), EINVAL);
-            mt_fail(g_options.level == EL_DBG);
+            mt_fail(g_el.level == EL_DBG);
         }
     }
 }
@@ -178,12 +178,12 @@ static void options_file_sync_level_set(void)
         if (i <= EL_DBG)
         {
             mt_fail(el_option(EL_FSYNC_LEVEL, i) == 0);
-            mt_fail(g_options.file_sync_level == i);
+            mt_fail(g_el.file_sync_level == i);
         }
         else
         {
             mt_ferr(el_option(EL_FSYNC_LEVEL, i), EINVAL);
-            mt_fail(g_options.file_sync_level == EL_DBG);
+            mt_fail(g_el.file_sync_level == EL_DBG);
         }
     }
 }
@@ -276,7 +276,7 @@ static void options_output(void)
     }
 
     mt_fok(el_option(EL_OUT, EL_OUT_ALL));
-    mt_fail(g_options.outputs == valid_outs);
+    mt_fail(g_el.outputs == valid_outs);
 }
 
 
@@ -286,17 +286,17 @@ static void options_output(void)
 
 static void options_log_allowed(void)
 {
-    g_options.level = EL_ERROR;
-    g_options.outputs = EL_OUT_STDERR;
+    g_el.level = EL_ERROR;
+    g_el.outputs = EL_OUT_STDERR;
 
-    mt_fail(el_log_allowed(&g_options, EL_FATAL)  == 1);
-    mt_fail(el_log_allowed(&g_options, EL_ALERT)  == 1);
-    mt_fail(el_log_allowed(&g_options, EL_CRIT)   == 1);
-    mt_fail(el_log_allowed(&g_options, EL_ERROR)  == 1);
-    mt_fail(el_log_allowed(&g_options, EL_WARN)   == 0);
-    mt_fail(el_log_allowed(&g_options, EL_NOTICE) == 0);
-    mt_fail(el_log_allowed(&g_options, EL_INFO)   == 0);
-    mt_fail(el_log_allowed(&g_options, EL_DBG)    == 0);
+    mt_fail(el_log_allowed(&g_el, EL_FATAL)  == 1);
+    mt_fail(el_log_allowed(&g_el, EL_ALERT)  == 1);
+    mt_fail(el_log_allowed(&g_el, EL_CRIT)   == 1);
+    mt_fail(el_log_allowed(&g_el, EL_ERROR)  == 1);
+    mt_fail(el_log_allowed(&g_el, EL_WARN)   == 0);
+    mt_fail(el_log_allowed(&g_el, EL_NOTICE) == 0);
+    mt_fail(el_log_allowed(&g_el, EL_INFO)   == 0);
+    mt_fail(el_log_allowed(&g_el, EL_DBG)    == 0);
 }
 
 
@@ -307,9 +307,9 @@ static void options_log_allowed(void)
 static void options_opt_print_level(void)
 {
     mt_fail(el_option(EL_PRINT_LEVEL, 0) == 0);
-    mt_fail(g_options.print_log_level == 0);
+    mt_fail(g_el.print_log_level == 0);
     mt_fail(el_option(EL_PRINT_LEVEL, 1) == 0);
-    mt_fail(g_options.print_log_level == 1);
+    mt_fail(g_el.print_log_level == 1);
 
     errno = 0;
     mt_fail(el_option(EL_PRINT_LEVEL, 2) == -1);
@@ -328,9 +328,9 @@ static void options_opt_colors(void)
 {
 #if ENABLE_COLORS
     mt_fok(el_option(EL_COLORS, 0));
-    mt_fail(g_options.colors == 0);
+    mt_fail(g_el.colors == 0);
     mt_fok(el_option(EL_COLORS, 1));
-    mt_fail(g_options.colors == 1);
+    mt_fail(g_el.colors == 1);
 
     mt_ferr(el_option(EL_COLORS, 2), EINVAL);
     mt_ferr(el_option(EL_COLORS, 3), EINVAL);
@@ -356,7 +356,7 @@ static void options_opt_timestamp(void)
     {
 #if ENABLE_TIMESTAMP
         mt_fok(el_option(EL_TS, i));
-        mt_fail(g_options.timestamp == i);
+        mt_fail(g_el.timestamp == i);
 #else
         mt_ferr(el_option(EL_TS, i), ENOSYS);
 #endif
@@ -409,7 +409,7 @@ static void options_opt_timestamp_timer(void)
 #   endif
 
         mt_fok(el_option(EL_TS_TM, i));
-        mt_fail(g_options.timestamp_timer == i);
+        mt_fail(g_el.timestamp_timer == i);
 #else
         mt_ferr(el_option(EL_TS, i), ENOSYS);
 #endif
@@ -437,7 +437,7 @@ static void options_opt_timestamp_fraction(void)
     {
 #if ENABLE_FRACTIONS && ENABLE_TIMESTAMP
         mt_fok(el_option(EL_TS_FRACT, i));
-        mt_fail(g_options.timestamp_fractions == i);
+        mt_fail(g_el.timestamp_fractions == i);
 #else
         mt_ferr(el_option(EL_TS_FRACT, i), ENOSYS);
 #endif
@@ -456,7 +456,7 @@ static void options_opt_timestamp_fraction(void)
 
 static void options_ooption_test(void)
 {
-    struct el_options  opts;
+    struct el  opts;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -477,13 +477,13 @@ static void options_prefix(void)
 {
     el_option(EL_PREFIX, "prefix");
 #if ENABLE_PREFIX
-    mt_fok(strcmp("prefix", g_options.prefix));
+    mt_fok(strcmp("prefix", g_el.prefix));
 #else
-    mt_fail(g_options.prefix == NULL);
+    mt_fail(g_el.prefix == NULL);
 #endif
 
     el_option(EL_PREFIX, NULL);
-    mt_fail(g_options.prefix == NULL);
+    mt_fail(g_el.prefix == NULL);
 }
 
 
@@ -501,51 +501,51 @@ static void options_einval(void)
    ========================================================================== */
 
 
-static void options_global_options_after_options_cleanup(void)
+static void options_global_el_after_el_cleanup(void)
 {
-    struct el_options  default_options; /* expected default options */
-    struct el_options  options;         /* custom options to init */
+    struct el  default_el; /* expected default el */
+    struct el  el;         /* custom el to init */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    memset(&default_options, 0, sizeof(default_options));
-    default_options.outputs             = EL_OUT_STDERR;
-    default_options.level               = EL_INFO;
-    default_options.file_sync_level     = EL_FATAL;
-    default_options.level_current_msg   = EL_DBG;
-    default_options.colors              = 0;
-    default_options.timestamp           = EL_TS_OFF;
-    default_options.timestamp_timer     = EL_TS_TM_TIME;
-    default_options.timestamp_fractions = EL_TS_FRACT_OFF;
-    default_options.print_log_level     = 1;
-    default_options.print_newline       = 1;
-    default_options.custom_puts         = NULL;
-    default_options.serial_fd           = -1;
+    memset(&default_el, 0, sizeof(default_el));
+    default_el.outputs             = EL_OUT_STDERR;
+    default_el.level               = EL_INFO;
+    default_el.file_sync_level     = EL_FATAL;
+    default_el.level_current_msg   = EL_DBG;
+    default_el.colors              = 0;
+    default_el.timestamp           = EL_TS_OFF;
+    default_el.timestamp_timer     = EL_TS_TM_TIME;
+    default_el.timestamp_fractions = EL_TS_FRACT_OFF;
+    default_el.print_log_level     = 1;
+    default_el.print_newline       = 1;
+    default_el.custom_puts         = NULL;
+    default_el.serial_fd           = -1;
 
-    default_options.funcinfo            = 0;
-    default_options.finfo               = 0;
-    default_options.frotate_number      = 0;
-    default_options.fcurrent_rotate     = 0;
-    default_options.frotate_size        = 0;
-    default_options.fpos                = 0;
-    default_options.file                = NULL;
-    default_options.file_sync_every     = 32768;
-    default_options.fname               = NULL;
+    default_el.funcinfo            = 0;
+    default_el.finfo               = 0;
+    default_el.frotate_number      = 0;
+    default_el.fcurrent_rotate     = 0;
+    default_el.frotate_size        = 0;
+    default_el.fpos                = 0;
+    default_el.file                = NULL;
+    default_el.file_sync_every     = 32768;
+    default_el.fname               = NULL;
 
 
     el_init();
-    el_oinit(&options);
-    mt_fail(memcmp(&g_options, &default_options, sizeof(default_options)) == 0);
-    mt_fail(g_options.outputs == EL_OUT_STDERR);
-    mt_fail(options.outputs == EL_OUT_STDERR);
+    el_oinit(&el);
+    mt_fail(memcmp(&g_el, &default_el, sizeof(default_el)) == 0);
+    mt_fail(g_el.outputs == EL_OUT_STDERR);
+    mt_fail(el.outputs == EL_OUT_STDERR);
 
-    el_ocleanup(&options);
+    el_ocleanup(&el);
 
-    /* global options should not be altered when el_ocleanup is called
+    /* global el should not be altered when el_ocleanup is called
      */
 
-    mt_fail(memcmp(&g_options, &default_options, sizeof(default_options)) == 0);
-    mt_fail(options.outputs == 0);
+    mt_fail(memcmp(&g_el, &default_el, sizeof(default_el)) == 0);
+    mt_fail(el.outputs == 0);
 }
 
 
@@ -557,9 +557,9 @@ static void options_set_funcinfo(void)
 {
 #if ENABLE_FUNCINFO && (__STDC_VERSION__ >= 199901L)
     mt_fok(el_option(EL_FUNCINFO, 0));
-    mt_fail(g_options.funcinfo == 0);
+    mt_fail(g_el.funcinfo == 0);
     mt_fok(el_option(EL_FUNCINFO, 1));
-    mt_fail(g_options.funcinfo == 1);
+    mt_fail(g_el.funcinfo == 1);
 
     mt_ferr(el_option(EL_FUNCINFO, 2), EINVAL);
     mt_ferr(el_option(EL_FUNCINFO, 3), EINVAL);
@@ -576,13 +576,13 @@ static void options_set_funcinfo(void)
    ========================================================================== */
 
 
-static void options_get_global_options(void)
+static void options_get_global_el(void)
 {
-    const struct el_options *opts;
+    const struct el *opts;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    opts = el_get_options();
-    mt_fail(opts == &g_options);
+    opts = el_get_el();
+    mt_fail(opts == &g_el);
 }
 
 
@@ -616,7 +616,7 @@ void el_options_test_group(void)
     mt_run(options_ooption_test);
     mt_run(options_einval);
     mt_run(options_prefix);
-    mt_run(options_global_options_after_options_cleanup);
+    mt_run(options_global_el_after_el_cleanup);
     mt_run(options_set_funcinfo);
-    mt_run(options_get_global_options);
+    mt_run(options_get_global_el);
 }

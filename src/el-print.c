@@ -153,13 +153,13 @@ static const char *color[] =
 
 static size_t el_color
 (
-    struct el_options  *options,  /* options defining printing style */
-    char               *buf,      /* buffer where to store color info */
-    int                 level     /* log level or 8 for reset */
+    struct el  *el,    /* el defining printing style */
+    char       *buf,   /* buffer where to store color info */
+    int         level  /* log level or 8 for reset */
 )
 {
 #if ENABLE_COLORS
-    if (options->colors == 0)
+    if (el->colors == 0)
     {
         /*
          * no colors, you got it!
@@ -215,25 +215,25 @@ static const char *el_basename
 
 /* ==========================================================================
     stores file and line information in 'buf'.  Number of  bytes  stored  in
-    'buf' is returned, if file info is disabled  during  compilation  or  in
-    runtime options 0 is returned
+    'buf' is returned. If file info is disabled  during  compilation  or  in
+    runtime, value 0 is returned
    ========================================================================== */
 
 
 static size_t el_finfo
 (
-    struct el_options  *options,  /* options defining printing style */
-    char               *buf,      /* location whre to store file information */
-    const char         *file,     /* path to file - will be basenamed */
-    int                 num       /* line number (max 99999) */
+    struct el    *el,    /* el defining printing style */
+    char         *buf,   /* location whre to store file information */
+    const char   *file,  /* path to file - will be basenamed */
+    int           num    /* line number (max 99999) */
 )
 {
 #if ENABLE_FINFO
-    const char      *base;     /* basenem of the 'file' */
-    size_t           fl;       /* number of bytes stored in 'buf' */
+    const char   *base;  /* basenem of the 'file' */
+    size_t        fl;    /* number of bytes stored in 'buf' */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (options->finfo == 0 || file == NULL || num == 0)
+    if (el->finfo == 0 || file == NULL || num == 0)
     {
         /*
          * no file info for this caller
@@ -250,7 +250,7 @@ static size_t el_finfo
     fl  = strlen(buf);
     fl += sprintf(buf + fl, ":%d", num);
 
-    if (options->funcinfo == 0)
+    if (el->funcinfo == 0)
     {
         /* when function info is printed, we don't close ']', to
          * let it print function in same [] brackets, we close
@@ -275,16 +275,16 @@ static size_t el_finfo
 
 static size_t el_funcinfo
 (
-    struct el_options  *options,  /* options defining printing style */
-    char               *buf,      /* location whre to store file information */
-    const char         *func      /* function name to print */
+    struct el   *el,   /* el defining printing style */
+    char        *buf,  /* location whre to store file information */
+    const char  *func  /* function name to print */
 )
 {
 #if ENABLE_FUNCINFO
-    size_t              fl;       /* number of bytes stored in 'buf' */
+    size_t       fl;   /* number of bytes stored in 'buf' */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    if (options->funcinfo == 0 || func == NULL)
+    if (el->funcinfo == 0 || func == NULL)
     {
         /* no function print for this caller
          */
@@ -297,7 +297,7 @@ static size_t el_funcinfo
      * '[' bracket, as it was not already opened by finfo
      */
 
-    buf[0] = options->finfo ? ':' : '[';
+    buf[0] = el->finfo ? ':' : '[';
 
     /* copy function name to buffer
      */
@@ -354,21 +354,21 @@ static size_t el_funcinfo
 
 int el_print
 (
-    const char    *file,                 /* file name where log is printed */
-    size_t         num,                  /* line number where log is printed */
-    const char    *func,                 /* function name to print */
-    enum el_level  level,                /* log level to print message with */
-    const char    *fmt,                  /* message format (see printf (3)) */
-                   ...                   /* additional parameters for fmt */
+    const char    *file,   /* file name where log is printed */
+    size_t         num,    /* line number where log is printed */
+    const char    *func,   /* function name to print */
+    enum el_level  level,  /* log level to print message with */
+    const char    *fmt,    /* message format (see printf (3)) */
+                   ...     /* additional parameters for fmt */
 )
 {
-    va_list        ap;                   /* arguments '...' for 'fmt' */
-    int            rc;                   /* return code from el_printfv() */
+    va_list        ap;     /* arguments '...' for 'fmt' */
+    int            rc;     /* return code from el_printfv() */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     va_start(ap, fmt);
-    rc = el_ovprint(file, num, func, level, &g_options, fmt, ap);
+    rc = el_ovprint(file, num, func, level, &g_el, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -376,28 +376,28 @@ int el_print
 
 
 /* ==========================================================================
-    el_print but with custom options
+    el_print but with custom el
    ========================================================================== */
 
 
 int el_oprint
 (
-    const char         *file,                 /* file name to print in log */
-    size_t              num,                  /* line number to print in log */
-    const char         *func,                 /* function name to print */
-    enum el_level       level,                /* log level to print log with */
-    struct el_options  *options,              /* printing style options */
-    const char         *fmt,                  /* message format (man printf) */
-                        ...                   /* additional params for fmt */
+    const char    *file,   /* file name to print in log */
+    size_t         num,    /* line number to print in log */
+    const char    *func,   /* function name to print */
+    enum el_level  level,  /* log level to print log with */
+    struct el     *el,     /* printing style el */
+    const char    *fmt,    /* message format (man printf) */
+                   ...     /* additional params for fmt */
 )
 {
-    va_list          ap;                   /* arguments '...' for 'fmt' */
-    int              rc;                   /* return code from el_printfv() */
+    va_list        ap;     /* arguments '...' for 'fmt' */
+    int            rc;     /* return code from el_printfv() */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     va_start(ap, fmt);
-    rc = el_ovprint(file, num, func, level, options, fmt, ap);
+    rc = el_ovprint(file, num, func, level, el, fmt, ap);
     va_end(ap);
 
     return rc;
@@ -419,7 +419,7 @@ int el_vprint
     va_list        ap      /* additional parameters for fmt */
 )
 {
-    return el_ovprint(file, num, func, level, &g_options, fmt, ap);
+    return el_ovprint(file, num, func, level, &g_el, fmt, ap);
 }
 
 
@@ -428,7 +428,7 @@ int el_vprint
     line number 'num' information, with specified  'level'  into  configured
     outputs.  Function allocates on  callers  stack  EL_BUF_MAX  of  memory.
     If log message is longer than available buffer,  it  will  be  truncated
-    and part of message will be lost.  Additionally options may be passed to
+    and part of message will be lost.  Additionally el may be passed to
     tune printing style in runtime
 
     errno:
@@ -441,26 +441,26 @@ int el_vprint
 
 int el_ovprint
 (
-    const char         *file,                 /* file name to print in log */
-    size_t              num,                  /* line number to print in log */
-    const char         *func,                 /* function name to print */
-    enum el_level       level,                /* log level to print log with */
-    struct el_options  *options,              /* options defining print style */
-    const char         *fmt,                  /* message format (man printf) */
-    va_list             ap                    /* additional params for fmt */
+    const char    *file,                 /* file name to print in log */
+    size_t         num,                  /* line number to print in log */
+    const char    *func,                 /* function name to print */
+    enum el_level  level,                /* log level to print log with */
+    struct el     *el,                   /* el defining print style */
+    const char    *fmt,                  /* message format (man printf) */
+    va_list        ap                    /* additional params for fmt */
 )
 {
-    char                buf[EL_BUF_MAX + 2];  /* buffer for message to print */
-    size_t              w;                    /* bytes written to buf */
-    size_t              flen;                 /* length of the fmt output */
-    int                 e;                    /* error code */
+    char           buf[EL_BUF_MAX + 2];  /* buffer for message to print */
+    size_t         w;                    /* bytes written to buf */
+    size_t         flen;                 /* length of the fmt output */
+    int            e;                    /* error code */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     VALID(EINVAL, fmt);
-    VALID(EINVAL, options);
-    VALID(ERANGE, el_log_allowed(options, level));
-    VALID(ENODEV, options->outputs);
+    VALID(EINVAL, el);
+    VALID(ERANGE, el_log_allowed(el, level));
+    VALID(ENODEV, el->outputs);
 
     e = 0;
 
@@ -481,10 +481,10 @@ int el_ovprint
      */
 
     buf[0] = '\0';
-    w  = el_color(options, buf, level);
-    w += el_timestamp(options, buf + w, TS_STRING);
-    w += el_finfo(options, buf + w, file, num);
-    w += el_funcinfo(options, buf + w, func);
+    w  = el_color(el, buf, level);
+    w += el_timestamp(el, buf + w, TS_STRING);
+    w += el_finfo(el, buf + w, file, num);
+    w += el_funcinfo(el, buf + w, func);
 
     if (w != 0 && buf[w - 1] == ']')
     {
@@ -497,13 +497,13 @@ int el_ovprint
         ++w;
     }
 
-    if (options->print_log_level)
+    if (el->print_log_level)
     {
         w += sprintf(buf + w, "%c/", char_level[level]);
     }
 
 #if ENABLE_PREFIX
-    if (options->prefix)
+    if (el->prefix)
     {
         /*
          * there is a case where buf[w] will point to something different
@@ -512,9 +512,9 @@ int el_ovprint
          */
 
         buf[w] = '\0';
-        strncat(buf + w, options->prefix, EL_PREFIX_LEN);
+        strncat(buf + w, el->prefix, EL_PREFIX_LEN);
 
-        if ((flen = strlen(options->prefix)) > EL_PREFIX_LEN)
+        if ((flen = strlen(el->prefix)) > EL_PREFIX_LEN)
         {
             /*
              * dodge a bullet - overflow would have occured
@@ -551,9 +551,9 @@ int el_ovprint
      * add terminal formatting reset sequence
      */
 
-    w += el_color(options, buf + w, 8 /* reset colors */);
+    w += el_color(el, buf + w, 8 /* reset colors */);
 
-    if (options->print_newline)
+    if (el->print_newline)
     {
         /*
          * add new line to log
@@ -570,11 +570,11 @@ int el_ovprint
      * we set it here in a 'object global' variable
      */
 
-    options->level_current_msg = level;
+    el->level_current_msg = level;
 
-    if (el_oputs(options, buf) != 0)
+    if (el_oputs(el, buf) != 0)
     {
-        options->level_current_msg = EL_DBG;
+        el->level_current_msg = EL_DBG;
         return -1;
     }
 
@@ -587,7 +587,7 @@ int el_ovprint
      * data to file or not.
      */
 
-    options->level_current_msg = EL_DBG;
+    el->level_current_msg = EL_DBG;
 
     if (e)
     {
@@ -597,4 +597,3 @@ int el_ovprint
 
     return 0;
 }
-

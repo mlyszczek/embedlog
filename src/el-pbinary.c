@@ -91,15 +91,15 @@
 
 static size_t el_flags
 (
-    enum el_level       level,
-    struct el_options  *options,
-    unsigned char      *buf
+    enum el_level   level,
+    struct el      *el,
+    unsigned char  *buf
 )
 {
     *buf = 0;
 
 #if ENABLE_TIMESTAMP
-    if (options->timestamp != EL_TS_OFF)
+    if (el->timestamp != EL_TS_OFF)
     {
         *buf |= FLAG_TS;
 
@@ -108,7 +108,7 @@ static size_t el_flags
          * fraction of seconds can be printed only when timestamp is on
          */
 
-        *buf |= options->timestamp_fractions << FLAG_TS_FRACT_SHIFT;
+        *buf |= el->timestamp_fractions << FLAG_TS_FRACT_SHIFT;
 #   endif
     }
 #endif
@@ -137,28 +137,28 @@ static size_t el_flags
 
 int el_opbinary
 (
-    enum el_level       level,
-    struct el_options  *options,
-    const void         *memory,
-    size_t              mlen
+    enum el_level   level,
+    struct el      *el,
+    const void     *memory,
+    size_t          mlen
 )
 {
-    unsigned char       buf[EL_BUF_MAX];  /* buffer for message to print */
-    size_t              l;                /* length of encoded mlen */
-    size_t              w;                /* bytes written to buf */
-    int                 e;                /* cache for errno */
+    unsigned char   buf[EL_BUF_MAX];  /* buffer for message to print */
+    size_t          l;                /* length of encoded mlen */
+    size_t          w;                /* bytes written to buf */
+    int             e;                /* cache for errno */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
     VALID(EINVAL, mlen);
     VALID(EINVAL, memory);
-    VALID(EINVAL, options);
-    VALID(ENODEV, options->outputs);
-    VALID(ERANGE, el_log_allowed(options, level));
+    VALID(EINVAL, el);
+    VALID(ENODEV, el->outputs);
+    VALID(ERANGE, el_log_allowed(el, level));
 
     e = 0;
-    w  = el_flags(level, options, buf);
-    w += el_timestamp(options, buf + w, TS_BINARY);
+    w  = el_flags(level, el, buf);
+    w += el_timestamp(el, buf + w, TS_BINARY);
 
     /*
      * encode mlen to know how much bytes we are going to need
@@ -183,16 +183,16 @@ int el_opbinary
 
     w += el_encode_number(mlen, buf + w);
     memcpy(buf + w, memory, mlen);
-    options->level_current_msg = level;
+    el->level_current_msg = level;
     w += mlen;
 
-    if (el_oputb(options, buf, w) != 0)
+    if (el_oputb(el, buf, w) != 0)
     {
-        options->level_current_msg = EL_DBG;
+        el->level_current_msg = EL_DBG;
         return -1;
     }
 
-    options->level_current_msg = EL_DBG;
+    el->level_current_msg = EL_DBG;
 
     if (e)
     {
@@ -205,7 +205,7 @@ int el_opbinary
 
 
 /* ==========================================================================
-    Same as el_opbinary but uses global options object
+    Same as el_opbinary but uses global el object
    ========================================================================== */
 
 
@@ -216,5 +216,5 @@ int el_pbinary
     size_t              mlen
 )
 {
-    return el_opbinary(level, &g_options, memory, mlen);
+    return el_opbinary(level, &g_el, memory, mlen);
 }
