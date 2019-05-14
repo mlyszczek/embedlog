@@ -14,6 +14,8 @@ calls.
 .BI "int el_cleanup(void)"
 .br
 .BI "int el_ocleanup(struct el *" el ")"
+.br
+.BI "int el_destroy(struct el *" el ")"
 .SH DESCRIPTION
 .PP
 .BR el_cleanup (3)
@@ -25,6 +27,13 @@ After clean up, library calls cannot be used without initialization.
 works just the same, but accepts custom
 .I el
 object as argument.
+.PP
+.BR el_destroy (3)
+works just the same, but must be used when
+.I el
+object has been created with
+.BR el_new (3)
+function.
 .SH RETURN VALUE
 .PP
 Functions return 0 upon successful cleanup or -1 on errors.
@@ -35,6 +44,8 @@ used.
 .BR el_cleanup (3)
 function cannot fail.
 .BR el_ocleanup (3)
+and
+.BR el_destroy (3)
 may return:
 .TP
 .B EINVAL
@@ -53,6 +64,7 @@ Passed el object is not valid
 .BR el_pmemory (3),
 .BR el_pmemory_table (3),
 .BR el_opmemory_table (3),
+.BR el_new (3),
 .BR el_ooption (3),
 .BR el_oputs (3),
 .BR el_oprint (3),

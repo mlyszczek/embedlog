@@ -88,6 +88,7 @@ static void options_init(void)
 {
     struct el  default_el;  /* expected default el */
     struct el  el;          /* custom el to init */
+    struct el *elp;         /* heap allocated el */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -122,6 +123,10 @@ static void options_init(void)
     mt_fail(el_init() == 0);
     mt_fail(memcmp(&g_el, &default_el, sizeof(default_el)) == 0);
     mt_fail(el_cleanup() == 0);
+
+    mt_fail((elp = el_new()) != NULL);
+    mt_fail(memcmp(elp, &default_el, sizeof(*elp)) == 0);
+    mt_fok(el_destroy(elp));
 }
 
 

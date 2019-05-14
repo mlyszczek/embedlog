@@ -219,6 +219,9 @@ int el_pbinary(enum el_level level, const void *memory, size_t mlen);
 const struct el *el_get_el(void);
 int el_flush(void);
 
+struct el * el_new(void);
+int el_destroy(struct el *el);
+
 int el_oinit(struct el *el);
 int el_ocleanup(struct el *el);
 int el_ooption(struct el *el, int option, ...);

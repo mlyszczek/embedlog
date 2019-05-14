@@ -111,6 +111,10 @@ for more information.
 .br
 .BI "int el_ocleanup(struct el *" el ")"
 .br
+.B struct el * el_new(void)
+.br
+.BI "int el_destroy(struct el *" el ")"
+.br
 .BI "int el_ooption(struct el *" el ", enum el_option " option ", \
 \&...)"
 .br
@@ -232,6 +236,77 @@ You can simply call it like
 .EX
     el_oprint(OELN, "Notice message");
 .EE
+.SH "STABLE ABI CONSIDERATION"
+.PP
+Since
+.B embedlog
+is versatile and can work on both hardcore embedded systems (nuttx, freertos,
+bare metals) and on big CPUs that can run Linux, library must provide a way
+for user to use stack-allocated objects and stable ABI.
+Unfortunately there is no way to provide both at the same time, so
+.B embedlog
+provides two solutions so everybody is happy.
+.PP
+Note that library versioning follows
+.B STABLE ABI
+way of using library.
+So if feature is added that adds new field to
+.BR "struct el",
+then this will not be treated as ABI breakage, because if you are using
+.BR el_new (3)
+or
+.BR el_init (3)
+functions, ABI will not be broken.
+Only when using
+.BR el_oinit (3)
+ABI will be broken.
+.SS "STABLE ABI"
+.PP
+When stable ABI is required, user must initialize
+.B embedlog
+either with
+.BR el_init (3)
+or
+.BR el_new (3)
+function.
+User also must not access internal fields directly and all operations on
+.I el
+object must be done through the API functions.
+.BR el_new (3)
+will malloc necessary memory for the user which must be freed with
+.BR el_destroy (3)
+function.
+Under no circumstances use
+.B sizeof
+on the object nor struct.
+Operation will succeed, but may return invalid results when library is updated.
+To put it in as few word as possible - you don't know anything about internals
+of
+.BR "struct el" .
+.SS "STACK ALLOCATED OBJECT"
+.PP
+When you use library in hardcore embedded environment, where there is not
+dynamic linking involved, you are save to ignore any ABI changes, since
+you always build your programs alongside the library.
+But thanks to that you can avoid
+.BR malloc ()
+call and allocate everything on the stack.
+To allocate object on stack you must use
+.BR el_oinit (3)
+function, and deinitialize object with
+.BR el_ocleanup (3).
+.PP
+If you are using
+.BR el_oinit (3)
+on systems with dynamic library support you are suscible to ABI breakage and
+undefined behaviour when only new features are added, or even when bugfix
+introduces new field to
+.BR "struct el" .
+Heck, even recompilation with different flags can break ABI here.
+Do not use this approach if your system have dynamic library support unless
+you can rebuild all programs against new version of library.
+.PP
+.B You've been warned!
 .SH EXAMPLE
 .PP
 Initial setup is very trivial.
@@ -274,6 +349,8 @@ for more details.
 .BR el_opmemory_table (3),
 .BR el_oinit (3),
 .BR el_ocleanup (3),
+.BR el_new (3),
+.BR el_destroy (3),
 .BR el_ooption (3),
 .BR el_oputs (3),
 .BR el_oprint (3),

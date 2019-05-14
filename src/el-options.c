@@ -38,6 +38,7 @@
 #include "el-private.h"
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -435,6 +436,36 @@ int el_oinit
 
 
 /* ==========================================================================
+    Same as el_init but struct el is initialized on heap, so user does not
+    have to know anything about internal structure of 'el'.
+
+    errno
+            ENOMEM      not enough memory in the system to allocate data
+   ========================================================================== */
+
+
+struct el *el_new
+(
+    void
+)
+{
+    struct el *el;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el = malloc(sizeof(*el));
+    if (el == NULL)
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
+
+    el_oinit(el);
+    return el;
+}
+
+
+/* ==========================================================================
     cleans up whatever has been initialized/reserved by el_init
    ========================================================================== */
 
@@ -476,6 +507,27 @@ int el_ocleanup
     }
 #endif
 
+    return 0;
+}
+
+
+/* ==========================================================================
+    Same as el_ocleanup but can be used only with object created on heap
+    with el_new().
+   ========================================================================== */
+
+
+int el_destroy
+(
+    struct el  *el  /* el object */
+)
+{
+    if (el_ocleanup(el) != 0)
+    {
+        return -1;
+    }
+
+    free(el);
     return 0;
 }
 

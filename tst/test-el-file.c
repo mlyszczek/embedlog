@@ -1263,6 +1263,32 @@ static void file_rotate_and_directory_reappear(void)
    ========================================================================== */
 
 
+static void file_multi_message_on_el_new(void)
+{
+    struct el  *el;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    mt_assert((el = el_new()) != NULL);
+    el_ooption(el, EL_OUT, EL_OUT_FILE);
+    el_ooption(el, EL_FSYNC_EVERY, 0);
+    el_ooption(el, EL_FROTATE_NUMBER, 0);
+    mt_fok(el_ooption(el, EL_FPATH, WORKDIR"/log"));
+
+    el_oputs(el, s9);
+    el_oputs(el, s8);
+    el_oputs(el, s5);
+    mt_fok(file_check(WORKDIR"/log", s9 s8 s5));
+
+    unlink(WORKDIR"/log");
+    mt_fok(el_destroy(el));
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void file_no_dir_for_logs(void)
 {
     mt_ferr(el_option(EL_FPATH, WORKDIR"/i-dont/exist"), ENOENT);
@@ -1652,6 +1678,7 @@ void el_file_test_group(void)
     mt_run(file_rotate_write_after_failed_open_to_existing_file_with_holes2);
     mt_run(file_rotate_write_after_failed_open_to_existing_file_with_holes3);
     mt_run(file_rotate_and_directory_reappear);
+    mt_run(file_multi_message_on_el_new);
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
