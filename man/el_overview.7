@@ -181,15 +181,15 @@ Awailable macros are:
 .PP
 So instead of calling
 .PP
-.EX
+.nf
     el_print(__FILE__, __LINE__, EL_FUNC_NAME, EL_NOTICE, "Notice message");
-.EE
+.fi
 .PP
 You can simply call it like
 .PP
-.EX
+.nf
     el_print(ELN, "Notice message");
-.EE
+.fi
 .PP
 There are also equivalent macros for use with functions that also provides
 .I el
@@ -223,19 +223,19 @@ for more info about that.
 .PP
 So instead of calling
 .PP
-.EX
+.nf
     el_oprint(__FILE__, __LINE__, EL_FUNC_NAME, EL_NOTICE, &g_log_object, "Notice message");
-.EE
+.fi
 or
-.EX
+.nf
     el_oprint(ELN, &g_log_object, "Notice message");
-.EE
+.fi
 .PP
 You can simply call it like
 .PP
-.EX
+.nf
     el_oprint(OELN, "Notice message");
-.EE
+.fi
 .SH "STABLE ABI CONSIDERATION"
 .PP
 Since
@@ -315,7 +315,7 @@ Output can also be customized with proper el object, see
 .BR el_option (3)
 for more details.
 .PP
-.EX
+.nf
     #include <embedlog.h>
 
     int main(void)
@@ -331,7 +331,7 @@ for more details.
 
         return 0;
     }
-.EE
+.fi
 .SH SEE ALSO
 .PP
 .BR el_overview (7),
