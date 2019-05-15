@@ -158,11 +158,17 @@ static int el_vooption
         el->level = value_int;
         return 0;
 
+
+#   if ENABLE_OUT_FILE
+
     case EL_FSYNC_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int <= 7);
         el->file_sync_level = value_int;
         return 0;
+
+#   endif /* ENABLE_OUT_FILE */
+
 
     case EL_OUT:
         value_int = va_arg(ap, int);
@@ -428,9 +434,15 @@ int el_oinit
     el->print_newline = 1;
     el->level = EL_INFO;
     el->level_current_msg = EL_DBG;
-    el->file_sync_level = EL_FATAL;
+
+#if ENABLE_OUT_TTY
     el->serial_fd = -1;
+#endif
+
+#if ENABLE_OUT_FILE
     el->file_sync_every = 32768;
+    el->file_sync_level = EL_FATAL;
+#endif
     return 0;
 }
 

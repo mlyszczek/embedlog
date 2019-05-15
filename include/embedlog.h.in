@@ -170,6 +170,20 @@ enum el_option_timestamp_fractions
 
 typedef int (*el_custom_puts)(const char *s, void *user);
 
+/* Main embedlog object that holds printing options and other data.
+ * This definition is here so people that don't care about stable
+ * ABI can avoid mallocs and allocate objects on stack. Check
+ * el_overview(7) for more information about this.
+ *
+ * Any #if [0,1] in this struct is generated during compilation and
+ * should no be changed without library recompilation, unless you
+ * like when your program executes undefined behaviour.
+ *
+ * It's generated as #if [0,1] so this is applied system-wide, if
+ * it were to be defined like #if ENABLE_OUT_FILE, then every
+ * compilation unit that uses embedlog would have to define that to
+ * either 1 or 0. Easy for mistakes and hard to find bugs.
+ */
 struct el
 {
     unsigned int    outputs:7;
@@ -183,9 +197,9 @@ struct el
     unsigned int    funcinfo:1;
     unsigned int    level:3;
     unsigned int    level_current_msg:3;
-    unsigned int    file_sync_level:3;
 
-    int             serial_fd;
+#if @ENABLE_OUT_FILE@
+    unsigned int    file_sync_level:3;
     unsigned int    frotate_number;
     unsigned int    fcurrent_rotate;
     unsigned long   frotate_size;
@@ -195,9 +209,20 @@ struct el
     FILE           *file;
     char           *current_log;
     const char     *fname;
+#endif
+
+#if @ENABLE_OUT_TTY@
+    int             serial_fd;
+#endif
+
+#if @ENABLE_PREFIX@
     const char     *prefix;
+#endif
+
+#if @ENABLE_OUT_CUSTOM@
     el_custom_puts  custom_puts;
     void           *custom_puts_user;
+#endif
 };
 
 int el_init(void);

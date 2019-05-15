@@ -445,6 +445,7 @@ static int print_check(void)
          * check for prefix
          */
 
+#if ENABLE_PREFIX
         if (g_el.prefix)
         {
             char expected_prefix[EL_PREFIX_LEN + 1] = {0};
@@ -461,6 +462,7 @@ static int print_check(void)
 
             msg += expected_prefix_len;
         }
+#endif
 
         msglen = strlen(expected.msg);
 

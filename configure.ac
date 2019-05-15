@@ -6,16 +6,8 @@ AC_PROG_CC_C89
 AC_CANONICAL_HOST
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_FILES([Makefile \
-                 src/Makefile \
-                 include/Makefile \
-                 tst/Makefile \
-                 man/Makefile \
-                 examples/Makefile \
-                 www/Makefile])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
-
 
 AC_SEARCH_LIBS([pow], [m])
 
@@ -64,6 +56,7 @@ AC_SUBST(COVERAGE_CFLAGS)
 AC_SUBST(COVERAGE_CXXFLAGS)
 AC_SUBST(COVERAGE_LDFLAGS)
 
+AC_CONFIG_FILES(include/embedlog.h)
 
 ###
 # --enable-feature options
@@ -96,14 +89,17 @@ AC_ARG_ENABLE([out-file],
     [], [enable_out_file="yes"])
 
 AM_CONDITIONAL([ENABLE_OUT_FILE], [test "x$enable_out_file" = "xyes"])
+ENABLE_OUT_FILE=0
 AS_IF([test "x$enable_out_file" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_FILE], [1], [Enable printing to file])
+    ENABLE_OUT_FILE=1
     AC_CHECK_FUNCS(access stat fsync fileno)
     AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
         AC_MSG_ERROR(not found, needed by --enable-out-file))
 ])
 
+AC_SUBST(ENABLE_OUT_FILE)
 
 ###
 # --enable-out-tty
@@ -115,14 +111,17 @@ AC_ARG_ENABLE([out-tty],
     [], [enable_out_tty="yes"])
 
 AM_CONDITIONAL([ENABLE_OUT_TTY], [test "x$enable_out_tty" = "xyes"])
+ENABLE_OUT_TTY=0
 AS_IF([test "x$enable_out_tty" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_TTY], [1], [Enable printing to tty])
+    ENABLE_OUT_TTY=1
     AC_CHECK_HEADERS(termios.h)
     AC_CHECK_FUNCS([open tcgetattr cfsetispeed tcsetattr close],,
         AC_MSG_ERROR(not found, needed by --enable-out-tty))
 ])
 
+AC_SUBST(ENABLE_OUT_TTY)
 
 ###
 # --enable-out-custom
@@ -133,14 +132,17 @@ AC_ARG_ENABLE([out-custom],
     AS_HELP_STRING([--enable-out-custom], [Enable printing to custom]),
     [], [enable_out_custom="yes"])
 
+ENABLE_OUT_CUSTOM=0
 AM_CONDITIONAL([ENABLE_OUT_CUSTOM], [test "x$enable_out_custom" = "xyes"])
 AS_IF([test "x$enable_out_custom" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_CUSTOM], [1], [Enable printing to custom])
+    ENABLE_OUT_CUSTOM=1
     AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
         AC_MSG_ERROR(not found, needed by --enable-out-custom))
 ])
 
+AC_SUBST(ENABLE_OUT_CUSTOM)
 
 ###
 # --enable-timestamp
@@ -293,13 +295,16 @@ AC_ARG_ENABLE([prefix],
     AS_HELP_STRING([--enable-prefix], [Enable printing prefix to each message]),
     [], [enable_prefix="yes"])
 
+ENABLE_PREFIX=0
 AS_IF([test "x$enable_prefix" = "xyes"],
 [
     AC_DEFINE([ENABLE_PREFIX], [1], [Enable printing prefix to each message])
+    ENABLE_PREFIX=1
     AC_CHECK_FUNCS([strncat strlen],,
         AC_MSG_ERROR(not found, needed by --enable-prefix))
 ])
 
+AC_SUBST(ENABLE_PREFIX)
 
 ###
 # --enable-finfo
@@ -467,6 +472,8 @@ AC_ARG_ENABLE([analyzer],
     [enable_analyzer="yes"], [enable_analyzer="no"])
 AM_CONDITIONAL([ENABLE_ANALYZER], [test "x$enable_analyzer" = "xyes"])
 
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile \
+                 man/Makefile examples/Makefile www/Makefile])
 
 AC_OUTPUT
 

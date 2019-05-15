@@ -95,7 +95,6 @@ static void options_init(void)
     memset(&default_el, 0, sizeof(default_el));
     default_el.outputs             = EL_OUT_STDERR;
     default_el.level               = EL_INFO;
-    default_el.file_sync_level     = EL_FATAL;
     default_el.level_current_msg   = EL_DBG;
     default_el.colors              = 0;
     default_el.timestamp           = EL_TS_OFF;
@@ -103,9 +102,9 @@ static void options_init(void)
     default_el.timestamp_fractions = EL_TS_FRACT_OFF;
     default_el.print_log_level     = 1;
     default_el.print_newline       = 1;
-    default_el.custom_puts         = NULL;
-    default_el.serial_fd           = -1;
 
+#if ENABLE_OUT_FILE
+    default_el.file_sync_level     = EL_FATAL;
     default_el.funcinfo            = 0;
     default_el.finfo               = 0;
     default_el.frotate_number      = 0;
@@ -115,6 +114,15 @@ static void options_init(void)
     default_el.file                = NULL;
     default_el.file_sync_every     = 32768;
     default_el.fname               = NULL;
+#endif
+
+#if ENABLE_OUT_TTY
+    default_el.serial_fd           = -1;
+#endif
+
+#if ENABLE_OUT_CUSTOM
+    default_el.custom_puts         = NULL;
+#endif
 
     mt_fail(el_oinit(&el) == 0);
     mt_fail(memcmp(&el, &default_el, sizeof(el)) == 0);
@@ -180,6 +188,7 @@ static void options_file_sync_level_set(void)
 
     for (i = 0; i != 16; ++i)
     {
+#if ENABLE_OUT_FILE
         if (i <= EL_DBG)
         {
             mt_fail(el_option(EL_FSYNC_LEVEL, i) == 0);
@@ -190,6 +199,9 @@ static void options_file_sync_level_set(void)
             mt_ferr(el_option(EL_FSYNC_LEVEL, i), EINVAL);
             mt_fail(g_el.file_sync_level == EL_DBG);
         }
+#else
+        mt_ferr(el_option(EL_FSYNC_LEVEL, i), ENOSYS);
+#endif
     }
 }
 
@@ -480,15 +492,16 @@ static void options_ooption_test(void)
 
 static void options_prefix(void)
 {
-    el_option(EL_PREFIX, "prefix");
 #if ENABLE_PREFIX
+    mt_fok(el_option(EL_PREFIX, "prefix"));
     mt_fok(strcmp("prefix", g_el.prefix));
-#else
+    mt_fok(el_option(EL_PREFIX, NULL));
     mt_fail(g_el.prefix == NULL);
+#else
+    mt_ferr(el_option(EL_PREFIX, "prefix"), ENOSYS);
+    mt_ferr(el_option(EL_PREFIX, NULL), ENOSYS);
 #endif
 
-    el_option(EL_PREFIX, NULL);
-    mt_fail(g_el.prefix == NULL);
 }
 
 
@@ -516,7 +529,6 @@ static void options_global_el_after_el_cleanup(void)
     memset(&default_el, 0, sizeof(default_el));
     default_el.outputs             = EL_OUT_STDERR;
     default_el.level               = EL_INFO;
-    default_el.file_sync_level     = EL_FATAL;
     default_el.level_current_msg   = EL_DBG;
     default_el.colors              = 0;
     default_el.timestamp           = EL_TS_OFF;
@@ -524,9 +536,9 @@ static void options_global_el_after_el_cleanup(void)
     default_el.timestamp_fractions = EL_TS_FRACT_OFF;
     default_el.print_log_level     = 1;
     default_el.print_newline       = 1;
-    default_el.custom_puts         = NULL;
-    default_el.serial_fd           = -1;
 
+#if ENABLE_OUT_FILE
+    default_el.file_sync_level     = EL_FATAL;
     default_el.funcinfo            = 0;
     default_el.finfo               = 0;
     default_el.frotate_number      = 0;
@@ -536,6 +548,16 @@ static void options_global_el_after_el_cleanup(void)
     default_el.file                = NULL;
     default_el.file_sync_every     = 32768;
     default_el.fname               = NULL;
+#endif
+
+#if ENABLE_OUT_TTY
+    default_el.serial_fd           = -1;
+#endif
+
+#if ENABLE_OUT_CUSTOM
+    default_el.custom_puts         = NULL;
+#endif
+
 
 
     el_init();
