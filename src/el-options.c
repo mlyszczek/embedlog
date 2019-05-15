@@ -337,7 +337,7 @@ static int el_vooption
     case EL_FSYNC_EVERY:
         value_long = va_arg(ap, long);
         VALID(EINVAL, value_long >= 0);
-        el->file_sync_every = value_long;
+        el->fsync_every = value_long;
         return 0;
 
 #   endif  /* ENABLE_OUT_FILE */
@@ -440,7 +440,7 @@ int el_oinit
 #endif
 
 #if ENABLE_OUT_FILE
-    el->file_sync_every = 32768;
+    el->fsync_every = 32768;
     el->fsync_level = EL_FATAL;
 #endif
     return 0;

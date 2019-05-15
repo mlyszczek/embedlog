@@ -112,7 +112,7 @@ static void options_init(void)
     default_el.frotate_size        = 0;
     default_el.fpos                = 0;
     default_el.file                = NULL;
-    default_el.file_sync_every     = 32768;
+    default_el.fsync_every         = 32768;
     default_el.fname               = NULL;
 #endif
 
@@ -546,7 +546,7 @@ static void options_global_el_after_el_cleanup(void)
     default_el.frotate_size        = 0;
     default_el.fpos                = 0;
     default_el.file                = NULL;
-    default_el.file_sync_every     = 32768;
+    default_el.fsync_every         = 32768;
     default_el.fname               = NULL;
 #endif
 

@@ -707,7 +707,7 @@ int el_file_putb
     el->fpos += mlen;
     el->written_after_sync += mlen;
 
-    if (el->written_after_sync >= el->file_sync_every ||
+    if (el->written_after_sync >= el->fsync_every ||
         el->level_current_msg <= el->fsync_level)
     {
         /* we either written enough bytes to trigger flush, or log

@@ -203,7 +203,7 @@ struct el
     unsigned int    frotate_number;
     unsigned int    fcurrent_rotate;
     unsigned long   frotate_size;
-    unsigned long   file_sync_every;
+    unsigned long   fsync_every;
     unsigned long   written_after_sync;
     unsigned long   fpos;
     FILE           *file;
