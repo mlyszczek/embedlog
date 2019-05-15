@@ -204,7 +204,7 @@ struct el
     unsigned int    fcurrent_rotate;
     unsigned long   frotate_size;
     unsigned long   fsync_every;
-    unsigned long   written_after_sync;
+    unsigned long   fwritten_after_sync;
     unsigned long   fpos;
     FILE           *file;
     char           *current_log;
