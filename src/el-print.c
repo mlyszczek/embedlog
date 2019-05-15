@@ -2,39 +2,35 @@
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ==========================================================================
-
-   ------------------------------------------------------------
-  / This module handles all el_print family functions, this is \
-  | the place where message log is constructed, colors, file   |
-  | name and timstamp are added here if applicable. After      |
-  | processing ready string is sent to el_puts to send it to   |
-  \ apropriate output facility.                                /
-   ------------------------------------------------------------
-    \                                ,+*^^*+___+++_
-     \                         ,*^^^^              )
-      \                     _+*                     ^**+_
-       \                  +^       _ _++*+_+++_,         )
-              _+^^*+_    (     ,+*^ ^          \+_        )
-             {       )  (    ,(    ,_+--+--,      ^)      ^\
-            { (@)    } f   ,(  ,+-^ __*_*_  ^^\_   ^\       )
-           {:;-/    (_+*-+^^^^^+*+*<_ _++_)_    )    )      /
-          ( /  (    (        ,___    ^*+_+* )   <    <      \
-           U _/     )    *--<  ) ^\-----++__)   )    )       )
-            (      )  _(^)^^))  )  )\^^^^^))^*+/    /       /
-          (      /  (_))_^)) )  )  ))^^^^^))^^^)__/     +^^
-         (     ,/    (^))^))  )  ) ))^^^^^^^))^^)       _)
-          *+__+*       (_))^)  ) ) ))^^^^^^))^^^^^)____*^
-          \             \_)^)_)) ))^^^^^^^^^^))^^^^)
-           (_             ^\__^^^^^^^^^^^^))^^^^^^^)
-             ^\___            ^\__^^^^^^))^^^^^^^^)\\
-                  ^^^^^\uuu/^^\uuu/^^^^\^\^\^\^\^\^\^\
-                     ___) >____) >___   ^\_\_\_\_\_\_\)
-                    ^^^//\\_^^//\\_^       ^(\_\_\_\)
-                      ^^^ ^^ ^^^ ^
-   ========================================================================== */
-
-
-/* ==========================================================================
+         ------------------------------------------------------------
+        / This module handles all el_print family functions, this is \
+        | the place where message log is constructed, colors, file   |
+        | name and timstamp are added here if applicable. After      |
+        | processing ready string is sent to el_puts to send it to   |
+        \ apropriate output facility.                                /
+         ------------------------------------------------------------
+          \                                ,+*^^*+___+++_
+           \                         ,*^^^^              )
+            \                     _+*                     ^**+_
+             \                  +^       _ _++*+_+++_,         )
+                    _+^^*+_    (     ,+*^ ^          \+_        )
+                   {       )  (    ,(    ,_+--+--,      ^)      ^\
+                  { (@)    } f   ,(  ,+-^ __*_*_  ^^\_   ^\       )
+                 {:;-/    (_+*-+^^^^^+*+*<_ _++_)_    )    )      /
+                ( /  (    (        ,___    ^*+_+* )   <    <      \
+                 U _/     )    *--<  ) ^\-----++__)   )    )       )
+                  (      )  _(^)^^))  )  )\^^^^^))^*+/    /       /
+                (      /  (_))_^)) )  )  ))^^^^^))^^^)__/     +^^
+               (     ,/    (^))^))  )  ) ))^^^^^^^))^^)       _)
+                *+__+*       (_))^)  ) ) ))^^^^^^))^^^^^)____*^
+                \             \_)^)_)) ))^^^^^^^^^^))^^^^)
+                 (_             ^\__^^^^^^^^^^^^))^^^^^^^)
+                   ^\___            ^\__^^^^^^))^^^^^^^^)\\
+                        ^^^^^\uuu/^^\uuu/^^^^\^\^\^\^\^\^\^\
+                           ___) >____) >___   ^\_\_\_\_\_\_\)
+                          ^^^//\\_^^//\\_^       ^(\_\_\_\)
+                            ^^^ ^^ ^^^ ^
+   ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -54,17 +50,11 @@
 
 
 /* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-                                   _         __     __
-              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
-             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
-             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
-             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
+          __             __                     __   _
+     ____/ /___   _____ / /____ _ _____ ____ _ / /_ (_)____   ____   _____
+    / __  // _ \ / ___// // __ `// ___// __ `// __// // __ \ / __ \ / ___/
+   / /_/ //  __// /__ / // /_/ // /   / /_/ // /_ / // /_/ // / / /(__  )
+   \__,_/ \___/ \___//_/ \__,_//_/    \__,_/ \__//_/ \____//_/ /_//____/
 
    ========================================================================== */
 
@@ -74,16 +64,14 @@ static const char char_level[8] = { 'f', 'a', 'c', 'e', 'w', 'n', 'i', 'd' };
 
 #if ENABLE_COLORS
 
-/*
- * colors indexes are synced with log level
+/* colors indexes are synced with log level
  */
 
 #if ENABLE_COLORS_EXTENDED
 
-/*
- * for those that like more colors, there are definitions with more colors!
- * this will enable light version of some levels, but this is not supported
- * on all terminal! You have been warned!
+/* for those that like more colors, there are definitions with more
+ * colors! this will enable light version of some levels, but this
+ * is not supported on all terminal! You have been warned!
  */
 
 static const char *color[] =
@@ -101,10 +89,10 @@ static const char *color[] =
 
 #else
 
-/*
- * not all terminal can support extended colors with light version of them,
- * for those who want to be more standard compliant there is this shortened
- * version of colors. On downside is that some level will have same colors.
+/* not all terminal can support extended colors with light version
+ * of them, for those who want to be more standard compliant there
+ * is this shortened version of colors. On downside is that some
+ * level will have same colors.
  */
 
 static const char *color[] =
@@ -126,27 +114,21 @@ static const char *color[] =
 
 
 /* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
+                  _                __           ____
+    ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
+   / __ \ / ___// /| | / // __ `// __// _ \   / /_ / / / // __ \ / ___// ___/
+  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / __// /_/ // / / // /__ (__  )
+ / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
+/_/
    ========================================================================== */
 
 
 /* ==========================================================================
-    adds color information to 'buf' based on  'level'.   Returns  number  of
-    bytes stored in buf.  If colors are disabled, function will return 0 and
+    adds color information to 'buf' based on 'level'. Returns number of
+    bytes stored in buf. If colors are disabled, function will return 0 and
     nothing will be stored int 'buf'.
 
-    color can be one of log levels passed directly, or int  value  8,  which
+    color can be one of log levels passed directly, or int value 8, which
     will reset colors.
    ========================================================================== */
 
@@ -159,6 +141,7 @@ static size_t el_color
 )
 {
 #if ENABLE_COLORS
+
     if (el->colors == 0)
     {
         /*
@@ -172,7 +155,12 @@ static size_t el_color
     return strlen(color[level]);
 
 #else
+
+    (void)el;
+    (void)buf;
+    (void)level;
     return 0;
+
 #endif
 }
 
@@ -196,7 +184,7 @@ static const char *el_basename
     const char  *s      /* string to basename */
 )
 {
-    const char  *base;  /* */
+    const char  *base;  /* pointer to base name of path */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
     base = s;
@@ -214,8 +202,8 @@ static const char *el_basename
 
 
 /* ==========================================================================
-    stores file and line information in 'buf'.  Number of  bytes  stored  in
-    'buf' is returned. If file info is disabled  during  compilation  or  in
+    stores file and line information in 'buf'. Number of bytes stored in
+    'buf' is returned. If file info is disabled during compilation or in
     runtime, value 0 is returned
    ========================================================================== */
 
@@ -235,8 +223,7 @@ static size_t el_finfo
 
     if (el->finfo == 0 || file == NULL || num == 0)
     {
-        /*
-         * no file info for this caller
+        /* no file info for this caller
          */
 
         return 0;
@@ -253,8 +240,8 @@ static size_t el_finfo
     if (el->funcinfo == 0)
     {
         /* when function info is printed, we don't close ']', to
-         * let it print function in same [] brackets, we close
-         * it only when there is no finfo
+         * let it print function in same [] brackets, we close it
+         * only when there is no finfo
          */
 
         buf[fl++] = ']';
@@ -281,6 +268,7 @@ static size_t el_funcinfo
 )
 {
 #if ENABLE_FUNCINFO
+
     size_t       fl;   /* number of bytes stored in 'buf' */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -325,25 +313,25 @@ static size_t el_funcinfo
 
     buf[fl++] = ']';
     return fl;
+
 #else
+
+    (void)el;
+    (void)buf;
+    (void)func;
     return 0;
+
 #endif
 }
 
 
 /* ==========================================================================
-                                        __     __ _
-                         ____   __  __ / /_   / /(_)_____
-                        / __ \ / / / // __ \ / // // ___/
-                       / /_/ // /_/ // /_/ // // // /__
-                      / .___/ \__,_//_.___//_//_/ \___/
-                     /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
+                       __     __ _          ____
+        ____   __  __ / /_   / /(_)_____   / __/__  __ ____   _____ _____
+       / __ \ / / / // __ \ / // // ___/  / /_ / / / // __ \ / ___// ___/
+      / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
+     / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
+    /_/
    ========================================================================== */
 
 
@@ -424,12 +412,12 @@ int el_vprint
 
 
 /* ==========================================================================
-    Prints message formated by 'fmt' and 'ap'  with  timestamp,  'file'  and
-    line number 'num' information, with specified  'level'  into  configured
-    outputs.  Function allocates on  callers  stack  EL_BUF_MAX  of  memory.
-    If log message is longer than available buffer,  it  will  be  truncated
-    and part of message will be lost.  Additionally el may be passed to
-    tune printing style in runtime
+    Prints message formated by 'fmt' and 'ap' with timestamp, 'file' and
+    line number 'num' information, with specified 'level' into configured
+    outputs. Function allocates on callers stack EL_BUF_MAX of memory. If
+    log message is longer than available buffer, it will be truncated and
+    part of message will be lost. Additionally el may be passed to tune
+    printing style in runtime
 
     errno:
             EINVAL      level is invalid
@@ -466,18 +454,16 @@ int el_ovprint
 
     if (level > EL_DBG)
     {
-        /*
-         * level is larger than predefined and  we  don't  have  colors  for
-         * those log levels, so we force colors to be of EL_DBG level, since
-         * every level larger than EL_DBG is threaded as more verbose  debug
-         * anyway.
+        /* level is larger than predefined and we don't have colors
+         * for those log levels, so we force colors to be of EL_DBG
+         * level, since every level larger than EL_DBG is threaded
+         * as more verbose debug anyway.
          */
 
         level = EL_DBG;
     }
 
-    /*
-     * add preamble and colors to log line buf
+    /* add preamble and colors to log line buf
      */
 
     buf[0] = '\0';
@@ -488,9 +474,8 @@ int el_ovprint
 
     if (w != 0 && buf[w - 1] == ']')
     {
-        /*
-         * at least one preamble has been added, add space beetween current
-         * preamble and log level
+        /* at least one preamble has been added, add space beetween
+         * current preamble and log level
          */
 
         *(buf + w) = ' ';
@@ -505,10 +490,9 @@ int el_ovprint
 #if ENABLE_PREFIX
     if (el->prefix)
     {
-        /*
-         * there is a case where buf[w] will point to something different
-         * than '\0'. This is not wrong but will confuse strncat function
-         * and logs will be printed incorectly.
+        /* there is a case where buf[w] will point to something
+         * different than '\0'. This is not wrong but will confuse
+         * strncat function and logs will be printed incorectly.
          */
 
         buf[w] = '\0';
@@ -516,8 +500,7 @@ int el_ovprint
 
         if ((flen = strlen(el->prefix)) > EL_PREFIX_LEN)
         {
-            /*
-             * dodge a bullet - overflow would have occured
+            /* dodge a bullet - overflow would have occured
              */
 
             flen = EL_PREFIX_LEN;
@@ -527,18 +510,17 @@ int el_ovprint
     }
 #endif
 
-    /*
-     * add requested log from format, we add + 1 to include null termination
+    /* add requested log from format, we add + 1 to include null
+     * termination
      */
 
     flen = vsnprintf(buf + w, EL_LOG_MAX + 1, fmt, ap);
 
     if (flen > EL_LOG_MAX)
     {
-        /*
-         * overflow would have occur, not all bytes have been copied, output
-         * will truncated. Correct flen to number of bytes actually stored in
-         * buf.
+        /* overflow would have occur, not all bytes have been
+         * copied, output will truncated. Correct flen to number of
+         * bytes actually stored in buf.
          */
 
         flen = EL_LOG_MAX;
@@ -547,16 +529,14 @@ int el_ovprint
 
     w += flen;
 
-    /*
-     * add terminal formatting reset sequence
+    /* add terminal formatting reset sequence
      */
 
     w += el_color(el, buf + w, 8 /* reset colors */);
 
     if (el->print_newline)
     {
-        /*
-         * add new line to log
+        /* add new line to log
          */
 
         buf[w++] = '\n';
@@ -564,10 +544,10 @@ int el_ovprint
 
     buf[w++] = '\0';
 
-    /*
-     * some modules (like el-file) needs to know level of message  they  are
-     * printing, and such information may not be available from string, thus
-     * we set it here in a 'object global' variable
+    /* some modules (like el-file) needs to know level of message
+     * they are printing, and such information may not be available
+     * from string, thus we set it here in a 'object global'
+     * variable
      */
 
     el->level_current_msg = level;
@@ -578,13 +558,13 @@ int el_ovprint
         return -1;
     }
 
-    /*
-     * after message is printed set current messasge level to debug, as next
-     * call might be using el_puts, which does not contain log level, and we
-     * thread all el_puts messages as they were debug.  Note,  it  does  not
-     * apply to log filtering, el_puts does not filter messages, but modules
-     * like el-file, will need this information to determin  wheter  fsync()
-     * data to file or not.
+    /* after message is printed set current messasge level to
+     * debug, as next call might be using el_puts, which does not
+     * contain log level, and we thread all el_puts messages as
+     * they were debug. Note, it does not apply to log filtering,
+     * el_puts does not filter messages, but modules like el-file,
+     * will need this information to determin wheter fsync() data
+     * to file or not.
      */
 
     el->level_current_msg = EL_DBG;

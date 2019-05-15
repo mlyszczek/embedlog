@@ -94,7 +94,7 @@ extern struct el g_el;
 
 
 /* ==========================================================================
-    length of all "HH ".   EL_MEM_LINE_SIZE  is  externally  defined  during
+    length of all "HH ". EL_MEM_LINE_SIZE is externally defined during
     compilation to tune the output
    ========================================================================== */
 
@@ -165,8 +165,8 @@ extern struct el g_el;
 
 
 /* ==========================================================================
-    Maximum length of line number.  ie, if set to 1, range 0-9  is  allowed,
-    rendering  [source-file.c:5]  valid  while  [source-file.c:13]  invalid.
+    Maximum length of line number. ie, if set to 1, range 0-9 is allowed,
+    rendering [source-file.c:5] valid while [source-file.c:13] invalid.
    ========================================================================== */
 
 
@@ -179,10 +179,9 @@ extern struct el g_el;
 
         [source-file.c:1337]
 
-    EL_FLEN_MAX is a maximum length of a  file  and  is  defined  externally
-    during  compilation  to  suite   users   needs,   3   is   for   special
-    characters "[:]".  EL_PRE_FINFO_LINE_MAX_LEN can  be  redefined  to  any
-    value.
+    EL_FLEN_MAX is a maximum length of a file and is defined externally
+    during compilation to suite users needs, 3 is for special characters
+    "[:]". EL_PRE_FINFO_LINE_MAX_LEN can be redefined to any value.
    ========================================================================== */
 
 
@@ -195,9 +194,9 @@ extern struct el g_el;
 
 /* ==========================================================================
     Maximum length of function field, 2 are added for appended "()" to
-    indicate function. 1 is added in case function is printed with
-    file info, in such case we will be adding ':' character also. This
-    May look like this:
+    indicate function. 1 is added in case function is printed with file
+    info, in such case we will be adding ':' character also. This May look
+    like this:
 
         [source-file.c:1337:foo()]
 
@@ -219,7 +218,7 @@ extern struct el g_el;
 /* ==========================================================================
     log level preamble string length. Preamble is always "c/" where c is one
     of 'e, w, i, d" depending on the log level. 3 characters are reserved in
-    a situation where another preamble (like timestamp)  is  printed  before
+    a situation where another preamble (like timestamp) is printed before
     level, and we need to delimiter them with space
    ========================================================================== */
 
@@ -245,8 +244,8 @@ extern struct el g_el;
 
 
 /* ==========================================================================
-    defines length needed to put color information.  5 chars are  needed  to
-    start coloring output, and 4 characters  are  neede  to  reset  terminal
+    defines length needed to put color information. 5 chars are needed to
+    start coloring output, and 4 characters are neede to reset terminal
     color to default
    ========================================================================== */
 
@@ -259,9 +258,9 @@ extern struct el g_el;
 
 
 /* ==========================================================================
-    maximum buffer length excluding  new  line  and  null  character.   This
-    defines length of final output not format.  So "%s" can  take  even  100
-    bytes.    EL_LOG_MAX   is   defined   externally   during   compilation.
+    maximum buffer length excluding new line and null character. This
+    defines length of final output not format. So "%s" can take even 100
+    bytes. EL_LOG_MAX is defined externally during compilation.
    ========================================================================== */
 
 

@@ -1,9 +1,34 @@
 /* ==========================================================================
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
-   ========================================================================== */
-
-/* ==========================================================================
+   ==========================================================================
+         -----------------------------------------------------------
+        / this file deals with date and timestamps, it can return   \
+        | current time from different clocks or return date string, |
+        \ or return date in binary format                           /
+         -----------------------------------------------------------
+                  \
+                   \
+                    \          __---__
+                            _-       /--______
+                       __--( /     \ )XXXXXXXXXXX\v.
+                     .-XXX(   O   O  )XXXXXXXXXXXXXXX-
+                    /XXX(       U     )        XXXXXXX\
+                  /XXXXX(              )--_  XXXXXXXXXXX\
+                 /XXXXX/ (      O     )   XXXXXX   \XXXXX\
+                 XXXXX/   /            XXXXXX   \__ \XXXXX
+                 XXXXXX__/          XXXXXX         \__---->
+         ---___  XXX__/          XXXXXX      \__         /
+           \-  --__/   ___/\  XXXXXX            /  ___--/=
+            \-\    ___/    XXXXXX              '--- XXXXXX
+               \-\/XXX\ XXXXXX                      /XXXXX
+                 \XXXXXXXXX   \                    /XXXXX/
+                  \XXXXXX      >                 _/XXXXX/
+                    \XXXXX--__/              __-- XXXX/
+                     -XXXXXXXX---------------  XXXXXX-
+                        \XXXXXXXXXXXXXXXXXXXXXXXXXX/
+                          ""VXXXXXXXXXXXXXXXXXXV""
+   ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -25,6 +50,7 @@
 
 #if ENABLE_TIMESTAMP
 #if ENABLE_CLOCK
+
 static void el_ts_clock
 (
     time_t   *s,   /* seconds will be stored here */
@@ -41,6 +67,7 @@ static void el_ts_clock
     *ns *= (1000000L / CLOCKS_PER_SEC); /* [ms] */
     *ns *= 1000L;                       /* [ns] */
 }
+
 #endif /* ENABLE_CLOCK */
 #endif /* ENABLE_TIMESTAMP */
 
@@ -50,6 +77,7 @@ static void el_ts_clock
 
 
 #if ENABLE_TIMESTAMP
+
 static void el_ts_time
 (
     time_t  *s,  /* seconds will be stored here */
@@ -59,6 +87,7 @@ static void el_ts_time
     *s = time(NULL);
     *ns = 0;
 }
+
 #endif /* ENABLE_TIMESTAMP */
 
 /* ==========================================================================
@@ -68,6 +97,7 @@ static void el_ts_time
 
 #if ENABLE_TIMESTAMP
 #if ENABLE_REALTIME || ENABLE_MONOTONIC
+
 static void el_ts_clock_gettime
 (
     time_t         *s,     /* seconds will be stored here */
@@ -83,15 +113,16 @@ static void el_ts_clock_gettime
     *s  = tp.tv_sec;
     *ns = tp.tv_nsec;
 }
+
 #endif /* ENABLE_REALTIME || ENABLE_MONOTONIC */
 #endif /* ENABLE_TIMESTAMP */
 
 
 /* ==========================================================================
-    returns current  timestamp  in  'buf'  location.   Depending  on  global
-    settings timestamp can be in long or short format.  Function will return
-    number of bytes copied to 'buf'.  If timestamp has been disabled  during
-    compilation time or in runtime during settings, function will return  0.
+    returns current timestamp in 'buf' location. Depending on global
+    settings timestamp can be in long or short format. Function will return
+    number of bytes copied to 'buf'. If timestamp has been disabled during
+    compilation time or in runtime during settings, function will return 0.
    ========================================================================== */
 
 
@@ -111,8 +142,7 @@ size_t el_timestamp
 
     if (el->timestamp == EL_TS_OFF)
     {
-        /*
-         * user doesn't want us to print timestamp, that's fine
+        /* user doesn't want us to print timestamp, that's fine
          */
 
         return 0;
@@ -120,8 +150,7 @@ size_t el_timestamp
 
     buf = b;
 
-    /*
-     * first we get seconds and nanoseconds from proper timer
+    /* first we get seconds and nanoseconds from proper timer
      */
 
     switch (el->timestamp_timer)
@@ -155,8 +184,7 @@ size_t el_timestamp
 #   endif
 
     default:
-        /*
-         * bad timer means no timer
+        /* bad timer means no timer
          */
 
         return 0;
@@ -166,8 +194,7 @@ size_t el_timestamp
 
     if (binary)
     {
-        /*
-         * put encoded seconds timestamp in buf
+        /* put encoded seconds timestamp in buf
          */
 
 #       ifdef LLONG_MAX
@@ -176,17 +203,15 @@ size_t el_timestamp
         tl = el_encode_number((unsigned long)s, (unsigned char*)buf);
 #       endif
 
-        /*
-         * put encoded nano/micro/milli seconds in buf if enabled
+        /* put encoded nano/micro/milli seconds in buf if enabled
          */
 #       if ENABLE_FRACTIONS
 
         switch (el->timestamp_fractions)
         {
         case EL_TS_FRACT_OFF:
-            /*
-             * we don't add  fractions,  so  simply  return  what  has  been
-             * already stored (only seconds)
+            /* we don't add fractions, so simply return what has
+             * been already stored (only seconds)
              */
 
             return tl;
@@ -204,13 +229,13 @@ size_t el_timestamp
             return tl;
 
         default:
-            /*
-             * something  went  somehere  seriously  wrong,  act  like   no
+            /* something went somehere seriously wrong, act like no
              * timestamp has been configured
              */
 
             return 0;
         }
+
 #       else  /* ENABLE_FRACTIONS */
 
         return tl;
@@ -222,8 +247,7 @@ size_t el_timestamp
 #   endif /* ENABLE_BINARY_LOGS */
 
     {
-        /*
-         * then convert retrieved time into string timestamp
+        /* then convert retrieved time into string timestamp
          */
 
         if (el->timestamp == EL_TS_LONG)
@@ -245,26 +269,25 @@ size_t el_timestamp
 #   ifdef LLONG_MAX
             tl = sprintf(buf, "[%lld", (long long)s);
 #   else
-            /*
-             * if long long is not available, code may be suscible  to  2038
-             * bug.  If you are sure your compiler does  support  long  long
-             * type, but doesn't define  LLONG_MAX,  define  this  value  to
-             * enable long long.
+            /* if long long is not available, code may be suscible
+             * to 2038 bug. If you are sure your compiler does
+             * support long long type, but doesn't define
+             * LLONG_MAX, define this value to enable long long.
              */
 
             tl = sprintf(buf, "[%ld", (long)s);
 #   endif
         }
 
-        /*
-         * if requested, add proper fractions of seconds
+        /* if requested, add proper fractions of seconds
          */
 #   if ENABLE_FRACTIONS
+
         switch (el->timestamp_fractions)
         {
         case EL_TS_FRACT_OFF:
-            /*
-             * we don't add fractions, so simply close opening bracker '['
+            /* we don't add fractions, so simply close opening
+             * bracker '['
              */
 
             buf[tl++] = ']';
@@ -283,16 +306,18 @@ size_t el_timestamp
             return tl;
 
         default:
-            /*
-             *  something  went  somehere  seriously  wrong,  act  like   no
-             *  timestamp has been configured
+            /* something went somehere seriously wrong, act like no
+             * timestamp has been configured
              */
 
             return 0;
         }
+
 #   else  /* ENABLE_FRACTIONS */
+
         buf[tl++] = ']';
         return tl;
+
 #   endif /* ENABLE_FRACTIONS */
     }
 

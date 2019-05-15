@@ -2,28 +2,25 @@
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ==========================================================================
-     -------------------------------------------------------------
-    / Module reponsible for printing binary logs. And by binary I \
-    | don't mean only metadata and logs in ASCII, but full binary |
-    | including data. This may be useful when one need to log ie. |
-    | every message it saw on CAN. It would be a waste of space   |
-    | to log it in ASCII when binary data can be less by an order |
-    \ of magnitude                                                /
-     -------------------------------------------------------------
-      \
-       \ ,   _ ___.--'''`--''//-,-_--_.
-          \`"' ` || \\ \ \\/ / // / ,-\\`,_
-         /'`  \ \ || Y  | \|/ / // / - |__ `-,
-        /@"\  ` \ `\ |  | ||/ // | \/  \  `-._`-,_.,
-       /  _.-. `.-\,___/\ _/|_/_\_\/|_/ |     `-._._)
-       `-'``/  /  |  // \__/\__  /  \__/ \
-            `-'  /-\/  | -|   \__ \   |-' |
-              __/\ / _/ \/ __,-'   ) ,' _|'
-             (((__/(((_.' ((___..-'((__,'
-   ========================================================================== */
-
-
-/* ==========================================================================
+         -------------------------------------------------------------
+        / Module reponsible for printing binary logs. And by binary I \
+        | don't mean only metadata and logs in ASCII, but full binary |
+        | including data. This may be useful when one need to log ie. |
+        | every message it saw on CAN. It would be a waste of space   |
+        | to log it in ASCII when binary data can be less by an order |
+        \ of magnitude                                                /
+         -------------------------------------------------------------
+          \
+           \ ,   _ ___.--'''`--''//-,-_--_.
+              \`"' ` || \\ \ \\/ / // / ,-\\`,_
+             /'`  \ \ || Y  | \|/ / // / - |__ `-,
+            /@"\  ` \ `\ |  | ||/ // | \/  \  `-._`-,_.,
+           /  _.-. `.-\,___/\ _/|_/_\_\/|_/ |     `-._._)
+           `-'``/  /  |  // \__/\__  /  \__/ \
+                `-'  /-\/  | -|   \__ \   |-' |
+                  __/\ / _/ \/ __,-'   ) ,' _|'
+                 (((__/(((_.' ((___..-'((__,'
+   ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -41,12 +38,12 @@
 
 
 /* ==========================================================================
-                  _                __           __
-    ____   _____ (_)_   __ ____ _ / /_ ___     / /_ __  __ ____   ___   _____
-   / __ \ / ___// /| | / // __ `// __// _ \   / __// / / // __ \ / _ \ / ___/
-  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / /_ / /_/ // /_/ //  __/(__  )
- / .___//_/   /_/  |___/ \__,_/ \__/ \___/   \__/ \__, // .___/ \___//____/
-/_/                                              /____//_/
+          __             __                     __   _
+     ____/ /___   _____ / /____ _ _____ ____ _ / /_ (_)____   ____   _____
+    / __  // _ \ / ___// // __ `// ___// __ `// __// // __ \ / __ \ / ___/
+   / /_/ //  __// /__ / // /_/ // /   / /_/ // /_ / // /_/ // / / /(__  )
+   \__,_/ \___/ \___//_/ \__,_//_/    \__,_/ \__//_/ \____//_/ /_//____/
+
    ========================================================================== */
 
 
@@ -63,19 +60,14 @@
 #define FLAG_LEVEL_SHIFT    (3)
 
 
-/* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
 
+/* ==========================================================================
+                  _                __           ____
+    ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
+   / __ \ / ___// /| | / // __ `// __// _ \   / /_ / / / // __ \ / ___// ___/
+  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / __// /_/ // / / // /__ (__  )
+ / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
+/_/
    ========================================================================== */
 
 
@@ -104,8 +96,8 @@ static size_t el_flags
         *buf |= FLAG_TS;
 
 #   if ENABLE_FRACTIONS
-        /*
-         * fraction of seconds can be printed only when timestamp is on
+        /* fraction of seconds can be printed only when timestamp
+         * is on
          */
 
         *buf |= el->timestamp_fractions << FLAG_TS_FRACT_SHIFT;
@@ -120,27 +112,61 @@ static size_t el_flags
 
 
 /* ==========================================================================
-                                        __     __ _
-                         ____   __  __ / /_   / /(_)_____
-                        / __ \ / / / // __ \ / // // ___/
-                       / /_/ // /_/ // /_/ // // // /__
-                      / .___/ \__,_//_.___//_//_/ \___/
-                     /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
+                       __     __ _          ____
+        ____   __  __ / /_   / /(_)_____   / __/__  __ ____   _____ _____
+       / __ \ / / / // __ \ / // // ___/  / /_ / / / // __ \ / ___// ___/
+      / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
+     / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
+    /_/
+   ========================================================================== */
 
+
+/* ==========================================================================
+    Stores data pointed by "memory" of size "mlen" into destination
+    specified by "el". All metadata amd "memory" itself will be stored in
+    binary format.
+
+    function uses specific format to store metadata to save as much space as
+    possible. All numerical values in metadata are variadic in size. Order
+    of fields are as follows:
+
+           +-------+------------+--------------+-------------+------+
+           | flags | ts_seconds | ts_fractions | data_length | data |
+           +-------+------------+--------------+-------------+------+
+
+    The only mandatory fields are flags, data_length and data. flags
+    determin what fields are present. flags field is always 1 byte in size
+    and its format is
+
+       +------+-------+-------------------------------------------------+
+       | bits | value | description                                     |
+       +------+-------+-------------------------------------------------+
+       |    0 |   0   | both ts_seconds and ts_fraction will not appear |
+       |      +-------+-------------------------------------------------+
+       |      |   1   | at least ts_seconds will appear, ts_fraction    |
+       |      |       | appearance depends on 1..2 bits values          |
+       +------+-------+-------------------------------------------------+
+       | 1..2 |   0   | ts_fractions will not appear                    |
+       |      +-------+-------------------------------------------------+
+       |      |   1   | ts_fractions will hold milliseconds value       |
+       |      +-------+-------------------------------------------------+
+       |      |   2   | ts_fractions will hold microseconds value       |
+       |      +-------+-------------------------------------------------+
+       |      |   3   | ts_fractions will hold nanoseconds value        |
+       +------+-------+-------------------------------------------------+
+       | 3..5 |  0..7 | severity of the log                             |
+       +------+-------+-------------------------------------------------+
+       | 6..7 |  0..3 | reserved                                        |
+       +------+-------+-------------------------------------------------+
    ========================================================================== */
 
 
 int el_opbinary
 (
-    enum el_level   level,
-    struct el      *el,
-    const void     *memory,
-    size_t          mlen
+    enum el_level   level,            /* log severity level */
+    struct el      *el,               /* el object with info how to print */
+    const void     *memory,           /* binary data to store to print */
+    size_t          mlen              /* length of "memory" buffer */
 )
 {
     unsigned char   buf[EL_BUF_MAX];  /* buffer for message to print */
@@ -160,25 +186,24 @@ int el_opbinary
     w  = el_flags(level, el, buf);
     w += el_timestamp(el, buf + w, TS_BINARY);
 
-    /*
-     * encode mlen to know how much bytes we are going to need
+    /* encode mlen to know how much bytes we are going to need
      */
 
     l = el_encode_number(mlen, buf + w);
 
     if (w + l + mlen > sizeof(buf))
     {
-        /*
-         * user tries to print more that than we can hold in our buffer,
-         * buffer overflow attack? Not going to happen! We truncate it.
+        /* user tries to print more that than we can hold in our
+         * buffer, buffer overflow attack? Not going to happen! We
+         * truncate it.
          */
 
         mlen = EL_BUF_MAX - w - l;
         e = ENOBUFS;
     }
 
-    /*
-     * know that we know real value of mlen, we can encode mlen again
+    /* now that we know real value of mlen, we can encode mlen
+     * again
      */
 
     w += el_encode_number(mlen, buf + w);
@@ -211,9 +236,10 @@ int el_opbinary
 
 int el_pbinary
 (
-    enum el_level       level,
-    const void         *memory,
-    size_t              mlen
+
+    enum el_level   level,   /* log severity level */
+    const void     *memory,  /* binary data to store to print */
+    size_t          mlen     /* length of "memory" buffer */
 )
 {
     return el_opbinary(level, &g_el, memory, mlen);

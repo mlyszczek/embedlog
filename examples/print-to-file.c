@@ -28,10 +28,9 @@ int main(void)
 
     if (el_option(EL_FPATH, WORKDIR"/log") != 0)
     {
-        /*
-         * embedlog will try to open file now, this may fail for various  of
-         * reasons, if opening fails, we cannot log to file -  all  el_print
-         * to files will return error
+        /* embedlog will try to open file now, this may fail for
+         * various of reasons, if opening fails, we cannot log to
+         * file - all el_print to files will return error
          */
 
         fprintf(stderr, "Couldn't open file for logging %s\n",
@@ -40,8 +39,7 @@ int main(void)
         goto error;
     }
 
-    /*
-     * instruct logger to print into both file and standard error
+    /* instruct logger to print into both file and standard error
      */
 
     el_option(EL_OUT, EL_OUT_FILE | EL_OUT_STDERR);
@@ -52,10 +50,9 @@ int main(void)
         "from consecutive execution if this code, as embedlog "
         "does not truncate logs but append to file");
 
-    /*
-     * enable file rotation and set file  size  to  small  enough  value  to
-     * present how rotation works, in real life, rotate size should be  much
-     * higher to prevent unnecessary rotation
+    /* enable file rotation and set file size to small enough value
+     * to present how rotation works, in real life, rotate size
+     * should be much higher to prevent unnecessary rotation
      */
 
     el_option(EL_FROTATE_NUMBER, 5);

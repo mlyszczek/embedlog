@@ -1,10 +1,7 @@
 /* ==========================================================================
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
-   ========================================================================== */
-
-
-/* ==========================================================================
+   ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -34,13 +31,13 @@
 
 #if ENABLE_BINARY_LOGS
 
+
 /* ==========================================================================
-                  _                __           __
-    ____   _____ (_)_   __ ____ _ / /_ ___     / /_ __  __ ____   ___   _____
-   / __ \ / ___// /| | / // __ `// __// _ \   / __// / / // __ \ / _ \ / ___/
-  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / /_ / /_/ // /_/ //  __/(__  )
- / .___//_/   /_/  |___/ \__,_/ \__/ \___/   \__/ \__, // .___/ \___//____/
-/_/                                              /____//_/
+          __             __                     __   _
+     ____/ /___   _____ / /____ _ _____ ____ _ / /_ (_)____   ____   _____
+    / __  // _ \ / ___// // __ `// ___// __ `// __// // __ \ / __ \ / ___/
+   / /_/ //  __// /__ / // /_/ // /   / /_/ // /_ / // /_/ // / / /(__  )
+   \__,_/ \___/ \___//_/ \__,_//_/    \__,_/ \__//_/ \____//_/ /_//____/
 
    ========================================================================== */
 
@@ -51,22 +48,6 @@ struct log_message
     size_t                msglen;
     int                   level;
 };
-
-
-/* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-                                   _         __     __
-              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
-             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
-             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
-             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
-
-   ========================================================================== */
 
 
 mt_defs_ext();
@@ -82,18 +63,12 @@ static unsigned char  d8[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
 
 
 /* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
+                  _                __           ____
+    ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
+   / __ \ / ___// /| | / // __ `// __// _ \   / /_ / / / // __ \ / ___// ___/
+  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / __// /_/ // / / // /__ (__  )
+ / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
+/_/
    ========================================================================== */
 
 
@@ -138,36 +113,32 @@ static int pbinary_check(void)
 
         if (expected.level > g_el.level)
         {
-            /*
-             * log should not have been printed due to current log level
-             * restriction. We just continue here, because if log was indeed
-             * printed, next checks will fail anyway.
+            /* log should not have been printed due to current log
+             * level restriction. We just continue here, because if
+             * log was indeed printed, next checks will fail
+             * anyway.
              */
 
             continue;
         }
 
-        /*
-         * read flags
+        /* read flags
          */
 
         flags = *msg++;
 
-        /*
-         * check if level is added to flags
+        /* check if level is added to flags
          */
 
         if ((flags >> 3) != expected.level)
         {
-            /*
-             * no, its not set correctly
+            /* no, its not set correctly
              */
 
             goto error;
         }
 
-        /*
-         * check printing timestamp
+        /* check printing timestamp
          */
 
         if (g_el.timestamp != EL_TS_OFF)
@@ -182,22 +153,20 @@ static int pbinary_check(void)
             len = el_decode_number(msg, &tmp);
             msg += len;
 
-            /*
-             * we don't know exact time embedlog put into log file, so we
-             * have to trust the size
+            /* we don't know exact time embedlog put into log file,
+             * so we have to trust the size
              */
 
             if (flags & 0x01 != 0x01)
             {
-                /*
-                 * expected timestamp flag to be set
+                /* expected timestamp flag to be set
                  */
 
                 goto error;
             }
 
-            /*
-             * fraction of seconds checks makes sense only when ts is set
+            /* fraction of seconds checks makes sense only when ts
+             * is set
              */
 
             if (g_el.timestamp_fractions)
@@ -214,9 +183,9 @@ static int pbinary_check(void)
 
                 if (usec > 999999)
                 {
-                    /*
-                     * we can't check exact value of microseconds, but we surely
-                     * can check if this value is not too big (and thus corrupt)
+                    /* we can't check exact value of microseconds,
+                     * but we surely can check if this value is not
+                     * too big (and thus corrupt)
                      */
 
                     goto error;
@@ -224,8 +193,7 @@ static int pbinary_check(void)
 
                 if (flags & 0x04 != 0x04)
                 {
-                    /*
-                     * usec not set, and should be
+                    /* usec not set, and should be
                      */
 
                     goto error;
@@ -235,8 +203,7 @@ static int pbinary_check(void)
             {
                 if (flags & 0x06)
                 {
-                    /*
-                     * fraction flags set, and should not be
+                    /* fraction flags set, and should not be
                      */
 
                     goto error;
@@ -249,8 +216,7 @@ static int pbinary_check(void)
         {
             if (flags & 0x01)
             {
-                /*
-                 * we didn't expect timestamp flag to be set
+                /* we didn't expect timestamp flag to be set
                  */
 
                 goto error;
@@ -258,17 +224,15 @@ static int pbinary_check(void)
 
             if (flags & 0x06)
             {
-                /*
-                 * when timestamp is not set, we expect fraction of seconds
-                 * to not be set as well
+                /* when timestamp is not set, we expect fraction of
+                 * seconds to not be set as well
                  */
 
                 goto error;
             }
         }
 
-        /*
-         * now we can check printed data
+        /* now we can check printed data
          */
 
         if (truncate_test)
@@ -289,8 +253,7 @@ static int pbinary_check(void)
 
             if (val != EL_BUF_MAX - written - len)
             {
-                /*
-                 * truncated message has wrong length
+                /* truncated message has wrong length
                  */
 
                 return -1;
@@ -300,15 +263,13 @@ static int pbinary_check(void)
 
             if (memcmp(msg, expect, val) != 0)
             {
-                /*
-                 * data is incorrect
+                /* data is incorrect
                  */
 
                 return -1;
             }
 
-            /*
-             * point to next message
+            /* point to next message
              */
 
             msg += val;
@@ -320,15 +281,13 @@ static int pbinary_check(void)
 
             if (memcmp(msg, expected.msg, val) != 0)
             {
-                /*
-                 * data different than expected
+                /* data different than expected
                  */
 
                 goto error;
             }
 
-            /*
-             * finally set msg to point to next message
+            /* finally set msg to point to next message
              */
 
             msg += val;
@@ -700,6 +659,8 @@ static void pbinary_truncate(void)
 }
 
 #endif
+
+
 /* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____

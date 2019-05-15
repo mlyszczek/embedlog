@@ -2,19 +2,15 @@
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ==========================================================================
-
-   -----------------------------------------------------------
-  / This module handles printing messages with standard errno \
-  \ message, no magic to be found here                        /
-   -----------------------------------------------------------
-         \   ,__,
-          \  (oo)____
-             (__)    )\
-                ||--|| *
-   ========================================================================== */
-
-
-/* ==========================================================================
+         -----------------------------------------------------------
+        / This module handles printing messages with standard errno \
+        \ message, no magic to be found here                        /
+         -----------------------------------------------------------
+               \   ,__,
+                \  (oo)____
+                   (__)    )\
+                      ||--|| *
+   ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -32,24 +28,18 @@
 
 
 /* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
+                  _                __           ____
+    ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
+   / __ \ / ___// /| | / // __ `// __// _ \   / /_ / / / // __ \ / ___// ___/
+  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / __// /_/ // / / // /__ (__  )
+ / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
+/_/
    ========================================================================== */
 
 
 /* ==========================================================================
-    calls el_print with 'fmt' and '...' parameters, but  additionaly  prints
-    information about errno.  Functionaly it is similar to  perror  function
+    calls el_print with 'fmt' and '...' parameters, but additionaly prints
+    information about errno. Functionaly it is similar to perror function
    ========================================================================== */
 
 
@@ -76,9 +66,8 @@ static int el_ovperror
 
     if (fmt)
     {
-        /*
-         * we print formatted message only when it is supplied by the user,
-         * otherwise only errno message will be printed
+        /* we print formatted message only when it is supplied by
+         * the user, otherwise only errno message will be printed
          */
 
         rc |= el_ovprint(file, num, func, level, el, fmt, ap);
@@ -87,9 +76,8 @@ static int el_ovperror
     rc |= el_oprint(file, num, func, level, el,
         "errno num: %lu, strerror: %s", e, strerror(e));
 
-    /*
-     * in case errno has been modified return it to value from before this
-     * call
+    /* in case errno has been modified return it to value from
+     * before this call
      */
 
     errno = e;
@@ -98,24 +86,18 @@ static int el_ovperror
 
 
 /* ==========================================================================
-                                        __     __ _
-                         ____   __  __ / /_   / /(_)_____
-                        / __ \ / / / // __ \ / // // ___/
-                       / /_/ // /_/ // /_/ // // // /__
-                      / .___/ \__,_//_.___//_//_/ \___/
-                     /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
+                       __     __ _          ____
+        ____   __  __ / /_   / /(_)_____   / __/__  __ ____   _____ _____
+       / __ \ / / / // __ \ / // // ___/  / /_ / / / // __ \ / ___// ___/
+      / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
+     / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
+    /_/
    ========================================================================== */
 
 
 /* ==========================================================================
-    calls el_print with 'fmt' and '...' parameters, but  additionaly  prints
-    information about errno.  Functionaly it is similar to  perror  function
+    calls el_print with 'fmt' and '...' parameters, but additionaly prints
+    information about errno. Functionaly it is similar to perror function
    ========================================================================== */
 
 

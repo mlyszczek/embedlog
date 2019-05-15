@@ -1,10 +1,22 @@
 /* ==========================================================================
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
-   ========================================================================== */
-
-
-/* ==========================================================================
+   ==========================================================================
+         ----------------------------------------------------------
+        / this module deals with initialization and writing to tty \
+        \ device                                                   /
+         ----------------------------------------------------------
+          \            .    .     .
+           \      .  . .     `  ,
+            \    .; .  : .' :  :  : .
+             \   i..`: i` i.i.,i  i .
+              \   `,--.|i |i|ii|ii|i:
+                   UooU\.'@@@@@@`.||'
+                   \__/(@@@@@@@@@@)'
+                        (@@@@@@@@)
+                        `YY~~~~YY'
+                         ||    ||
+   ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -21,23 +33,19 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #if HAVE_TERMIOS_H
-#include <termios.h>
+#   include <termios.h>
 #endif
 
-/* ==========================================================================
-                                        __     __ _
-                         ____   __  __ / /_   / /(_)_____
-                        / __ \ / / / // __ \ / // // ___/
-                       / /_/ // /_/ // /_/ // // // /__
-                      / .___/ \__,_//_.___//_//_/ \___/
-                     /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
 
+/* ==========================================================================
+                       __     __ _          ____
+        ____   __  __ / /_   / /(_)_____   / __/__  __ ____   _____ _____
+       / __ \ / / / // __ \ / // // ___/  / /_ / / / // __ \ / ___// ___/
+      / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
+     / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
+    /_/
    ========================================================================== */
 
 
@@ -60,10 +68,9 @@ int el_tty_open
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    /*
-     * it is possible to reopen serial device (like changing output device
-     * with EL_TTY_DEV again) during runtime, so we need to close previous
-     * socket first
+    /* it is possible to reopen serial device (like changing output
+     * device with EL_TTY_DEV again) during runtime, so we need to
+     * close previous socket first
      */
 
     el_tty_close(el);
@@ -74,20 +81,18 @@ int el_tty_open
     }
 
 #if HAVE_TERMIOS_H
-    /*
-     * if termios is not available, simply open device without reconfiguring
-     * it.  Some embedded OSes might configure tty  during  compilation  and
-     * have termios disabled to save memory.
+    /* if termios is not available, simply open device without
+     * reconfiguring it. Some embedded OSes might configure tty
+     * during compilation and have termios disabled to save memory.
      */
 
     if (speed == B0)
     {
-        /*
-         * normally with B0 we should terminate  transmission,  it  is  used
-         * with modem lines, but since we do not use  modem  lines,  and  in
-         * logger terminating connection does not make  any  sense,  we  use
-         * this to tell embedlog *not* to change any settings but only  open
-         * serial
+        /* normally with B0 we should terminate transmission, it is
+         * used with modem lines, but since we do not use modem
+         * lines, and in logger terminating connection does not
+         * make any sense, we use this to tell embedlog *not* to
+         * change any settings but only open serial
          */
 
         return 0;
@@ -103,13 +108,13 @@ int el_tty_open
         goto error;
     }
 
-    tty.c_cflag &= ~CSIZE;  /* apply size mask */
-    tty.c_cflag |= CS8;     /* 8bit transmission */
-    tty.c_cflag &= ~PARENB; /* no parity check */
-    tty.c_cflag &= ~CSTOPB; /* set one stop bit */
+    tty.c_cflag &= ~CSIZE;          /* apply size mask */
+    tty.c_cflag |= CS8;             /* 8bit transmission */
+    tty.c_cflag &= ~PARENB;         /* no parity check */
+    tty.c_cflag &= ~CSTOPB;         /* set one stop bit */
 
-    tty.c_cflag |= CLOCAL;  /* ignore modem lines */
-    tty.c_cflag &= ~CREAD;  /* disable receiver - we only send data */
+    tty.c_cflag |= CLOCAL;          /* ignore modem lines */
+    tty.c_cflag &= ~CREAD;          /* disable receiver - we only send data */
     tty.c_oflag |= OPOST | ONLCR;   /* enable output post-processing by OS */
 
     if (tcsetattr(el->serial_fd, TCSANOW, &tty) != 0)

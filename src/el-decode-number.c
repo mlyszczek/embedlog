@@ -17,18 +17,12 @@
 
 
 /* ==========================================================================
-                                        __     __ _
-                         ____   __  __ / /_   / /(_)_____
-                        / __ \ / / / // __ \ / // // ___/
-                       / /_/ // /_/ // /_/ // // // /__
-                      / .___/ \__,_//_.___//_//_/ \___/
-                     /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
+                       __     __ _          ____
+        ____   __  __ / /_   / /(_)_____   / __/__  __ ____   _____ _____
+       / __ \ / / / // __ \ / // // ___/  / /_ / / / // __ \ / ___// ___/
+      / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
+     / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
+    /_/
    ========================================================================== */
 
 
@@ -61,8 +55,7 @@ size_t el_decode_number
 
     do
     {
-        /*
-         * multiple stuff is happening in this one-liner
+        /* multiple stuff is happening in this one-liner
          *
          * - first we take 7 bits of number
          * - calculate weigth of current number
@@ -71,15 +64,13 @@ size_t el_decode_number
 
         *out |= (n[i] & 0x7f) << (i * 7);
 
-        /*
-         * we do this until number lacks of continuation bit, which means
+        /* we do this until number lacks of continuation bit, which means
          * we are done
          */
     }
     while (n[i++] & 0x80);
 
-    /*
-     * return number of bytes processed from 'number'
+    /* return number of bytes processed from 'number'
      */
 
     return i;

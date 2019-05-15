@@ -1,10 +1,7 @@
 /* ==========================================================================
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
-   ========================================================================== */
-
-
-/* ==========================================================================
+   ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
@@ -30,12 +27,11 @@
 
 
 /* ==========================================================================
-                  _                __           __
-    ____   _____ (_)_   __ ____ _ / /_ ___     / /_ __  __ ____   ___   _____
-   / __ \ / ___// /| | / // __ `// __// _ \   / __// / / // __ \ / _ \ / ___/
-  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / /_ / /_/ // /_/ //  __/(__  )
- / .___//_/   /_/  |___/ \__,_/ \__/ \___/   \__/ \__, // .___/ \___//____/
-/_/                                              /____//_/
+          __             __                     __   _
+     ____/ /___   _____ / /____ _ _____ ____ _ / /_ (_)____   ____   _____
+    / __  // _ \ / ___// // __ `// ___// __ `// __// // __ \ / __ \ / ___/
+   / /_/ //  __// /__ / // /_/ // /   / /_/ // /_ / // /_/ // / / /(__  )
+   \__,_/ \___/ \___//_/ \__,_//_/    \__,_/ \__//_/ \____//_/ /_//____/
 
    ========================================================================== */
 
@@ -50,40 +46,18 @@ struct log_message
 };
 
 
-/* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-                                   _         __     __
-              _   __ ____ _ _____ (_)____ _ / /_   / /___   _____
-             | | / // __ `// ___// // __ `// __ \ / // _ \ / ___/
-             | |/ // /_/ // /   / // /_/ // /_/ // //  __/(__  )
-             |___/ \__,_//_/   /_/ \__,_//_.___//_/ \___//____/
-
-   ========================================================================== */
-
-
 mt_defs_ext();
 static char        logbuf[1024 * 1024];  /* output simulation */
 static struct rb  *expected_logs;        /* array of expected logs */
 
 
 /* ==========================================================================
-                                   _                __
-                     ____   _____ (_)_   __ ____ _ / /_ ___
-                    / __ \ / ___// /| | / // __ `// __// _ \
-                   / /_/ // /   / / | |/ // /_/ // /_ /  __/
-                  / .___//_/   /_/  |___/ \__,_/ \__/ \___/
-                 /_/
-               ____                     __   _
-              / __/__  __ ____   _____ / /_ (_)____   ____   _____
-             / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
-            / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
-           /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
+                  _                __           ____
+    ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
+   / __ \ / ___// /| | / // __ `// __// _ \   / /_ / / / // __ \ / ___// ___/
+  / /_/ // /   / / | |/ // /_/ // /_ /  __/  / __// /_/ // / / // /__ (__  )
+ / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
+/_/
    ========================================================================== */
 
 
@@ -161,10 +135,10 @@ static int print_check(void)
 
         if (expected.level > g_el.level)
         {
-            /*
-             * log should not have been printed due to current log level
-             * restriction. We just continue here, because if log was indeed
-             * printed, next checks will fail anyway.
+            /* log should not have been printed due to current log
+             * level restriction. We just continue here, because if
+             * log was indeed printed, next checks will fail
+             * anyway.
              */
 
             continue;
@@ -174,22 +148,21 @@ static int print_check(void)
         {
             if (strncmp(msg, color[slevel], 5) != 0)
             {
-                /*
-                 * no color information or el_print generated wrong color
+                /* no color information or el_print generated wrong
+                 * color
                  */
 
                 return -1;
             }
 
-            /*
-             * move msg by 5 bytes - begging of color is always 5char long
+            /* move msg by 5 bytes - begging of color is always
+             * 5char long
              */
 
             msg += 5;
         }
 
-        /*
-         * check printing timestamp
+        /* check printing timestamp
          */
 
         if (g_el.timestamp == EL_TS_LONG)
@@ -258,21 +231,18 @@ static int print_check(void)
         }
         else if (g_el.timestamp == EL_TS_OFF)
         {
-            /*
-             * we check for nothing here
+            /* we check for nothing here
              */
         }
         else
         {
-            /*
-             * wrong timestamp option value
+            /* wrong timestamp option value
              */
 
            return -1;
         }
 
-        /*
-         * check printing file information
+        /* check printing file information
          */
 
         if (g_el.finfo && expected.file != NULL && expected.line != 0)
@@ -290,9 +260,8 @@ static int print_check(void)
                 tmp[i] = *msg++;
                 if (i++ == EL_FLEN_MAX)
                 {
-                    /*
-                     * we didn't find ':' character withing maximum lenght
-                     * of file - file is too long
+                    /* we didn't find ':' character withing maximum
+                     * lenght of file - file is too long
                      */
 
                     return -1;
@@ -327,15 +296,14 @@ static int print_check(void)
                 tmp[i] = *msg;
                 if (i++ == EL_PRE_FINFO_LINE_MAX_LEN)
                 {
-                    /*
-                     * file line lenght is too large, or ending ']' is missing
+                    /* file line lenght is too large, or ending ']'
+                     * is missing
                      */
 
                     return -1;
                 }
 
-                /*
-                 * file line should be a number ;-)
+                /* file line should be a number ;-)
                  */
 
                 IS_DIGIT();
@@ -347,8 +315,8 @@ static int print_check(void)
 
             if ((size_t)atoi(tmp) != expected.line)
             {
-                /*
-                 * line number in printed log is different than what was set
+                /* line number in printed log is different than
+                 * what was set
                  */
 
                 return -1;
@@ -396,7 +364,7 @@ static int print_check(void)
             if (strcmp(tmp, expected.func) != 0)
             {
                 /* function is different than what we expected
-                */
+                 */
 
                 return -1;
             }
@@ -413,9 +381,9 @@ static int print_check(void)
              g_el.timestamp != EL_TS_OFF ||
             (g_el.funcinfo && expected.func != NULL))
         {
-            /*
-             * prefix or timestamp information  is  enabled,  in  that  case
-             * we check for additional space between info  and  log  message
+            /* prefix or timestamp information is enabled, in that
+             * case we check for additional space between info and
+             * log message
              */
 
             if (*msg++ != ' ')
@@ -424,8 +392,7 @@ static int print_check(void)
             }
         }
 
-        /*
-         * check printing log level
+        /* check printing log level
          */
 
         if (g_el.print_log_level)
@@ -441,8 +408,7 @@ static int print_check(void)
             }
         }
 
-        /*
-         * check for prefix
+        /* check for prefix
          */
 
 #if ENABLE_PREFIX
@@ -477,15 +443,13 @@ static int print_check(void)
         {
             if (strncmp(msg, color[8], 4) != 0)
             {
-                /*
-                 * expected end of color, got some shit
+                /* expected end of color, got some shit
                  */
 
                 return -1;
             }
 
-            /*
-             * end of color is always 4 bytes long
+            /* end of color is always 4 bytes long
              */
 
             msg += 4;
@@ -495,17 +459,16 @@ static int print_check(void)
         {
             if (*msg != '\n')
             {
-                /*
-                 * when new line is enabled, log should end with new line
+                /* when new line is enabled, log should end with
+                 * new line
                  */
 
                 return -1;
             }
 
-            /*
-             * set msg to point to next message, there is no  need  to  move
-             * msg pointer if newline is not printed as msg  already  points
-             * to next message
+            /* set msg to point to next message, there is no need
+             * to move msg pointer if newline is not printed as msg
+             * already points to next message
              */
 
             ++msg;
@@ -924,11 +887,11 @@ static void print_too_long_print_truncate(void)
     add_log(ELI, "not truncated");
     add_log(ELI, msg);
 
-    /*
-     * while el_print will make copy of msg, our test  print_check  function
-     * will just use pointer to our msg here, and since we expect message to
-     * be truncated, we truncate it here  and  print_check  will  take  this
-     * truncated message as expected one.
+    /* while el_print will make copy of msg, our test print_check
+     * function will just use pointer to our msg here, and since we
+     * expect message to be truncated, we truncate it here and
+     * print_check will take this truncated message as expected
+     * one.
      */
 
     msg[sizeof(msg) - 3] = '\0';
@@ -958,11 +921,11 @@ static void print_too_long_print_truncate_no_newline(void)
     add_log(ELI, "not truncated");
     add_log(ELI, msg);
 
-    /*
-     * while el_print will make copy of msg, our test  print_check  function
-     * will just use pointer to our msg here, and since we expect message to
-     * be truncated, we truncate it here  and  print_check  will  take  this
-     * truncated message as expected one.
+    /* while el_print will make copy of msg, our test print_check
+     * function will just use pointer to our msg here, and since we
+     * expect message to be truncated, we truncate it here and
+     * print_check will take this truncated message as expected
+     * one.
      */
 
     msg[sizeof(msg) - 3] = '\0';
