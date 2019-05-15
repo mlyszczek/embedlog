@@ -54,7 +54,7 @@ extern "C" {
 #endif
 
 #if (__STDC_VERSION__ >= 199901L)
-    /* options for c99 users, they can affort more */
+    /* options for c99 users, they can afford more */
 #   define EL_FUNC_NAME __func__
 #   ifdef NDEBUG
 #       define EL_DEBUG(...) ((void)0)
