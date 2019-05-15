@@ -104,7 +104,7 @@ static void options_init(void)
     default_el.print_newline       = 1;
 
 #if ENABLE_OUT_FILE
-    default_el.file_sync_level     = EL_FATAL;
+    default_el.fsync_level         = EL_FATAL;
     default_el.funcinfo            = 0;
     default_el.finfo               = 0;
     default_el.frotate_number      = 0;
@@ -180,7 +180,7 @@ static void options_level_set(void)
    ========================================================================== */
 
 
-static void options_file_sync_level_set(void)
+static void options_fsync_level_set(void)
 {
     int i;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -192,12 +192,12 @@ static void options_file_sync_level_set(void)
         if (i <= EL_DBG)
         {
             mt_fail(el_option(EL_FSYNC_LEVEL, i) == 0);
-            mt_fail(g_el.file_sync_level == i);
+            mt_fail(g_el.fsync_level == i);
         }
         else
         {
             mt_ferr(el_option(EL_FSYNC_LEVEL, i), EINVAL);
-            mt_fail(g_el.file_sync_level == EL_DBG);
+            mt_fail(g_el.fsync_level == EL_DBG);
         }
 #else
         mt_ferr(el_option(EL_FSYNC_LEVEL, i), ENOSYS);
@@ -538,7 +538,7 @@ static void options_global_el_after_el_cleanup(void)
     default_el.print_newline       = 1;
 
 #if ENABLE_OUT_FILE
-    default_el.file_sync_level     = EL_FATAL;
+    default_el.fsync_level         = EL_FATAL;
     default_el.funcinfo            = 0;
     default_el.finfo               = 0;
     default_el.frotate_number      = 0;
@@ -632,7 +632,7 @@ void el_options_test_group(void)
     mt_cleanup_test = &test_cleanup;
 
     mt_run(options_level_set);
-    mt_run(options_file_sync_level_set);
+    mt_run(options_fsync_level_set);
     mt_run(options_output);
     mt_run(options_log_allowed);
     mt_run(options_opt_print_level);

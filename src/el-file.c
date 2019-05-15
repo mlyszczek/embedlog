@@ -708,7 +708,7 @@ int el_file_putb
     el->written_after_sync += mlen;
 
     if (el->written_after_sync >= el->file_sync_every ||
-        el->level_current_msg <= el->file_sync_level)
+        el->level_current_msg <= el->fsync_level)
     {
         /* we either written enough bytes to trigger flush, or log
          * level is high enough it triggers log flush to block

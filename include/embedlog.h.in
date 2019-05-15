@@ -199,7 +199,7 @@ struct el
     unsigned int    level_current_msg:3;
 
 #if @ENABLE_OUT_FILE@
-    unsigned int    file_sync_level:3;
+    unsigned int    fsync_level:3;
     unsigned int    frotate_number;
     unsigned int    fcurrent_rotate;
     unsigned long   frotate_size;
