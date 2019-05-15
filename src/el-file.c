@@ -267,10 +267,10 @@ skip_rotate:
      * passes there, it will pass here as well
      */
 
-    sprintf(el->current_log, "%s.%d",
+    sprintf(el->fcurrent_log, "%s.%d",
         el->fname, el->fcurrent_rotate);
 
-    if ((el->file = fopen(el->current_log, "w")) == NULL)
+    if ((el->file = fopen(el->fcurrent_log, "w")) == NULL)
     {
         el->fcurrent_rotate--;
         return -1;
@@ -309,7 +309,7 @@ int el_file_open
     struct el  *el  /* el object with file information */
 )
 {
-    if (el->current_log == NULL)
+    if (el->fcurrent_log == NULL)
     {
         /*
          * yes, we need to dynamically allocate memory here. It's because we
@@ -319,7 +319,7 @@ int el_file_open
          * dynamic allocation, we will be doing one too.
          */
 
-        if ((el->current_log = malloc(PATH_MAX + 1)) == NULL)
+        if ((el->fcurrent_log = malloc(PATH_MAX + 1)) == NULL)
         {
             errno = ENOMEM;
             return -1;
@@ -356,7 +356,7 @@ int el_file_open
 
         for (i = el->frotate_number - 1; i >= 0; --i)
         {
-            pathl = snprintf(el->current_log, PATH_MAX + 1, "%s.%d",
+            pathl = snprintf(el->fcurrent_log, PATH_MAX + 1, "%s.%d",
                 el->fname, i);
 
             if (pathl > PATH_MAX)
@@ -367,7 +367,7 @@ int el_file_open
                  * could result in some data lose on the disk.
                  */
 
-                el->current_log[0] = '\0';
+                el->fcurrent_log[0] = '\0';
                 errno = ENAMETOOLONG;
                 return -1;
             }
@@ -386,7 +386,7 @@ int el_file_open
                  * thus this path is not taken in such case.
                  */
 
-                if (el_file_exists(el->current_log) == 0)
+                if (el_file_exists(el->fcurrent_log) == 0)
                 {
                     /*
                      * current log file does not exist, this is not the file
@@ -396,7 +396,7 @@ int el_file_open
                     continue;
                 }
 
-                if (stat(el->current_log, &st) != 0)
+                if (stat(el->fcurrent_log, &st) != 0)
                 {
                     /*
                      * error while stating file, probably don't have  access
@@ -405,7 +405,7 @@ int el_file_open
                      * exit with error from stat.
                      */
 
-                    el->current_log[0] = '\0';
+                    el->fcurrent_log[0] = '\0';
                     return -1;
                 }
 
@@ -419,7 +419,7 @@ int el_file_open
                      * doesn't botter us later
                      */
 
-                    remove(el->current_log);
+                    remove(el->fcurrent_log);
                     continue;
                 }
             }
@@ -429,7 +429,7 @@ int el_file_open
              * a day
              */
 
-            if ((f = fopen(el->current_log, "a")) == NULL)
+            if ((f = fopen(el->fcurrent_log, "a")) == NULL)
             {
                 /*
                  * couldn't open file, probably directory doesn't exist,  or
@@ -450,7 +450,7 @@ int el_file_open
 
 #else /* HAVE_STAT */
 
-            if ((f = fopen(el->current_log, "a")) == NULL)
+            if ((f = fopen(el->fcurrent_log, "a")) == NULL)
             {
                 /*
                  * if we cannot open file, that means there is some kind  of
@@ -458,7 +458,7 @@ int el_file_open
                  * it's pointless to continue
                  */
 
-                el->current_log[0] = '\0';
+                el->fcurrent_log[0] = '\0';
                 return -1;
             }
 
@@ -494,7 +494,7 @@ int el_file_open
                  */
 
                 fclose(f);
-                remove(el->current_log);
+                remove(el->fcurrent_log);
                 continue;
             }
 
@@ -518,17 +518,17 @@ int el_file_open
 
     if (strlen(el->fname) > PATH_MAX)
     {
-        el->current_log[0] = '\0';
+        el->fcurrent_log[0] = '\0';
         errno = ENAMETOOLONG;
         return -1;
     }
 
-    strcpy(el->current_log, el->fname);
+    strcpy(el->fcurrent_log, el->fname);
 
-    if ((el->file = fopen(el->current_log, "a")) == NULL)
+    if ((el->file = fopen(el->fcurrent_log, "a")) == NULL)
     {
         /*
-         * we couldn't open file, but don't set clear  el->current_log,
+         * we couldn't open file, but don't set clear  el->fcurrent_log,
          * we will try to reopen this file each time we print to file.  This
          * is usefull when user tries to open log file in  not-yet  existing
          * directory.  Error is of course returned to user is aware of  this
@@ -577,8 +577,8 @@ int el_file_flush
 #endif /* HAVE_FSYNC && HAVE_FILENO */
 
     VALID(EINVAL, el);
-    VALID(EBADF, el->current_log);
-    VALID(EBADF, el->current_log[0] != '\0');
+    VALID(EBADF, el->fcurrent_log);
+    VALID(EBADF, el->fcurrent_log[0] != '\0');
 
     /*
      * first flush data from stdio library buffers into kernel
@@ -612,7 +612,7 @@ int el_file_flush
 
     fclose(el->file);
 
-    if ((el->file = fopen(el->current_log, "a")) == NULL)
+    if ((el->file = fopen(el->fcurrent_log, "a")) == NULL)
     {
         errno = EBADF;
         return -1;
@@ -652,8 +652,8 @@ int el_file_putb
     VALID(EINVAL, mem);
     VALID(EINVAL, mlen);
     VALID(EINVAL, el);
-    VALID(EBADF, el->current_log);
-    VALID(EBADF, el->current_log[0] != '\0');
+    VALID(EBADF, el->fcurrent_log);
+    VALID(EBADF, el->fcurrent_log[0] != '\0');
 
 
     /*
@@ -661,7 +661,7 @@ int el_file_putb
      * due to error or deliberate acion of user
      */
 
-    if (el_file_exists(el->current_log) == 0 || el->file == NULL)
+    if (el_file_exists(el->fcurrent_log) == 0 || el->file == NULL)
     {
         if (el_file_open(el) != 0)
         {
@@ -759,10 +759,10 @@ void el_file_cleanup
 
     el->file = NULL;
 
-    if (el->current_log)
+    if (el->fcurrent_log)
     {
-        el->current_log[0] = '\0';
-        free(el->current_log);
-        el->current_log = NULL;
+        el->fcurrent_log[0] = '\0';
+        free(el->fcurrent_log);
+        el->fcurrent_log = NULL;
     }
 }

@@ -207,7 +207,7 @@ struct el
     unsigned long   fwritten_after_sync;
     unsigned long   fpos;
     FILE           *file;
-    char           *current_log;
+    char           *fcurrent_log;
     const char     *fname;
 #endif
 
