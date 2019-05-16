@@ -101,7 +101,7 @@ static int el_ovperror
    ========================================================================== */
 
 
-int el_perror
+/* public api */ int el_perror
 (
     const char    *file,   /* file name where log is printed */
     size_t         num,    /* line number where log is printed */
@@ -129,7 +129,7 @@ int el_perror
    ========================================================================== */
 
 
-int el_operror
+/* public api */ int el_operror
 (
     const char    *file,   /* file name where log is printed */
     size_t         num,    /* line number where log is printed*/

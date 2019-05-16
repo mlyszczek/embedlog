@@ -45,7 +45,7 @@
    ========================================================================== */
 
 
-int el_flush
+/* public api */ int el_flush
 (
     void
 )
@@ -59,7 +59,7 @@ int el_flush
    ========================================================================== */
 
 
-int el_oflush
+/* public api */ int el_oflush
 (
     struct el  *el   /* options defining printing style */
 )

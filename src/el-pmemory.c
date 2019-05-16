@@ -271,7 +271,7 @@ static int el_pmem
    ========================================================================== */
 
 
-int el_opmemory_table
+/* public api */ int el_opmemory_table
 (
     const char     *file,   /* file name where log is printed */
     size_t          num,    /* line number where log is printed */
@@ -291,7 +291,7 @@ int el_opmemory_table
    ========================================================================== */
 
 
-int el_pmemory_table
+/* public api */ int el_pmemory_table
 (
     const char      *file,     /* file name where log is printed */
     size_t           num,      /* line number where log is printed */
@@ -309,7 +309,7 @@ int el_pmemory_table
    ========================================================================== */
 
 
-int el_opmemory
+/* public api */ int el_opmemory
 (
     const char    *file,   /* file name where log is printed */
     size_t         num,    /* line number where log is printed */
@@ -329,7 +329,7 @@ int el_opmemory
    ========================================================================== */
 
 
-int el_pmemory
+/* public api */ int el_pmemory
 (
     const char      *file,     /* file name where log is printed */
     size_t           num,      /* line number where log is printed */

@@ -559,7 +559,7 @@ static int el_vooption
    ========================================================================== */
 
 
-int el_init
+/* public api */ int el_init
 (
     void
 )
@@ -576,7 +576,7 @@ int el_init
    ========================================================================== */
 
 
-int el_oinit
+/* public api */ int el_oinit
 (
     struct el  *el  /* el object */
 )
@@ -611,7 +611,7 @@ int el_oinit
    ========================================================================== */
 
 
-struct el *el_new
+/* public api */ struct el *el_new
 (
     void
 )
@@ -637,7 +637,7 @@ struct el *el_new
    ========================================================================== */
 
 
-int el_cleanup
+/* public api */ int el_cleanup
 (
     void
 )
@@ -655,7 +655,7 @@ int el_cleanup
    ========================================================================== */
 
 
-int el_ocleanup
+/* public api */ int el_ocleanup
 (
     struct el  *el  /* el object */
 )
@@ -684,7 +684,7 @@ int el_ocleanup
    ========================================================================== */
 
 
-int el_destroy
+/* public api */ int el_destroy
 (
     struct el  *el  /* el object */
 )
@@ -720,7 +720,7 @@ int el_log_allowed
    ========================================================================== */
 
 
-int el_option
+/* public api */ int el_option
 (
     int      option,   /* option to set */
              ...       /* option value */
@@ -743,7 +743,7 @@ int el_option
    ========================================================================== */
 
 
-int el_ooption
+/* public api */ int el_ooption
 (
     struct el  *el,       /* el object to set option to */
     int         option,   /* option to set */
@@ -769,7 +769,7 @@ int el_ooption
    ========================================================================== */
 
 
-const struct el *el_get_el
+/* public api */ const struct el *el_get_el
 (
     void
 )

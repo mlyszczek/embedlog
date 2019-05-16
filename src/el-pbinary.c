@@ -161,7 +161,7 @@ static size_t el_flags
    ========================================================================== */
 
 
-int el_opbinary
+/* public api */ int el_opbinary
 (
     enum el_level   level,            /* log severity level */
     struct el      *el,               /* el object with info how to print */
@@ -234,7 +234,7 @@ int el_opbinary
    ========================================================================== */
 
 
-int el_pbinary
+/* public api */ int el_pbinary
 (
 
     enum el_level   level,   /* log severity level */

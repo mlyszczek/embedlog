@@ -49,7 +49,7 @@
    ========================================================================== */
 
 
-int el_puts
+/* public api */ int el_puts
 (
     const char  *s  /* string to put into output */
 )
@@ -137,7 +137,7 @@ int el_oputs
    ========================================================================== */
 
 
-int el_putb
+/* public api */ int el_putb
 (
     const void  *mem,  /* memory location to 'print' */
     size_t       mlen  /* size of the mem buffer */

@@ -340,7 +340,7 @@ static size_t el_funcinfo
    ========================================================================== */
 
 
-int el_print
+/* public api */ int el_print
 (
     const char    *file,   /* file name where log is printed */
     size_t         num,    /* line number where log is printed */
@@ -368,7 +368,7 @@ int el_print
    ========================================================================== */
 
 
-int el_oprint
+/* public api */ int el_oprint
 (
     const char    *file,   /* file name to print in log */
     size_t         num,    /* line number to print in log */
@@ -397,7 +397,7 @@ int el_oprint
    ========================================================================== */
 
 
-int el_vprint
+/* public api */ int el_vprint
 (
     const char    *file,   /* file name where log is printed */
     size_t         num,    /* line number where log is printed */
@@ -427,7 +427,7 @@ int el_vprint
    ========================================================================== */
 
 
-int el_ovprint
+/* public api */ int el_ovprint
 (
     const char    *file,                 /* file name to print in log */
     size_t         num,                  /* line number to print in log */
