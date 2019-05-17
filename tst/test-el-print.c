@@ -89,12 +89,19 @@ static int print_to_buffer
 
 static int print_check(void)
 {
-#define IS_DIGIT() if (!isdigit(*msg++)) return -1
-#define IS_CHAR(c) if (*msg++ != c) return -1
+#define IS_DIGIT() if (!isdigit(*msg++)) { \
+    fprintf(stderr, "%c not a digit in %s\n", *(msg - 1), line); \
+    return -1; \
+}
+#define IS_CHAR(c) if (*msg++ != c) { \
+    fprintf(stderr, "%c not a char %c in %s\n", *(msg - 1), c, line); \
+    return -1; \
+}
 
     static const char  *levelstr = "facewnid";
     struct log_message  expected;
     char               *msg;
+    char                line[1024];
     char                tmp[1024];
     int                 i;
     int                 slevel;
@@ -133,6 +140,25 @@ static int print_check(void)
     {
         slevel = expected.level > EL_DBG ? EL_DBG : expected.level;
 
+        /* put current line into buf, we will print in in event of error
+         */
+
+        {
+            char *nl;
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+            strncpy(line, msg, sizeof(line));
+            line[sizeof(line) - 1] = '\0';
+            nl = strchr(line, '\n');
+
+            if (nl != NULL)
+            {
+                *nl = '\0';
+            }
+        }
+
+
         if (expected.level > g_el.level)
         {
             /* log should not have been printed due to current log
@@ -152,6 +178,7 @@ static int print_check(void)
                  * color
                  */
 
+                fprintf(stderr, "no color info in %s\n", line);
                 return -1;
             }
 
@@ -239,7 +266,8 @@ static int print_check(void)
             /* wrong timestamp option value
              */
 
-           return -1;
+            fprintf(stderr, "wrong timestamp opton value in %s\n", line);
+            return -1;
         }
 
         /* check printing file information
@@ -264,6 +292,7 @@ static int print_check(void)
                      * lenght of file - file is too long
                      */
 
+                    fprintf(stderr, "':' not found in finfo in %s\n", line);
                     return -1;
                 }
             }
@@ -278,6 +307,8 @@ static int print_check(void)
                  * file name in printed log is different than what we set
                  */
 
+                fprintf(stderr, "wrong filename %s != %s in %s\n",
+                        tmp, expected_file, line);
                 return -1;
             }
 
@@ -300,6 +331,7 @@ static int print_check(void)
                      * is missing
                      */
 
+                    fprintf(stderr, "']' not found in finfo in %s\n", line);
                     return -1;
                 }
 
@@ -319,6 +351,8 @@ static int print_check(void)
                  * what was set
                  */
 
+                fprintf(stderr, "wrong line number %ld != %ld in %s\n",
+                        (long)atoi(tmp), (long)expected.line, line);
                 return -1;
             }
 
@@ -338,6 +372,7 @@ static int print_check(void)
 
                 if (*msg++ != '[')
                 {
+                    fprintf(stderr, "missing '[' in %s\n", line);
                     return -1;
                 }
             }
@@ -356,6 +391,7 @@ static int print_check(void)
                      * is missing
                      */
 
+                    fprintf(stderr, "missing ( in funcinfo in %s\n", line);
                     return -1;
                 }
             }
@@ -366,6 +402,8 @@ static int print_check(void)
                 /* function is different than what we expected
                  */
 
+                fprintf(stderr, "function is wrong %s != %s in %s\n",
+                        tmp, expected.func, line);
                 return -1;
             }
 
@@ -388,6 +426,7 @@ static int print_check(void)
 
             if (*msg++ != ' ')
             {
+                fprintf(stderr, "missing space delimiter in %s\n", line);
                 return -1;
             }
         }
@@ -399,11 +438,14 @@ static int print_check(void)
         {
             if (*msg++ != levelstr[slevel])
             {
+                fprintf(stderr, "wrong level char %c != %c in %s\n",
+                        *(msg - 1), levelstr[slevel], line);
                 return -1;
             }
 
             if (*msg++ != '/')
             {
+                fprintf(stderr, "missing '/' near log level in %s\n", line);
                 return -1;
             }
         }
@@ -423,6 +465,8 @@ static int print_check(void)
 
             if (strncmp(expected_prefix, msg, expected_prefix_len) != 0)
             {
+                fprintf(stderr, "wrong prefix expected %s in %s\n",
+                        expected_prefix, line);
                 return -1;
             }
 
@@ -434,6 +478,8 @@ static int print_check(void)
 
         if (strncmp(msg, expected.msg, msglen) != 0)
         {
+            fprintf(stderr, "log msg is bad, expected %s in %s\n",
+                    expected.msg, line);
             return -1;
         }
 
@@ -446,6 +492,7 @@ static int print_check(void)
                 /* expected end of color, got some shit
                  */
 
+                fprintf(stderr, "missing color ending code in %s\n", line);
                 return -1;
             }
 
@@ -463,6 +510,7 @@ static int print_check(void)
                  * new line
                  */
 
+                fprintf(stderr, "missing new line char in %s\n", line);
                 return -1;
             }
 
