@@ -135,6 +135,8 @@ static int pbinary_check(void)
             /* no, its not set correctly
              */
 
+            fprintf(stderr, "wrong level, exp: %d, got: %d\n",
+                    expected.level, flags >> 3);
             goto error;
         }
 
@@ -162,6 +164,7 @@ static int pbinary_check(void)
                 /* expected timestamp flag to be set
                  */
 
+                fprintf(stderr, "flag timestamp not set: %d\n", flags);
                 goto error;
             }
 
@@ -188,6 +191,7 @@ static int pbinary_check(void)
                      * too big (and thus corrupt)
                      */
 
+                    fprintf(stderr, "invalid fraction part: %ld\n", (long)usec);
                     goto error;
                 }
 
@@ -196,6 +200,7 @@ static int pbinary_check(void)
                     /* usec not set, and should be
                      */
 
+                    fprintf(stderr, "usec flag not set: %d\n", flags);
                     goto error;
                 }
             }
@@ -206,11 +211,11 @@ static int pbinary_check(void)
                     /* fraction flags set, and should not be
                      */
 
+                    fprintf(stderr, "fraction flag set (should not be): %d\n",
+                            flags);
                     goto error;
                 }
             }
-
-
         }
         else
         {
@@ -219,6 +224,8 @@ static int pbinary_check(void)
                 /* we didn't expect timestamp flag to be set
                  */
 
+                fprintf(stderr, "timestamp flag set (shouldn't be): %d\n",
+                        flags);
                 goto error;
             }
 
@@ -228,6 +235,8 @@ static int pbinary_check(void)
                  * seconds to not be set as well
                  */
 
+                fprintf(stderr, "timestamp flag not set but fraction is: %d\n",
+                        flags);
                 goto error;
             }
         }
@@ -256,6 +265,9 @@ static int pbinary_check(void)
                 /* truncated message has wrong length
                  */
 
+                fprintf(stderr, "truncated message wrong length "
+                        "exp: %lu, got %lu\n", EL_BUF_MAX - written - len,
+                        (long)val);
                 return -1;
             }
 
@@ -266,6 +278,7 @@ static int pbinary_check(void)
                 /* data is incorrect
                  */
 
+                fprintf(stderr, "data is incorrect\n");
                 return -1;
             }
 
@@ -284,6 +297,7 @@ static int pbinary_check(void)
                 /* data different than expected
                  */
 
+                fprintf(stderr, "data different than expected\n");
                 goto error;
             }
 
@@ -590,6 +604,9 @@ static void pbinary_mix_of_everything(void)
          * disk so pbinary_check() can read that data
          */
 
+        fprintf(stderr, "fract: %d, level: %d, timestamp: %d, printlevel: %d"
+                ", finfo: %d, colors: %d, prefix: %d, nl: %d\n", fract, level,
+                timestamp, printlevel, finfo, colors, prefix, nl);
         el_cleanup();
         mt_fok(pbinary_check());
 
