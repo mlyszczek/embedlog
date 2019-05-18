@@ -172,39 +172,7 @@ static int pbinary_check(void)
              * is set
              */
 
-            if (g_el.timestamp_fractions)
-            {
-#   ifdef LLONG_MAX
-                unsigned long long usec;
-#   else
-                unsigned long      usec;
-#   endif
-                /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-                len = el_decode_number(msg, &usec);
-                msg += len;
-
-                if (usec > 999999)
-                {
-                    /* we can't check exact value of microseconds,
-                     * but we surely can check if this value is not
-                     * too big (and thus corrupt)
-                     */
-
-                    fprintf(stderr, "invalid fraction part: %ld\n", (long)usec);
-                    goto error;
-                }
-
-                if ((flags & 0x04) != 0x04)
-                {
-                    /* usec not set, and should be
-                     */
-
-                    fprintf(stderr, "usec flag not set: %d\n", flags);
-                    goto error;
-                }
-            }
-            else
+            if (g_el.timestamp_fractions == EL_TS_FRACT_OFF)
             {
                 if (flags & 0x06)
                 {
@@ -216,6 +184,60 @@ static int pbinary_check(void)
                     goto error;
                 }
             }
+            else
+            {
+                len = el_decode_number(msg, &tmp);
+                msg += len;
+            }
+
+            if (g_el.timestamp_fractions == EL_TS_FRACT_MS)
+            {
+                if (tmp > 999)
+                {
+                    fprintf(stderr, "msec set, but value > 999: %ld\n",
+                            (long)tmp);
+                    goto error;
+                }
+
+                if (((flags & 0x06) >> 1) != 1)
+                {
+                    fprintf(stderr, "msec flag not set: %d\n", flags);
+                    goto error;
+                }
+            }
+
+            if (g_el.timestamp_fractions == EL_TS_FRACT_US)
+            {
+                if (tmp > 999999l)
+                {
+                    fprintf(stderr, "usec set, but value > 999999: %ld\n",
+                            (long)tmp);
+                    goto error;
+                }
+
+                if (((flags & 0x06) >> 1) != 2)
+                {
+                    fprintf(stderr, "usec flag not set: %d\n", flags);
+                    goto error;
+                }
+            }
+
+            if (g_el.timestamp_fractions == EL_TS_FRACT_NS)
+            {
+                if (tmp > 999999999l)
+                {
+                    fprintf(stderr, "nsec set, but value > 999999999: %ld\n",
+                            (long)tmp);
+                    goto error;
+                }
+
+                if (((flags & 0x06) >> 1) != 3)
+                {
+                    fprintf(stderr, "nsec flag not set: %d\n", flags);
+                    goto error;
+                }
+            }
+
         }
         else
         {
@@ -604,9 +626,11 @@ static void pbinary_mix_of_everything(void)
          * disk so pbinary_check() can read that data
          */
 
+#if 0
         fprintf(stderr, "fract: %d, level: %d, timestamp: %d, printlevel: %d"
                 ", finfo: %d, colors: %d, prefix: %d, nl: %d\n", fract, level,
                 timestamp, printlevel, finfo, colors, prefix, nl);
+#endif
         el_cleanup();
         mt_fok(pbinary_check());
 
