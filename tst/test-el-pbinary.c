@@ -201,29 +201,43 @@ static int pbinary_check(void)
              * fraction of seconds checks makes sense only when ts is set
              */
 
-            if (g_options.timestamp_fractions)
+            if (g_options.timestamp_fractions == EL_TS_FRACT_OFF)
             {
-#   ifdef LLONG_MAX
-                unsigned long long usec;
-#   else
-                unsigned long      usec;
-#   endif
-                /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-                len = el_decode_number(msg, &usec);
-                msg += len;
-
-                if (usec > 999999)
+                if (flags & 0x06)
                 {
-                    /*
-                     * we can't check exact value of microseconds, but we surely
-                     * can check if this value is not too big (and thus corrupt)
+                    /* fraction flags set, and should not be
                      */
 
+                    fprintf(stderr, "fraction flag set (should not be): %d\n",
+                            flags);
+                    goto error;
+                }
+            }
+            else
+            {
+                len = el_decode_number(msg, &tmp);
+                msg += len;
+            }
+
+            if (g_options.timestamp_fractions == EL_TS_FRACT_MS)
+            {
+                if (tmp > 999)
+                {
+                    fprintf(stderr, "msec set, but value > 999: %ld\n",
+                            (long)tmp);
                     goto error;
                 }
 
-                if ((flags & 0x04) != 0x04)
+                if (((flags & 0x06) >> 1) != 1)
+                {
+                    fprintf(stderr, "msec flag not set: %d\n", flags);
+                    goto error;
+                }
+            }
+
+            if (g_options.timestamp_fractions == EL_TS_FRACT_US)
+            {
+                if (tmp > 999999l)
                 {
                     /*
                      * usec not set, and should be
@@ -231,20 +245,29 @@ static int pbinary_check(void)
 
                     goto error;
                 }
-            }
-            else
-            {
-                if (flags & 0x06)
-                {
-                    /*
-                     * fraction flags set, and should not be
-                     */
 
+                if (((flags & 0x06) >> 1) != 2)
+                {
+                    fprintf(stderr, "usec flag not set: %d\n", flags);
                     goto error;
                 }
             }
 
+            if (g_options.timestamp_fractions == EL_TS_FRACT_NS)
+            {
+                if (tmp > 999999999l)
+                {
+                    fprintf(stderr, "nsec set, but value > 999999999: %ld\n",
+                            (long)tmp);
+                    goto error;
+                }
 
+                if (((flags & 0x06) >> 1) != 3)
+                {
+                    fprintf(stderr, "nsec flag not set: %d\n", flags);
+                    goto error;
+                }
+            }
         }
         else
         {
