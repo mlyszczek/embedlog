@@ -594,7 +594,9 @@ int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap) {
       char fmt_spec = '\0';
         /* current conversion specifier character */
 
+#if defined(PREFER_PORTABLE_SNPRINTF)
       str_arg = credits;/* just to make compiler happy (defined but not used)*/
+#endif
       str_arg = NULL;
       starting_p = p; p++;  /* skip '%' */
    /* parse flags */
