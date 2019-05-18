@@ -590,6 +590,7 @@ static void pbinary_mix_of_everything(void)
     int prefix;
     int fract;
     int nl;
+    int tm;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -601,6 +602,7 @@ static void pbinary_mix_of_everything(void)
     for (colors = 0;                colors <= 1;                  ++colors)
     for (prefix = 0;                prefix <= 1;                  ++prefix)
     for (nl = 0;                    nl <= 1;                      ++nl)
+    for (tm = 0;                    tm <= EL_TS_TM_ERROR;         ++tm)
     {
         test_prepare();
         el_option(EL_LEVEL, level);
@@ -611,6 +613,7 @@ static void pbinary_mix_of_everything(void)
         el_option(EL_COLORS, colors);
         el_option(EL_PREFIX, prefix ? "prefix" : NULL);
         el_option(EL_TS_FRACT, fract);
+        el_option(EL_TS_TM, tm);
 
         add_log(EL_FATAL,  d1, 1);
         add_log(EL_ALERT,  d1, 1);
