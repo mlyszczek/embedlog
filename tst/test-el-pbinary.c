@@ -580,17 +580,23 @@ static void pbinary_different_clocks(void)
    ========================================================================== */
 
 
+static void pbinary_mix_of_everything_check(void)
+{
+    mt_fok(pbinary_check());
+}
+
 static void pbinary_mix_of_everything(void)
 {
-    int level;
-    int timestamp;
-    int printlevel;
-    int finfo;
-    int colors;
-    int prefix;
-    int fract;
-    int nl;
-    int tm;
+    int   level;
+    int   timestamp;
+    int   printlevel;
+    int   finfo;
+    int   colors;
+    int   prefix;
+    int   fract;
+    int   nl;
+    int   tm;
+    char  tname[512];
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -629,13 +635,12 @@ static void pbinary_mix_of_everything(void)
          * disk so pbinary_check() can read that data
          */
 
-#if 0
-        fprintf(stderr, "fract: %d, level: %d, timestamp: %d, printlevel: %d"
-                ", finfo: %d, colors: %d, prefix: %d, nl: %d\n", fract, level,
-                timestamp, printlevel, finfo, colors, prefix, nl);
-#endif
         el_cleanup();
-        mt_fok(pbinary_check());
+        sprintf(tname, "pbinary_mix_of_everything:  fract: %d, level: %d"
+                ", timestamp: %d, printlevel: %d"
+                ", finfo: %d, colors: %d, prefix: %d, nl: %d, tm: %d", fract,
+                level, timestamp, printlevel, finfo, colors, prefix, nl, tm);
+        mt_run_named(pbinary_mix_of_everything_check, tname);
 
         test_cleanup();
     }
@@ -719,7 +724,7 @@ void el_pbinary_test_group(void)
 {
 #if ENABLE_BINARY_LOGS
     mt_run(pbinary_different_clocks);
-    mt_run(pbinary_mix_of_everything);
+    pbinary_mix_of_everything();
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
