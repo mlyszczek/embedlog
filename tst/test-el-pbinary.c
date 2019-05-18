@@ -159,7 +159,7 @@ static int pbinary_check(void)
              * so we have to trust the size
              */
 
-            if (flags & 0x01 != 0x01)
+            if ((flags & 0x01) != 0x01)
             {
                 /* expected timestamp flag to be set
                  */
@@ -195,7 +195,7 @@ static int pbinary_check(void)
                     goto error;
                 }
 
-                if (flags & 0x04 != 0x04)
+                if ((flags & 0x04) != 0x04)
                 {
                     /* usec not set, and should be
                      */
