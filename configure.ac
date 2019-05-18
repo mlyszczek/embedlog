@@ -74,8 +74,6 @@ AC_ARG_ENABLE([out-stderr],
 AS_IF([test "x$enable_out_stderr" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_STDERR], [1], [Enable printing to stderr and stdout])
-    AC_CHECK_FUNCS([fputs],,
-        AC_MSG_ERROR(not found, needed by --enable-out-stderr))
 ])
 
 
@@ -95,11 +93,10 @@ AS_IF([test "x$enable_out_file" = "xyes"],
     AC_DEFINE([ENABLE_OUT_FILE], [1], [Enable printing to file])
     ENABLE_OUT_FILE=1
     AC_CHECK_FUNCS(access stat fsync fileno)
-    AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
-        AC_MSG_ERROR(not found, needed by --enable-out-file))
 ])
 
 AC_SUBST(ENABLE_OUT_FILE)
+
 
 ###
 # --enable-out-tty
@@ -117,11 +114,10 @@ AS_IF([test "x$enable_out_tty" = "xyes"],
     AC_DEFINE([ENABLE_OUT_TTY], [1], [Enable printing to tty])
     ENABLE_OUT_TTY=1
     AC_CHECK_HEADERS(termios.h)
-    AC_CHECK_FUNCS([open tcgetattr cfsetispeed tcsetattr close],,
-        AC_MSG_ERROR(not found, needed by --enable-out-tty))
 ])
 
 AC_SUBST(ENABLE_OUT_TTY)
+
 
 ###
 # --enable-out-custom
@@ -138,11 +134,10 @@ AS_IF([test "x$enable_out_custom" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_CUSTOM], [1], [Enable printing to custom])
     ENABLE_OUT_CUSTOM=1
-    AC_CHECK_FUNCS([fopen fclose fwrite remove rename],,
-        AC_MSG_ERROR(not found, needed by --enable-out-custom))
 ])
 
 AC_SUBST(ENABLE_OUT_CUSTOM)
+
 
 ###
 # --enable-timestamp
@@ -156,8 +151,6 @@ AC_ARG_ENABLE([timestamp],
 AS_IF([test "x$enable_timestamp" = "xyes"],
 [
     AC_DEFINE([ENABLE_TIMESTAMP], [1], [Enable printing timestamp with log])
-    AC_CHECK_FUNCS([clock time sprintf],,
-        AC_MSG_ERROR(not found, needed by --enable-timestamp))
 ])
 
 
@@ -175,8 +168,6 @@ AS_IF([test "x$enable_fractions" = "xyes"],
     AS_IF([test "x$enable_timestamp" = "xyes"],
     [
         AC_DEFINE([ENABLE_FRACTIONS], [1], [Enable printing fractions with log])
-        AC_CHECK_FUNCS([sprintf],,
-            AC_MSG_ERROR(not found, needed by --enable-fractions))
     ],
     #else
     [
@@ -200,8 +191,6 @@ AS_IF([test "x$enable_realtime" = "xyes"],
     AS_IF([test "x$enable_timestamp" = "xyes"],
     [
         AC_DEFINE([ENABLE_REALTIME], [1], [Enable using CLOCK_REALTIME in log])
-        AC_CHECK_FUNCS([clock_gettime],,
-            AC_MSG_ERROR(not found, needed by --enable-realtime))
     ],
     #else
     [
@@ -225,8 +214,6 @@ AS_IF([test "x$enable_monotonic" = "xyes"],
     AS_IF([test "x$enable_timestamp" = "xyes"],
     [
         AC_DEFINE([ENABLE_MONOTONIC], [1], [Enable using CLOCK_MONOTONIC in log])
-        AC_CHECK_FUNCS([clock_gettime],,
-            AC_MSG_ERROR(not found, needed by --enable-monotonic))
     ],
     #else
     [
@@ -250,8 +237,6 @@ AS_IF([test "x$enable_clock" = "xyes"],
     AS_IF([test "x$enable_timestamp" = "xyes"],
     [
         AC_DEFINE([ENABLE_CLOCK], [1], [Enable using clock() as time source in log])
-        AC_CHECK_FUNCS([clock],,
-            AC_MSG_ERROR(not found, needed by --enable-clock))
     ],
     # else
     [
@@ -300,8 +285,6 @@ AS_IF([test "x$enable_prefix" = "xyes"],
 [
     AC_DEFINE([ENABLE_PREFIX], [1], [Enable printing prefix to each message])
     ENABLE_PREFIX=1
-    AC_CHECK_FUNCS([strncat strlen],,
-        AC_MSG_ERROR(not found, needed by --enable-prefix))
 ])
 
 AC_SUBST(ENABLE_PREFIX)
@@ -318,8 +301,6 @@ AC_ARG_ENABLE([finfo],
 AS_IF([test "x$enable_finfo" = "xyes"],
 [
     AC_DEFINE([ENABLE_FINFO], [1], [Enable printing file info with log])
-    AC_CHECK_FUNCS([strncat strlen sprintf],,
-        AC_MSG_ERROR(not found, needed by --enable-finfo))
 ])
 
 
@@ -335,8 +316,6 @@ AC_ARG_ENABLE([funcinfo],
 AS_IF([test "x$enable_funcinfo" = "xyes"],
 [
     AC_DEFINE([ENABLE_FUNCINFO], [1], [Enable printing function info with log])
-    AC_CHECK_FUNCS([strncat strlen sprintf],,
-        AC_MSG_ERROR(not found, needed by --enable-funcinfo))
 ])
 
 
@@ -352,8 +331,6 @@ AC_ARG_ENABLE([colors],
 AS_IF([test "x$enable_colors" = "xyes"],
 [
     AC_DEFINE([ENABLE_COLORS], [1], [Enable output colorization])
-    AC_CHECK_FUNCS([strcpy strlen],,
-        AC_MSG_ERROR(not found, needed by --enable-colors))
 ])
 
 
