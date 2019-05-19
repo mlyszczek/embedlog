@@ -35,11 +35,19 @@ build()
     opts="${1}"
     project="${2}"
     slot="${3}"
+    project_dir="${4}"
 
     cd "${project}-${slot}"
     export AM_DISTCHECK_CONFIGURE_FLAGS="${opts}"
     make distcheck
-    exit ${?}
+    ret=${?}
+
+    if [ ${ret} -eq 0 ]
+    then
+        echo "[ok]   ${opts}" >> "${project_dir}/compilation-test-results"
+    else
+        echo "[nok]  ${opts}" >> "${project_dir}/compilation-test-results"
+    fi
 }
 
 
@@ -57,6 +65,9 @@ workdir="/tmp/parallel-test-compilation"
 combination_file="${workdir}/combinations"
 project="embedlog"
 optfile="test-compilation-options"
+project_dir="$(dirname "${0}")"
+cd "${project_dir}"
+project_dir="$(pwd)"
 
 export -f build
 export -f prepare
@@ -145,4 +156,4 @@ parallel --output-as-files --bar --results "${workdir}" \
 # and run distcheck tests, will take a loooong time
 cat ${combination_file} | parallel --output-as-files --bar \
     --results "${workdir}" --halt-on-error now,fail=1 --jobs ${num_jobs} \
-    build {} "${project}" {%}
+    build {} "${project}" {%} "${project_dir}"
