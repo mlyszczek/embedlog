@@ -621,9 +621,9 @@ Function can return errors from
 .   B cfsetispeed
 and
 .   BR tcsetattr .
-.   SH RETURN VALUE
 .   RE
 .RE
+.SH RETURN VALUE
 .PP
 On success 0 is returned. -1 is returned when any error occured.
 .SH ERRORS
@@ -637,6 +637,7 @@ is invalid.
 Passed
 .I option
 is not supported on this system (support was not compiled)
+.PP
 Also check for error description of specific option that failed for more
 informations
 .SH SEE ALSO
