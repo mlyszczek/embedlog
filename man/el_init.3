@@ -26,26 +26,6 @@ Another type are functions that accept additional
 argument. These functions are prefixed with
 .BR el_o .
 .PP
-All functions (el_o or not) are "line" thread-safe (provided that
-.B \-\-enable\-reentrant
-is turned on).
-That means library buffers whole line before it calls
-.B puts
-function, so lines in output will not overlap.
-.PP
-NOTE: this may not be entirely true for every operating system there is! Yes,
-.B embedlog
-will always buffer and print whole lines, but OS may, for example interrupt
-.B puts
-call from thread1, and call
-.B puts
-from thread2.
-In such case output will be mangled with 2 different lines.
-While this situation is very rare, it's only fair to mention it.
-If in doubt, check
-.B stdio
-implementation in your operating system.
-.PP
 .BR el_init (3)
 initializes static global option structure. This option structure is used by all
 functions that don't accept

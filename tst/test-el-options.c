@@ -464,6 +464,8 @@ static void options_ooption_test(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+    el_oinit(&opts);
+
 #if ENABLE_TIMESTAMP
     el_ooption(&opts, EL_TS_TM, EL_TS_TM_TIME);
     mt_fail(opts.timestamp_timer == EL_TS_TM_TIME);

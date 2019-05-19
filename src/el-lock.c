@@ -2,16 +2,14 @@
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ==========================================================================
-         _____________________________________________________________
-        / here we handle el_flush function which should make sure all \
-        | logs are flushed from buffers and are received by           |
-        \ underlying device                                           /
-         -------------------------------------------------------------
-          \
-           \   \
-                \ /\
-                ( )
-              .( o ).
+         ----------------------------------------------------------
+        < this simple file, deals with locking and unlocking mutex >
+         ----------------------------------------------------------
+                \   ^__^
+                 \  (oo)\_______
+                    (__)\       )\/\
+                        ||----w |
+                        ||     ||
    ==========================================================================
           _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
@@ -24,8 +22,7 @@
 
 #include "el-private.h"
 
-#include <errno.h>
-#include <stdio.h>
+#include <pthread.h>
 
 
 /* ==========================================================================
@@ -39,69 +36,36 @@
 
 
 /* ==========================================================================
-    Does whatever it takes to make sure data is flushed from buffers and is
-    received by underlying devices (which may be block device or remote
-    server).
+    Locks mutex on specified "el" object. If mutex is not initialized, that
+    is thread safety is turned off, nothing happens.
    ========================================================================== */
 
 
-/* public api */ int el_flush
+void el_lock
 (
-    void
+    struct el  *el  /* el object to lock */
 )
 {
-    return el_oflush(&g_el);
+    if (el->lock_initialized)
+    {
+        pthread_mutex_lock(&el->lock);
+    }
 }
 
 
 /* ==========================================================================
-    Same as el_flush() but takes el object as argument
+    Unlock mutex on specified "el" object. If mutex is not initialized, that
+    is thread safety is turned off, nothing happens.
    ========================================================================== */
 
 
-/* public api */ int el_oflush
+void el_unlock
 (
-    struct el  *el   /* options defining printing style */
+    struct el  *el  /* el object to unlock */
 )
 {
-    int         rv;  /* return value from function */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    VALID(EINVAL, el);
-    el_lock(el);
-    VALIDC(ENODEV, el->outputs != 0, el_unlock(el));
-
-    rv = 0;
-
-
-#if ENABLE_OUT_STDERR
-    if (el->outputs & EL_OUT_STDERR)
+    if (el->lock_initialized)
     {
-        rv |= fflush(stderr);
+        pthread_mutex_unlock(&el->lock);
     }
-#endif
-
-#if ENABLE_OUT_STDERR
-    if (el->outputs & EL_OUT_STDOUT)
-    {
-        rv |= fflush(stdout);
-    }
-#endif
-
-#if ENABLE_OUT_FILE
-    if (el->outputs & EL_OUT_FILE)
-    {
-        rv |= el_file_flush(el);
-    }
-#endif
-
-#if 0
-    if (el->outputs & EL_OUT_NET)
-    {
-        el_net_flush(el);
-    }
-#endif
-
-    el_unlock(el);
-    return rv;
 }

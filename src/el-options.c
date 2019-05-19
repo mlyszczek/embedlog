@@ -118,6 +118,7 @@ static int el_vooption
     va_list         ap           /* option value(s) */
 )
 {
+    int             ret;         /* return code from various functions */
     int             value_int;   /* ap value treated as integer */
     long            value_long;  /* ap value treated as long */
     const char     *value_str;   /* ap value treated as string */
@@ -140,7 +141,9 @@ static int el_vooption
     case EL_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int <= 7);
+        el_lock(el);
         el->level = value_int;
+        el_unlock(el);
         return 0;
 
 
@@ -158,7 +161,9 @@ static int el_vooption
     case EL_FSYNC_LEVEL:
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int <= 7);
+        el_lock(el);
         el->fsync_level = value_int;
+        el_unlock(el);
         return 0;
 
 #   endif /* ENABLE_OUT_FILE */
@@ -178,7 +183,9 @@ static int el_vooption
         value_int = value_int == EL_OUT_ALL ? VALID_OUTS : value_int;
         VALID(EINVAL, (value_int & ~ALL_OUTS) == 0x00);
         VALID(ENODEV, (value_int & ~VALID_OUTS) == 0x00);
+        el_lock(el);
         el->outputs = value_int;
+        el_unlock(el);
         return 0;
 
 
@@ -195,7 +202,9 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
+        el_lock(el);
         el->print_log_level = value_int;
+        el_unlock(el);
         return 0;
 
 
@@ -212,7 +221,9 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
+        el_lock(el);
         el->print_newline = value_int;
+        el_unlock(el);
         return 0;
 
 
@@ -229,7 +240,9 @@ static int el_vooption
 
     case EL_PREFIX:
         value_str = va_arg(ap, const char *);
+        el_lock(el);
         el->prefix = value_str;
+        el_unlock(el);
         return 0;
 
 #   endif /* ENABLE_PREFIX */
@@ -254,7 +267,9 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
+        el_lock(el);
         el->colors = value_int;
+        el_unlock(el);
         return 0;
 
 #   endif /* ENABLE_COLORS */
@@ -275,7 +290,9 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_ERROR);
 
+        el_lock(el);
         el->timestamp = value_int;
+        el_unlock(el);
         return 0;
 
 
@@ -294,7 +311,9 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, 0 <= value_int && value_int < EL_TS_FRACT_ERROR);
 
+        el_lock(el);
         el->timestamp_fractions = value_int;
+        el_unlock(el);
         return 0;
 
 #       endif /* ENABLE_FRACTIONS */
@@ -326,7 +345,9 @@ static int el_vooption
         VALID(ENODEV, value_int != EL_TS_TM_CLOCK);
 #       endif
 
+        el_lock(el);
         el->timestamp_timer = value_int;
+        el_unlock(el);
         return 0;
 
 #   endif /* ENABLE_TIMESTAMP */
@@ -347,7 +368,9 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
+        el_lock(el);
         el->finfo = value_int;
+        el_unlock(el);
         return 0;
 
 #   endif /* ENABLE_FINFO */
@@ -379,7 +402,9 @@ static int el_vooption
         value_int = va_arg(ap, int);
         VALID(EINVAL, (value_int & ~1) == 0);
 
+        el_lock(el);
         el->funcinfo = value_int;
+        el_unlock(el);
         return 0;
 
 #       endif /* __STDC_VERSION__ < 199901L */
@@ -401,8 +426,11 @@ static int el_vooption
     case EL_FPATH:
         value_str = va_arg(ap, const char *);
         VALID(EINVAL, value_str);
+        el_lock(el);
         el->fname = value_str;
-        return el_file_open(el);
+        ret = el_file_open(el);
+        el_unlock(el);
+        return ret;
 
 
     /* ==================================================================
@@ -422,22 +450,25 @@ static int el_vooption
 
         value_int = va_arg(ap, int);
         VALID(EINVAL, value_int >= 0);
+        el_lock(el);
         previous_frotate = el->frotate_number;
         el->frotate_number = value_int;
+        ret = 0;
 
         if (previous_frotate == 0 && el->file)
         {
             /* user turned on file rotation when file is already
              * opened without rotation. To prevent weird situations
              * and even data loss, we reopen file as opening with
-             * log rotation is a bit different.  el_file_open
+             * log rotation is a bit different. el_file_open()
              * function will close file before reopening
              */
 
-            return el_file_open(el);
+            ret = el_file_open(el);
         }
 
-        return 0;
+        el_unlock(el);
+        return ret;
     }
 
 
@@ -453,7 +484,9 @@ static int el_vooption
     case EL_FROTATE_SIZE:
         value_long = va_arg(ap, long);
         VALID(EINVAL, value_long >= 1);
+        el_lock(el);
         el->frotate_size = value_long;
+        el_unlock(el);
         return 0;
 
 
@@ -469,7 +502,9 @@ static int el_vooption
     case EL_FSYNC_EVERY:
         value_long = va_arg(ap, long);
         VALID(EINVAL, value_long >= 0);
+        el_lock(el);
         el->fsync_every = value_long;
+        el_unlock(el);
         return 0;
 
 #   endif  /* ENABLE_OUT_FILE */
@@ -495,7 +530,10 @@ static int el_vooption
 
         VALID(EINVAL, value_str);
 
-        return el_tty_open(el, value_str, speed);
+        el_lock(el);
+        ret = el_tty_open(el, value_str, speed);
+        el_unlock(el);
+        return ret;
     }
 
 #   endif /* ENABLE_OUT_TTY */
@@ -513,11 +551,87 @@ static int el_vooption
 #   if ENABLE_OUT_CUSTOM
 
     case EL_CUSTOM_PUTS:
+        el_lock(el);
         el->custom_puts = va_arg(ap, el_custom_puts);
         el->custom_puts_user = va_arg(ap, void *);
+        el_unlock(el);
         return 0;
 
 #   endif /* ENABLE_OUT_CUSTOM */
+
+
+    /* ==================================================================
+              __   __                       __            ___
+             / /_ / /   ____ ___  ___ _ ___/ / ___ ___ _ / _/___
+            / __// _ \ / __// -_)/ _ `// _  / (_-</ _ `// _// -_)
+            \__//_//_//_/   \__/ \_,_/ \_,_/ /___/\_,_//_/  \__/
+
+       ==================================================================
+        param
+                int [0,1]
+
+        description
+                initializes or destroys lock for given "el" object,
+                function does make sure not to double initialize or
+                destroy mutex. This case must be called when no
+                other threads are accessing any of "el" fields.
+       ================================================================== */
+
+
+#   if ENABLE_PTHREAD
+
+    case EL_THREAD_SAFE:
+        value_int = va_arg(ap, int);
+
+        if (value_int)
+        {
+            if (el->lock_initialized)
+            {
+                /* lock is already initialized, don't initialize
+                 * it again, as this will result in undefined
+                 * behaviour
+                 */
+
+                return 0;
+            }
+
+            /* lock not initialized, do it now
+             */
+
+            ret = pthread_mutex_init(&el->lock, NULL);
+            if (ret > 0)
+            {
+                /* pthread does not need to set errno, and it
+                 * returns errno value as return value from
+                 * function, convert it to our standard error
+                 * reporting
+                 */
+
+                errno = ret;
+                return -1;
+            }
+
+            el->lock_initialized = 1;
+            return 0;
+        }
+
+        /* user wants to disable thread safety
+         */
+
+        if (el->lock_initialized == 0)
+        {
+            /* but lock is not initialized, can't destroy what has
+             * no yet been created.
+             */
+
+            return 0;
+        }
+
+        pthread_mutex_destroy(&el->lock);
+        el->lock_initialized = 0;
+        return 0;
+
+#   endif /* ENABLE_PTHREAD */
 
 
     /* ==================================================================
@@ -598,6 +712,11 @@ static int el_vooption
     el->fsync_every = 32768;
     el->fsync_level = EL_FATAL;
 #endif
+
+#if ENABLE_PTHREAD
+    el->lock_initialized = 0;
+#endif
+
     return 0;
 }
 
@@ -633,7 +752,9 @@ static int el_vooption
 
 
 /* ==========================================================================
-    cleans up whatever has been initialized/reserved by el_init
+    cleans up whatever has been initialized/reserved by el_init. Due to the
+    nature of pthread, this functions must be called only when no other
+    threads operate on "el" object.
    ========================================================================== */
 
 
@@ -648,7 +769,8 @@ static int el_vooption
 
 /* ==========================================================================
     cleans up whatever has been initialized/reserved by el_option and
-    el_init calls
+    el_init calls. Due to the nature of pthread, this functions must be
+    called only when no other threads operate on "el" object.
 
     errno
             EINVAL      el is invalid (null)
@@ -674,6 +796,12 @@ static int el_vooption
     }
 #endif
 
+#if ENABLE_PTHREAD
+    if (el->lock_initialized)
+    {
+        pthread_mutex_destroy(&el->lock);
+    }
+#endif
     return 0;
 }
 

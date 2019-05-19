@@ -393,6 +393,34 @@ static size_t el_funcinfo
 
 
 /* ==========================================================================
+    el_print but with custom el and does not lock mutex.
+   ========================================================================== */
+
+
+int el_oprint_nb
+(
+    const char    *file,   /* file name to print in log */
+    size_t         num,    /* line number to print in log */
+    const char    *func,   /* function name to print */
+    enum el_level  level,  /* log level to print log with */
+    struct el     *el,     /* printing style el */
+    const char    *fmt,    /* message format (man printf) */
+                   ...     /* additional params for fmt */
+)
+{
+    va_list        ap;     /* arguments '...' for 'fmt' */
+    int            ret;    /* return code from el_printfv() */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    va_start(ap, fmt);
+    ret = el_ovprint_nb(file, num, func, level, el, fmt, ap);
+    va_end(ap);
+    return ret;
+}
+
+
+/* ==========================================================================
     el_print but accepts variadic argument list object instead of '...'
    ========================================================================== */
 
@@ -412,6 +440,34 @@ static size_t el_funcinfo
 
 
 /* ==========================================================================
+    Same as el_ovprint_nb() but can lock mutex.
+   ========================================================================== */
+
+
+/* public api */ int el_ovprint
+(
+    const char    *file,   /* file name to print in log */
+    size_t         num,    /* line number to print in log */
+    const char    *func,   /* function name to print */
+    enum el_level  level,  /* log level to print log with */
+    struct el     *el,     /* el defining print style */
+    const char    *fmt,    /* message format (man printf) */
+    va_list        ap      /* additional params for fmt */
+)
+{
+    int            ret;    /* return from el_ovprint_nb() */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    VALID(EINVAL, el);
+    el_lock(el);
+    ret = el_ovprint_nb(file, num, func, level, el, fmt, ap);
+    el_unlock(el);
+    return ret;
+}
+
+
+/* ==========================================================================
     Prints message formated by 'fmt' and 'ap' with timestamp, 'file' and
     line number 'num' information, with specified 'level' into configured
     outputs. Function allocates on callers stack EL_BUF_MAX of memory. If
@@ -427,7 +483,7 @@ static size_t el_funcinfo
    ========================================================================== */
 
 
-/* public api */ int el_ovprint
+int el_ovprint_nb
 (
     const char    *file,                 /* file name to print in log */
     size_t         num,                  /* line number to print in log */
@@ -552,7 +608,7 @@ static size_t el_funcinfo
 
     el->level_current_msg = level;
 
-    if (el_oputs(el, buf) != 0)
+    if (el_oputs_nb(el, buf) != 0)
     {
         el->level_current_msg = EL_DBG;
         return -1;

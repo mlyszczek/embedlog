@@ -706,7 +706,227 @@ static void pbinary_truncate(void)
     mt_fok(pbinary_check());
 }
 
-#endif
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+#if ENABLE_PTHREAD
+
+#define total_prints 125000
+#define line_length (2 * sizeof(int) + 2)
+#define number_of_threads 25
+
+#define file_size (total_prints * line_length)
+#define prints_per_rotate (file_size / line_length)
+#define prints_per_thread (total_prints / number_of_threads)
+
+static int sort_pbinary
+(
+    const void  *p1,
+    const void  *p2
+)
+{
+    int          m1[2];
+    int          m2[2];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    memcpy(m1, (unsigned char *)p1 + 2, sizeof(m1));
+    memcpy(m2, (unsigned char *)p2 + 2, sizeof(m2));
+
+    if (m1[0] < m2[0])
+    {
+        return -1;
+    }
+
+    if (m1[0] > m2[0])
+    {
+        return 1;
+    }
+
+    /* thread id equal, let message id decide euqualness
+     */
+
+    if (m1[1] < m2[1])
+    {
+        return -1;
+    }
+
+    if (m1[1] > m2[1])
+    {
+        return 1;
+    }
+
+    /* everything is equal, there is bug, upper layer will
+     * take care of it
+     */
+
+    fprintf(stderr, "sort_pbinary, m1 == m2\n");
+    return 0;
+}
+
+
+static int print_check(void)
+{
+    struct stat     st;
+    unsigned char  *msg;
+    unsigned char  *msgsave;
+    int             fd;
+    unsigned char   flags;
+    unsigned char   len;
+    int             tid;
+    int             mid;
+    int             curr_tid;
+    int             curr_mid;
+    unsigned        i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    stat(logpath, &st);
+
+    if (st.st_size != file_size)
+    {
+        fprintf(stderr, "file size different than expected\n");
+        return -1;
+    }
+
+    fd = open(logpath, O_RDONLY);
+    msg = mmap(NULL, st.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+    msgsave = msg;
+    curr_tid = 0;
+    curr_mid = 0;
+
+
+    qsort(msg, total_prints, line_length, sort_pbinary);
+
+    for (i = 0; i < file_size; i += line_length)
+    {
+        flags = msg[i + 0];
+        len = msg[i + 1];
+        memcpy(&tid, &msg[i + 2], sizeof(tid));
+        memcpy(&mid, &msg[i + 6], sizeof(mid));
+
+        /* flag should contain only severity level (info == 6)
+         */
+
+        if (flags != 6 << 3)
+        {
+            fprintf(stderr, "incorect flags: %d\n", flags);
+            munmap(msgsave, st.st_size);
+            close(fd);
+            return -1;
+        }
+
+        if (len != 2 * sizeof(int))
+        {
+            fprintf(stderr, "incorect line length: %d\n", len);
+            munmap(msgsave, st.st_size);
+            close(fd);
+            return -1;
+        }
+
+        if (tid != curr_tid)
+        {
+            fprintf(stderr, "msg_tid (%d) != curr_tid (%d)\n",
+                    tid, curr_tid);
+            munmap(msgsave, st.st_size);
+            close(fd);
+            return -1;
+        }
+
+        if (mid != curr_mid)
+        {
+            fprintf(stderr, "msg_mid (%d) != curr_mid (%d)\n",
+                    mid, curr_mid);
+            munmap(msgsave, st.st_size);
+            close(fd);
+            return -1;
+        }
+
+        if (++curr_mid == prints_per_thread)
+        {
+            ++curr_tid;
+            curr_mid = 0;
+        }
+    }
+
+    if (curr_tid != number_of_threads || curr_mid != 0)
+    {
+        fprintf(stderr, "file didn't contain all entries, tid: %d, mid: %d\n",
+                curr_tid, curr_mid);
+        munmap(msgsave, st.st_size);
+        close(fd);
+        return -1;
+    }
+
+    munmap(msgsave, st.st_size);
+    close(fd);
+    return 0;
+}
+
+static void *print_t
+(
+    void  *arg
+)
+{
+    int    msg[2];
+    int    i;
+    int    n;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    n = *(int *)arg;
+
+    for (i = 0; i != prints_per_thread; ++i)
+    {
+        msg[0] = n;
+        msg[1] = i;
+        el_pbinary(EL_INFO, msg, sizeof(msg));
+    }
+
+    return NULL;
+}
+
+
+static void prbinary_threaded(void)
+{
+    pthread_t  pt[number_of_threads];
+    int        i, j, n[number_of_threads];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    unlink(logpath);
+    el_init();
+
+    el_option(EL_THREAD_SAFE, 1);
+    el_option(EL_PRINT_LEVEL, 0);
+    el_option(EL_OUT, EL_OUT_FILE);
+    el_option(EL_FROTATE_NUMBER, 0);
+    el_option(EL_FPATH, logpath);
+    el_option(EL_FSYNC_EVERY, file_size / 4);
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        n[i] = i;
+        pthread_create(&pt[i], NULL, print_t, &n[i]);
+    }
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        pthread_join(pt[i], NULL);
+    }
+
+    /* do it before print_check() so any buffered data is flushed
+     * to disk, otherwise files will be incomplete
+     */
+
+    el_flush();
+    mt_fok(print_check());
+    el_cleanup();
+}
+
+#endif /* ENABLE_PTHREAD */
+#endif /* ENABLE_BINARY_LOGS */
+
 
 
 /* ==========================================================================
@@ -722,6 +942,12 @@ static void pbinary_truncate(void)
 void el_pbinary_test_group(void)
 {
 #if ENABLE_BINARY_LOGS
+#if ENABLE_PTHREAD
+
+    mt_run(prbinary_threaded);
+
+#endif
+
     mt_run(pbinary_different_clocks);
     pbinary_mix_of_everything();
 

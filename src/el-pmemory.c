@@ -111,7 +111,7 @@ static int el_print_line
     /* print constructed line
      */
 
-    return el_oprint(file, num, func, level, el, "0x%04x  %-*s %s",
+    return el_oprint_nb(file, num, func, level, el, "0x%04x  %-*s %s",
         offset, EL_MEM_HEX_LEN, hex_data, char_data);
 }
 
@@ -185,7 +185,9 @@ static int el_pmem
     VALID(EINVAL, mem);
     VALID(EINVAL, mlen);
     VALID(EINVAL, el);
-    VALID(ERANGE, el_log_allowed(el, level));
+    el_lock(el);
+    VALIDC(ERANGE, el_log_allowed(el, level), el_unlock(el));
+
 
     /* print log table preamble that is:
      *
@@ -197,16 +199,16 @@ static int el_pmem
     if (table)
     {
         rv = 0;
-        rv |= el_oprint(file, num, func, level, el, "%.*s  %.*s  %.*s",
+        rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
             EL_MEM_OFFSET_LEN - 2, separator,
             EL_MEM_HEX_LEN - 1, separator,
             EL_MEM_CHAR_LEN, separator);
 
-        rv |= el_oprint(file, num, func, level, el, "%-*s%-*s%s",
+        rv |= el_oprint_nb(file, num, func, level, el, "%-*s%-*s%s",
             EL_MEM_OFFSET_LEN, "offset",
             EL_MEM_HEX_LEN + 1, "hex", "ascii");
 
-        rv |= el_oprint(file, num, func, level, el, "%.*s  %.*s  %.*s",
+        rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
             EL_MEM_OFFSET_LEN - 2, separator,
             EL_MEM_HEX_LEN - 1, separator,
             EL_MEM_CHAR_LEN, separator);
@@ -246,12 +248,13 @@ static int el_pmem
 
     if (table)
     {
-        rv |= el_oprint(file, num, func, level, el, "%.*s  %.*s  %.*s",
+        rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
             EL_MEM_OFFSET_LEN - 2, separator,
             EL_MEM_HEX_LEN - 1, separator,
             EL_MEM_CHAR_LEN, separator);
     }
 
+    el_unlock(el);
     return rv;
 }
 

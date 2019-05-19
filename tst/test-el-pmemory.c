@@ -19,6 +19,9 @@
 #include "mtest.h"
 #include "embedlog.h"
 
+#if ENABLE_PTHREAD
+#   include <pthread.h>
+#endif
 
 /* ==========================================================================
           __             __                     __   _
@@ -32,6 +35,7 @@
 
 mt_defs_ext();
 static char  logbuf[1024 * 1024];  /* output simulation */
+static char  ascii[128];
 
 
 /* ==========================================================================
@@ -194,18 +198,7 @@ static void pmemory_binary_data_with_nulls(void)
 
 static void pmemory_print_ascii_table(void)
 {
-    char  ascii[128 + 1];
-    int   i;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    for (i = 0; i != 0x80; ++i)
-    {
-        ascii[i] = (char)i;
-    }
-
-    ascii[i] = '\0';
-
-    el_pmemory(ELI, ascii, sizeof(ascii) - 1);
+    el_pmemory(ELI, ascii, sizeof(ascii));
     mt_fok(strcmp(logbuf,
 "0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................\n"
 "0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................\n"
@@ -224,18 +217,7 @@ static void pmemory_print_ascii_table(void)
 
 static void pmemory_print_ascii_table_with_table(void)
 {
-    char  ascii[128 + 1];
-    int   i;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    for (i = 0; i != 0x80; ++i)
-    {
-        ascii[i] = (char)i;
-    }
-
-    ascii[i] = '\0';
-
-    el_pmemory_table(ELI, ascii, sizeof(ascii) - 1);
+    el_pmemory_table(ELI, ascii, sizeof(ascii));
     mt_fok(strcmp(logbuf,
 "------  -----------------------------------------------  ----------------\n"
 "offset  hex                                              ascii\n"
@@ -250,6 +232,117 @@ static void pmemory_print_ascii_table_with_table(void)
 "0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.\n"
 "------  -----------------------------------------------  ----------------\n"));
 }
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+#if ENABLE_PTHREAD
+
+static const char expected_out[] =
+"0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................\n"
+"0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................\n"
+"0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !\"#$%&'()*+,-./\n"
+"0x0030  30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f  0123456789:;<=>?\n"
+"0x0040  40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO\n"
+"0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[\\]^_\n"
+"0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno\n"
+"0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.\n";
+
+#define max_size sizeof(logbuf)
+#define number_of_threads 32
+#define print_length (sizeof(expected_out) - 1)
+#define prints_per_thread (max_size / print_length / number_of_threads)
+#define number_of_prints (prints_per_thread * number_of_threads)
+
+static int print_check(void)
+{
+    int    i;
+    char  *msg;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    /* all we care about is that there are no interlaces
+     */
+
+    for (msg = logbuf, i = 0; i != number_of_prints; ++i, msg += print_length)
+    {
+        if (strncmp(msg, expected_out, print_length) != 0)
+        {
+            fprintf(stderr, "message does not match (pass %d) msg: %s\n",
+                    i, msg);
+            return -1;
+        }
+    }
+
+    if (*msg != '\0')
+    {
+        fprintf(stderr, "expected null terminator on last msg byte\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+
+static void *print_t
+(
+    void *arg
+)
+{
+    int   i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    (void)arg;
+
+
+    for (i = 0; i != prints_per_thread; ++i)
+    {
+        el_pmemory(ELN, ascii, sizeof(ascii));
+    }
+
+    return NULL;
+}
+
+
+static void pmemory_print_threaded(void)
+{
+    pthread_t  pt[number_of_threads];
+    int        i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_init();
+    el_option(EL_THREAD_SAFE, 1);
+    el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+    el_option(EL_PRINT_LEVEL, 0);
+    el_option(EL_OUT, EL_OUT_CUSTOM);
+    logbuf[0] = '\0';
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        pthread_create(&pt[i], NULL, print_t, NULL);
+    }
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        pthread_join(pt[i], NULL);
+    }
+
+    /* do it before print_check() so any buffered data is flushed
+     * to disk, otherwise files will be incomplete
+     */
+
+    el_flush();
+
+    mt_fok(print_check());
+
+    el_cleanup();
+}
+
+#endif /* ENABLE_PTHREAD */
 
 
 /* ==========================================================================
@@ -288,6 +381,19 @@ static void pmemory_zero_size(void)
 
 void el_pmemory_test_group(void)
 {
+    int  i;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    for (i = 0; i != 0x80; ++i)
+    {
+        ascii[i] = (char)i;
+    }
+
+#if ENABLE_PTHREAD
+    mt_run(pmemory_print_threaded);
+#endif
+
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
 

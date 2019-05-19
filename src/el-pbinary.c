@@ -60,7 +60,6 @@
 #define FLAG_LEVEL_SHIFT    (3)
 
 
-
 /* ==========================================================================
                   _                __           ____
     ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
@@ -179,8 +178,9 @@ static size_t el_flags
     VALID(EINVAL, mlen);
     VALID(EINVAL, memory);
     VALID(EINVAL, el);
-    VALID(ENODEV, el->outputs);
-    VALID(ERANGE, el_log_allowed(el, level));
+    el_lock(el);
+    VALIDC(ENODEV, el->outputs, el_unlock(el));
+    VALIDC(ERANGE, el_log_allowed(el, level), el_unlock(el));
 
     e = 0;
     w  = el_flags(level, el, buf);
@@ -211,9 +211,10 @@ static size_t el_flags
     el->level_current_msg = level;
     w += mlen;
 
-    if (el_oputb(el, buf, w) != 0)
+    if (el_oputb_nb(el, buf, w) != 0)
     {
         el->level_current_msg = EL_DBG;
+        el_unlock(el);
         return -1;
     }
 
@@ -222,9 +223,11 @@ static size_t el_flags
     if (e)
     {
         errno = e;
+        el_unlock(el);
         return -1;
     }
 
+    el_unlock(el);
     return 0;
 }
 

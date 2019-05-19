@@ -64,6 +64,10 @@ static int el_ovperror
     e = errno;
     rc = 0;
 
+    /* there is not need to el_lock() mutex here, as el_ovprint()
+     * and el_oprint() will do it for us
+     */
+
     if (fmt)
     {
         /* we print formatted message only when it is supplied by

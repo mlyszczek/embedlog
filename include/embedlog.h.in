@@ -11,6 +11,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#if @ENABLE_PTHREAD@
+#   include <pthread.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -116,12 +120,14 @@ enum el_option
     EL_FSYNC_EVERY    = 16,
     EL_FSYNC_LEVEL    = 17,
 
+    EL_THREAD_SAFE    = 18,
+
     /* internal use only, should represent number of options, if
      * you add option, increment this by one (or by the number of
      * options you add).
      */
 
-    EL_OPT_ERROR      = 18
+    EL_OPT_ERROR      = 19
 };
 
 enum el_option_timestamp
@@ -222,6 +228,11 @@ struct el
 #if @ENABLE_OUT_CUSTOM@
     el_custom_puts  custom_puts;
     void           *custom_puts_user;
+#endif
+
+#if @ENABLE_PTHREAD@
+    pthread_mutex_t lock;
+    int             lock_initialized;
 #endif
 };
 

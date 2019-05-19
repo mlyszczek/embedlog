@@ -1637,6 +1637,181 @@ static void file_sync_level(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+#if ENABLE_PTHREAD
+
+#define max_file_size 200000 /* 200kB */
+#define line_length 7 /* max number will be "999999\n" 0 padded */
+#define number_of_rotation 7
+#define number_of_threads 32
+#define prints_per_rotate (max_file_size / line_length)
+#define total_prints (prints_per_rotate * number_of_rotation)
+#define prints_per_thread (total_prints / number_of_threads)
+
+static int print_check(void)
+{
+    char   line[line_length + 1];
+    char   expected[line_length + 1];
+    FILE  *f;
+    int    curr_tid;
+    int    curr_mid;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    /* concat and sort files, let's take shortcut with system tools,
+     * because why not?
+     */
+
+    system("cat "WORKDIR"/log* | sort > "WORKDIR"/result");
+
+    f = fopen(WORKDIR"/result", "r");
+    if (f == NULL)
+    {
+        fprintf(stderr, WORKDIR"/result does not exist\n");
+        return -1;
+    }
+
+    curr_tid = 0;
+    curr_mid = 0;
+    for (;;)
+    {
+        line[sizeof(line) - 1] = 0x55;
+
+        if (fgets(line, sizeof(line), f) == NULL)
+        {
+            if (feof(f))
+            {
+                /* got all lines without errors
+                 */
+
+                break;
+            }
+
+            perror("fgets()");
+            fclose(f);
+            return -1;
+        }
+
+        if (line[sizeof(line) - 1] == '\0' && line[sizeof(line) - 2] != '\n')
+        {
+            fprintf(stderr, "line is too long '%s', thread interlacing?\n",
+                    line);
+            fclose(f);
+            return -1;
+        }
+
+        sprintf(expected, "%02d%04d\n", curr_tid, curr_mid);
+        if (strcmp(expected, line) != 0)
+        {
+            fprintf(stderr, "expected different than line: %s != %s\n",
+                    expected, line);
+            fclose(f);
+            return -1;
+        }
+
+        if (++curr_mid == prints_per_thread)
+        {
+            ++curr_tid;
+            curr_mid = 0;
+        }
+    }
+
+    if (curr_tid != number_of_threads || curr_mid != 0)
+    {
+        fprintf(stderr, "file didn't contain all entries, tid: %d, mid: %d\n",
+                curr_tid, curr_mid);
+        fclose(f);
+        return -1;
+    }
+
+    fclose(f);
+    return 0;
+}
+
+
+static void *print_t
+(
+    void  *arg
+)
+{
+    char   msg[line_length + 1];
+    int    i;
+    int    n;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    n = *(int *)arg;
+
+    for (i = 0; i != prints_per_thread; ++i)
+    {
+        sprintf(msg, "%02d%04d", n, i);
+        el_print(ELN, "%s", msg);
+    }
+
+    return NULL;
+}
+
+
+static void file_print_threaded(void)
+{
+    pthread_t  pt[number_of_threads];
+    int        i, n[number_of_threads];;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_init();
+
+    el_option(EL_THREAD_SAFE, 1);
+    el_option(EL_PRINT_LEVEL, 0);
+    el_option(EL_OUT, EL_OUT_FILE);
+
+    /* rotate around 200kB, line is 7 bytes long, so this will
+     * get us 28571 prints before rotation
+     */
+
+    el_option(EL_FROTATE_SIZE, max_file_size);
+    el_option(EL_FROTATE_NUMBER, 99);
+    el_option(EL_FPATH, WORKDIR"/log");
+    el_option(EL_FSYNC_EVERY, max_file_size / 4);
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        n[i] = i;
+        pthread_create(&pt[i], NULL, print_t, &n[i]);
+    }
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        pthread_join(pt[i], NULL);
+    }
+
+    /* do it before print_check() so any buffered data is flushed
+     * to disk, otherwise files will be incomplete
+     */
+
+    el_flush();
+
+    mt_fok(print_check());
+
+    for (i = 0; i != 99; ++i)
+    {
+        char path[PATH_MAX];
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+        sprintf(path, WORKDIR"/log.%d", i);
+        unlink(path);
+    }
+
+    unlink(WORKDIR"/result");
+    el_cleanup();
+}
+
+#endif /* ENABLE_PTHREAD */
+
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -1650,6 +1825,10 @@ void el_file_test_group(void)
 {
 #if ENABLE_OUT_FILE
     mkdir(WORKDIR, 0755);
+
+#if ENABLE_PTHREAD
+    mt_run(file_print_threaded);
+#endif
 
     mt_run(file_print_without_init);
     mt_run(file_print_after_cleanup);

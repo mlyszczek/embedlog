@@ -369,9 +369,32 @@ AC_ARG_ENABLE([reentrant],
 AS_IF([test "x$enable_reentrant" = "xyes"],
 [
     AC_DEFINE([ENABLE_REENTRANT], [1], [Enable reentrant functions])
-    AC_CHECK_FUNCS([gmtime_r],,
-        AC_MSG_ERROR(not found, needed by --enable-reentrant))
 ])
+
+
+###
+# --enable-pthread
+#
+
+
+AC_ARG_ENABLE([pthread],
+    AS_HELP_STRING([--enable-pthread], [Enable thread safety measures]),
+    [], [enable_pthread="yes"])
+
+AM_CONDITIONAL([ENABLE_PTHREAD], [test "x$enable_pthread" = "xyes"])
+ENABLE_PTHREAD=0
+AS_IF([test "x$enable_pthread" = "xyes"],
+[
+    AC_DEFINE([ENABLE_PTHREAD], [1], [Enable thread safety measures])
+    AX_PTHREAD
+    LIBS="$PTHREAD_LIBS $LIBS"
+    CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+    CC="$PTHREAD_CC"
+    ENABLE_PTHREAD=1
+])
+
+AC_SUBST(ENABLE_PTHREAD)
+
 
 
 ###
@@ -475,6 +498,7 @@ echo "binary logs................. : $enable_binary_logs"
 echo "colorize output............. : $enable_colors"
 echo "extended colors............. : $enable_colors_extended"
 echo "reentrant functions......... : $enable_reentrant"
+echo "enable pthread support...... : $enable_pthread"
 echo "maximum prefix length....... : $EL_PREFIX_MAX"
 echo "maximum file length......... : $EL_FLEN_MAX"
 echo "maximum function namelength. : $EL_FUNCLEN_MAX"

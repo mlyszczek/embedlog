@@ -8,7 +8,7 @@ small and fast. Many features can be disabled during compilation to generate
 smaller binary. Amount of needed stack memory can be lowered by adjusting
 maximum printable size of single log message. Altough logger focuses on embedded
 systems, it is general **c/c++** logger that can be used in any application.
-Implemented features are:
+Implemented features are (most of them optionally configured in runtime):
 
 * printing to different outputs (simultaneously) like:
     * syslog (very limited, works on *nuttx* for now)
@@ -31,6 +31,7 @@ Implemented features are:
 * colorful output (ansi colors) for easy error spotting
 * print memory block in wireshark-like output
 * fully binary logs with binary data (like CAN frames) to save space
+* full thread safety using *pthread*
 
 Almost all of these features can be disabled to save some precious bytes of
 memory.
@@ -245,7 +246,17 @@ extended colors.
 
 Uses reentrant functions where possible. Not available on every platform, but
 if enabled, provides thread-safety on line level - that means, lines won't
-overlap with another thread
+overlap with another thread. This is true only when output is *stderr* or
+*stdout*, when output is *file*, you need to use true thread safety with
+the help of **EL_THREAD_SAFE** and **--enable-pthread**.
+
+--enable-pthread (default: enable)
+----------------------------------
+
+ When enabled, you will be able to configure **embedlog** to use
+**EL_THREAD_SAFE**, which will provide full thread safety in all circumstances.
+This is critical if output is other than *stderr* or *stdout* - like *file*,
+as there is internal state in *el* object that is kept between calls.
 
 --enable-portable-snprintf (default: disable)
 ---------------------------------------------

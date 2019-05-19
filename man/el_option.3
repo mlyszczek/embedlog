@@ -623,6 +623,65 @@ and
 .   BR tcsetattr .
 .   RE
 .RE
+.PP
+.BI "EL_THREAD_SAFE (" int " safe)"
+.RS
+By default,
+.   B embedlog
+is not thread safe.
+While it may be relatively safe to use it in multi-thread environment
+when you are logging to
+.   B stdio
+or
+.   BR stderr ,
+this surely isn't the case for more complex outputs like printing to file.
+Also, without
+.   B EL_THREAD_SAFE
+calling
+.   BR el_pmemory (3)
+may result in interlacing prints.
+.   PP
+So, when using embedlog in multi-threaded environment, it is advised to enable
+.   B EL_THREAD_SAFE
+by passing 1 as
+.   I safe
+argument.
+.   B embedlog
+will then
+.   BR pthread_mutex_lock ()
+whenever threads access
+.   I el
+object.
+.   PP
+.   B EL_THREAD_SAFE
+call must be performed when no other threads are accessing
+.   I el
+object, since at this point it is not possible to lock the mutex.
+Common usage is to enable thread safety at the beggining - right after
+.   BR el_init (3),
+and leave it to be destroyed by
+.   BR el_cleanup (3).
+.   PP
+It is safe to call this option multiple time with same argument.
+.B embedlog
+will not allow for multiple initialization nor destruction of mutex.
+When options is called for the second time with same argument (like 1),
+nothing will happen and funciton will return 0.
+.   PP
+.   B ERRORS
+.   RS
+Function can return errors from
+.       BR pthread_mutex_init (),
+and
+.       BR pthread_mutex_destroy ().
+.       PP
+.       B EINVAL
+.       RS
+.           I safe
+is different than 1 or 0
+.       RE
+.   RE
+.RE
 .SH RETURN VALUE
 .PP
 On success 0 is returned. -1 is returned when any error occured.

@@ -20,3 +20,7 @@ embedlog_sources += el-pbinary.c \
 	el-decode-number.c \
 	el-encode-number.c
 endif
+
+if ENABLE_PTHREAD
+embedlog_sources += el-lock.c
+endif

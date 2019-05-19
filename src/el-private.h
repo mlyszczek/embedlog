@@ -309,6 +309,23 @@ void el_file_cleanup(struct el *el);
 int el_file_flush(struct el *el);
 #endif
 
+    
+int el_oputb_nb(struct el *el, const void *mem, size_t mlen);
+int el_oputs_nb(struct el *el, const char *s);
+int el_ovprint_nb(const char *file, size_t num, const char *func,
+        enum el_level level, struct el *el, const char *fmt, va_list ap);
+int el_oprint_nb(const char *file, size_t num, const char *func,
+        enum el_level level, struct el *el, const char *fmt, ...);
+
+
+#if ENABLE_PTHREAD
+void el_lock(struct el *el);
+void el_unlock(struct el *el);
+#else
+#define el_lock(x)
+#define el_unlock(x)
+#endif
+
 
 #if ENABLE_OUT_TTY
 int el_tty_open(struct el *el, const char *dev, unsigned int speed);
@@ -326,6 +343,5 @@ size_t el_decode_number(const void *number, unsigned long long *out);
 size_t el_encode_number(unsigned long number, void *out);
 size_t el_decode_number(const void *number, unsigned long *out);
 #endif
-
 
 #endif

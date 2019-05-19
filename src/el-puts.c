@@ -59,11 +59,35 @@
 
 
 /* ==========================================================================
-    puts string 's' to all enabled output facilities specified by el
+    Just like el_oputs_nb() but can lock mutex.
    ========================================================================== */
 
 
-int el_oputs
+/* public api */ int el_oputs
+(
+    struct el   *el,   /* el defining printing style */
+    const char  *s     /* string to put into output */
+)
+{
+    int          ret;  /* return from el_oputs_nb() */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_lock(el);
+    ret = el_oputs_nb(el, s);
+    el_unlock(el);
+    return ret;
+}
+
+
+
+/* ==========================================================================
+    puts string 's' to all enabled output facilities specified by el. Does
+    not do any locking, thus _nb (non blocking).
+   ========================================================================== */
+
+
+int el_oputs_nb
 (
     struct el   *el,  /* el defining printing style */
     const char  *s    /* string to put into output */
@@ -148,12 +172,37 @@ int el_oputs
 
 
 /* ==========================================================================
-    Puts binary data 'mem' of size 'mlen' to enabled output facilities
-    specified by 'el object'. No all outputs support printing binary data
+    Just like el_oputb_nb() but also can perform pthread locking.
    ========================================================================== */
 
 
-int el_oputb
+/* public api */ int el_oputb
+(
+    struct el   *el,   /* el defining printing style */
+    const void  *mem,  /* memory location to 'print' */
+    size_t       mlen  /* size of the mem buffer */
+)
+{
+    int          ret;  /* return value from el_oputb_nb() */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_lock(el);
+    ret = el_oputb_nb(el, mem, mlen);
+    el_unlock(el);
+    return ret;
+}
+
+
+/* ==========================================================================
+    Puts binary data 'mem' of size 'mlen' to enabled output facilities
+    specified by 'el object'. No all outputs support printing binary data.
+
+    This functions does not do any locking - thus _nb (non blocking).
+   ========================================================================== */
+
+
+int el_oputb_nb
 (
     struct el   *el,      /* el defining printing style */
     const void  *mem,     /* memory location to 'print' */

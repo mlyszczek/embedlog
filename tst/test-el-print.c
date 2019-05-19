@@ -21,6 +21,10 @@
 #include <stdint.h>
 #include <math.h>
 
+#if ENABLE_PTHREAD
+#   include <pthread.h>
+#endif
+
 #include "mtest.h"
 #include "stdlib.h"
 #include "embedlog.h"
@@ -47,8 +51,29 @@ struct log_message
 
 
 mt_defs_ext();
-static char        logbuf[1024 * 1024];  /* output simulation */
-static struct rb  *expected_logs;        /* array of expected logs */
+static char       *logbuf;         /* output simulation */
+static struct rb  *expected_logs;  /* array of expected logs */
+
+/* declarations for threaded tests
+ */
+
+#if ENABLE_PTHREAD
+
+#define prints_per_thread 1024
+#define number_of_threads 32
+#define msg_size 31
+
+/* this multiplication must result in number being a power of 2
+ * (2, 4, 8, 16 etc.)
+ */
+
+#define number_of_messages (prints_per_thread * number_of_threads)
+
+static int                thread_test;
+static char               msgs[number_of_threads][prints_per_thread][msg_size];
+static struct log_message expected_msgs[number_of_threads];
+
+#endif
 
 
 /* ==========================================================================
@@ -59,6 +84,44 @@ static struct rb  *expected_logs;        /* array of expected logs */
  / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
 /_/
    ========================================================================== */
+
+
+/* ==========================================================================
+    Extracts thread id from message during thread test.
+   ========================================================================== */
+
+
+static int thread_str_to_int
+(
+    const char  *msg
+)
+{
+    char        *tids;
+    char         mcpy[1024];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    /* msg is in format "msg [TTT:III]" where TTT is thread id
+     */
+
+    strcpy(mcpy, msg);
+
+    /* turn : into null
+     */
+
+    tids = strrchr(mcpy, ':');
+    *tids = '\0';
+
+    /* point tids to beginning of thread id
+     */
+
+    tids = strrchr(mcpy, '[') + 1;
+
+    /* convert thread id to int
+     */
+
+    return atoi(tids);
+}
 
 
 /* ==========================================================================
@@ -75,6 +138,24 @@ static int print_to_buffer
 )
 {
     strcat(user, s);
+
+#if ENABLE_PTHREAD
+    if (thread_test)
+    {
+        int  tid;
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+        /* we can now add previously cached log info to expected logs.
+         * We do it here, so we can be sure it will go into the list
+         * in the same order as "s" into "user" (log_buf).
+         */
+
+        tid = thread_str_to_int(s);
+        rb_write(expected_logs, &expected_msgs[tid], 1);
+    }
+#endif
+
     return 0;
 }
 
@@ -545,16 +626,51 @@ static void add_log
     const char    *msg
 )
 {
-    struct log_message  expected;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#if ENABLE_PTHREAD
+    if (thread_test == 0)
+#endif
+    {
+        struct log_message  expected;
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    expected.file = file;
-    expected.line = line;
-    expected.func = func;
-    expected.level = level;
-    expected.msg = msg;
-    rb_write(expected_logs, &expected, 1);
+        expected.file = file;
+        expected.line = line;
+        expected.func = func;
+        expected.level = level;
+        expected.msg = msg;
+        rb_write(expected_logs, &expected, 1);
+    }
+#if ENABLE_PTHREAD
+    else
+    {
+        int    tid;
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+        /* when threaded test is performed, cache expected logs and
+         * add them in custom print function. This is due to the
+         * fact, that multiple threads can get here, and expected
+         * logs buffer can be in different order than logs in
+         * log_buf. Custom print function should be protected with
+         * mutexes so no such situation should happen there.
+         *
+         * msg is in format "msg [TTT:III]" where TTT is thread id
+         */
+
+        tid = thread_str_to_int(msg);
+
+        /* now cache entries
+         */
+
+        expected_msgs[tid].file = file;
+        expected_msgs[tid].line = line;
+        expected_msgs[tid].func = func;
+        expected_msgs[tid].level = level;
+        expected_msgs[tid].msg = msg;
+    }
+#endif
+
     el_print(file, line, func, level, msg);
 }
 
@@ -568,10 +684,10 @@ static void add_log
 static void test_prepare(void)
 {
     el_init();
+    logbuf = calloc(1, 1024 * 1024);
     el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
     el_option(EL_PRINT_LEVEL, 0);
     el_option(EL_OUT, EL_OUT_CUSTOM);
-    memset(logbuf, 0, sizeof(logbuf));
     expected_logs = rb_new(1024, sizeof(struct log_message), 0);
 }
 
@@ -584,6 +700,7 @@ static void test_prepare(void)
 static void test_cleanup(void)
 {
     el_cleanup();
+    free(logbuf);
     rb_destroy(expected_logs);
 }
 
@@ -837,6 +954,87 @@ static void print_finfo(void)
     add_log(ELF, "print_finfo second");
     mt_fok(print_check());
 }
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+#if ENABLE_PTHREAD
+
+static void *print_t
+(
+    void  *arg
+)
+{
+    int    i;
+    int    n;
+    char  *m;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    n = *(int *)arg;
+
+    for (i = 0; i != prints_per_thread; ++i)
+    {
+        m = msgs[n][i];
+        sprintf(m, "print_t [%d:%d]", n, i);
+        add_log(ELF, m);
+    }
+
+    return NULL;
+}
+
+static void print_threaded(void)
+{
+    pthread_t  pt[number_of_threads];
+    int        i, n[number_of_threads];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_init();
+
+    /* allocate memory that can hold all messages with full
+     * pre information (timestamp, file info) and message of length
+     * 31 characters
+     */
+
+    logbuf = calloc(1, number_of_messages *
+            (EL_PRE_LEN + EL_COLORS_LEN + msg_size));
+    expected_logs = rb_new(number_of_messages, sizeof(struct log_message), 0);
+
+    el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+    el_option(EL_PRINT_LEVEL, 1);
+    el_option(EL_TS, EL_TS_LONG);
+    el_option(EL_TS_TM, EL_TS_TM_REALTIME);
+    el_option(EL_TS_FRACT, EL_TS_FRACT_US);
+    el_option(EL_FINFO, 1);
+    el_option(EL_FUNCINFO, 1);
+    el_option(EL_COLORS, 1);
+    el_option(EL_PREFIX, "thread-test");
+    el_option(EL_OUT, EL_OUT_CUSTOM);
+    el_option(EL_LEVEL, EL_DBG);
+    el_option(EL_THREAD_SAFE, 1);
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        n[i] = i;
+        pthread_create(&pt[i], NULL, print_t, &n[i]);
+    }
+
+    for (i = 0; i != number_of_threads; ++i)
+    {
+        pthread_join(pt[i], NULL);
+    }
+
+    mt_fok(print_check());
+    rb_destroy(expected_logs);
+    free(logbuf);
+
+    el_cleanup();
+}
+
+#endif /* ENABLE_PTHREAD */
 
 
 /* ==========================================================================
@@ -1185,6 +1383,12 @@ static void print_prefix_overflow(void)
 
 void el_print_test_group(void)
 {
+#if ENABLE_PTHREAD
+    thread_test = 1;
+    mt_run(print_threaded);
+    thread_test = 0;
+#endif
+
     mt_run(print_different_clocks);
     print_mix_of_everything();
 
