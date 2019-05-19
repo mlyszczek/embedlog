@@ -14,9 +14,10 @@ prepare()
 {
     project="${1}"
     slot="${2}"
+    project_dir="${3}"
 
     # clone
-    if ! git clone git://kurwinet.pl/"${project}" "${project}-${slot}"
+    if ! git clone "${project_dir}" "${project}-${slot}"
     then
         echo "couldn't clone, sorry"
         exit 1
@@ -151,7 +152,7 @@ done
 # run preparation
 parallel --output-as-files --bar --results "${workdir}" \
     --halt-on-error now,fail=1 --jobs ${num_jobs} \
-    prepare ::: "${project}" ::: ${slots}
+    prepare ::: "${project}" ::: ${slots} ::: "${project_dir}"
 
 # and run distcheck tests, will take a loooong time
 cat ${combination_file} | parallel --output-as-files --bar \
