@@ -13,3 +13,4 @@
 --disable-prefix
 --disable-reentrant
 --disable-funcinfo
+--disable-pthread
