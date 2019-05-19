@@ -873,36 +873,40 @@ static void print_mix_of_everything_check(void)
 static void print_mix_of_everything(void)
 {
     int   level;
-    int   timestamp;
+    int   ts;
     int   printlevel;
     int   finfo;
     int   funcinfo;
     int   colors;
     int   prefix;
-    int   fract;
+    int   ts_fract;
     int   nl;
+    int   ts_tm;
     char  tname[512];
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (fract = EL_TS_FRACT_OFF;   fract != EL_TS_FRACT_ERROR;   ++fract)
-    for (timestamp = EL_TS_OFF;     timestamp != EL_TS_ERROR;     ++timestamp)
-    for (level = EL_FATAL;          level <= EL_DBG;              ++level)
-    for (printlevel = 0;            printlevel <= 1;              ++printlevel)
-    for (colors = 0;                colors <= 1;                  ++colors)
-    for (prefix = 0;                prefix <= 1;                  ++prefix)
-    for (finfo = 0;                 finfo <= 1;                   ++finfo)
-    for (funcinfo = 0;              funcinfo <= 1;                ++funcinfo)
-    for (nl = 0;                    nl <= 1;                      ++nl)
+    for (level = 0;        level <= EL_DBG;                ++level)
+    for (colors = 0;       colors <= 1;                    ++colors)
+    for (ts = 0;           ts != EL_TS_ERROR;              ++ts)
+    for (ts_tm = 0;        ts_tm <= EL_TS_TM_ERROR;        ++ts_tm)
+    for (ts_fract = 0;     ts_fract != EL_TS_FRACT_ERROR;  ++ts_fract)
+    for (printlevel = 0;   printlevel <= 1;                ++printlevel)
+    for (nl = 0;           nl <= 1;                        ++nl)
+    for (finfo = 0;        finfo <= 1;                     ++finfo)
+    for (funcinfo = 0;     funcinfo <= 1;                  ++funcinfo)
+    for (prefix = 0;       prefix <= 1;                    ++prefix)
     {
         test_prepare();
         el_option(EL_LEVEL, level);
-        el_option(EL_TS, timestamp);
+        el_option(EL_COLORS, colors);
+        el_option(EL_TS, ts);
+        el_option(EL_TS_TM, ts_tm);
+        el_option(EL_TS_FRACT, ts_fract);
         el_option(EL_PRINT_LEVEL, printlevel);
         el_option(EL_PRINT_NL, nl);
         el_option(EL_FINFO, finfo);
         el_option(EL_FUNCINFO, funcinfo);
-        el_option(EL_COLORS, colors);
         el_option(EL_PREFIX, prefix ? "prefix" : NULL);
 
         add_log(ELF, "fatal message");
@@ -914,11 +918,11 @@ static void print_mix_of_everything(void)
         add_log(ELI, "info message");
         add_log(ELD, "debug message");
 
-        sprintf(tname, "print_mix_of_everything:  fract: %d, level: %d"
-                ", timestamp: %d, printlevel: %d, funcinfo: %d"
-                ", finfo: %d, colors: %d, prefix: %d, nl: %d", fract,
-                level, timestamp, printlevel, funcinfo ,finfo, colors, prefix,
-                nl);
+        sprintf(tname, "print_mix_of_everything: level: %d, colors: %d, "
+                "ts: %d, ts_tm: %d, ts_fract: %d, print_level: %d, "
+                "nl: %d, finfo: %d, funcinfo: %d, prefix: %d",
+                level, colors, ts, ts_tm, ts_fract, printlevel, nl,
+                finfo, funcinfo, prefix);
         mt_run_named(print_mix_of_everything_check, tname);
 
         test_cleanup();
