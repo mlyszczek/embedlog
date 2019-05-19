@@ -52,8 +52,10 @@ struct log_message
 
 mt_defs_ext();
 static const char   *logpath = "./embedlog-pbinary-test";
+static char          logbuf[1024];
 static struct rb    *expected_logs;        /* array of expected logs */
 static int           truncate_test;
+static int           store_to_file;
 
 static unsigned char  d1[] = { 0x01 };
 static unsigned char  d2[] = { 0x53, 0x10 };
@@ -70,6 +72,24 @@ static unsigned char  d8[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
  / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
 /_/
    ========================================================================== */
+
+
+static int print_mix
+(
+    const char  *s,
+    size_t       slen,
+    void        *user
+)
+{
+    int          pos;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    pos = *(int *)user;
+    memcpy(logbuf + pos, s, slen);
+    *(int *)user += slen;
+    return 0;
+}
 
 
 /* ==========================================================================
@@ -102,10 +122,17 @@ static int pbinary_check(void)
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    stat(logpath, &st);
-    fd = open(logpath, O_RDONLY);
-    msg = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    msgsave = msg;
+    if (store_to_file)
+    {
+        stat(logpath, &st);
+        fd = open(logpath, O_RDONLY);
+        msg = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+        msgsave = msg;
+    }
+    else
+    {
+        msg = (unsigned char *)logbuf;
+    }
 
     while (rb_read(expected_logs, &expected, 1) == 1)
     {
@@ -330,13 +357,19 @@ static int pbinary_check(void)
         }
     }
 
-    munmap(msgsave, st.st_size);
-    close(fd);
+    if (store_to_file)
+    {
+        munmap(msgsave, st.st_size);
+        close(fd);
+    }
     return 0;
 
 error:
-    munmap(msgsave, st.st_size);
-    close(fd);
+    if (store_to_file)
+    {
+        munmap(msgsave, st.st_size);
+        close(fd);
+    }
     return 1;
 }
 
@@ -598,8 +631,11 @@ static void pbinary_mix_of_everything(void)
     int   nl;
     int   ts_tm;
     char  tname[512];
+    int   pos;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+    expected_logs = rb_new(16, sizeof(struct log_message), 0);
+    truncate_test = 0;
 
     for (level = 0;        level <= EL_DBG;                ++level)
     for (colors = 0;       colors <= 1;                    ++colors)
@@ -612,7 +648,8 @@ static void pbinary_mix_of_everything(void)
     for (funcinfo = 0;     funcinfo <= 1;                  ++funcinfo)
     for (prefix = 0;       prefix <= 1;                    ++prefix)
     {
-        test_prepare();
+        el_init();
+
         el_option(EL_LEVEL, level);
         el_option(EL_COLORS, colors);
         el_option(EL_TS, ts);
@@ -623,7 +660,10 @@ static void pbinary_mix_of_everything(void)
         el_option(EL_FINFO, finfo);
         el_option(EL_FUNCINFO, funcinfo);
         el_option(EL_PREFIX, prefix ? "prefix" : NULL);
+        el_option(EL_CUSTOM_PUT, print_mix, &pos);
+        el_option(EL_OUT, EL_OUT_CUSTOM);
 
+        pos = 0;
         add_log(EL_FATAL,  d1, 1);
         add_log(EL_ALERT,  d1, 1);
         add_log(EL_CRIT,   d1, 1);
@@ -633,16 +673,19 @@ static void pbinary_mix_of_everything(void)
         add_log(EL_INFO,   d1, 1);
         add_log(EL_DBG,    d8, 8);
 
+        el_cleanup();
+
         sprintf(tname, "pbinary_mix_of_everything: level: %d, colors: %d, "
                 "ts: %d, ts_tm: %d, ts_fract: %d, print_level: %d, "
                 "nl: %d, finfo: %d, funcinfo: %d, prefix: %d",
                 level, colors, ts, ts_tm, ts_fract, printlevel, nl,
                 finfo, funcinfo, prefix);
 
-        el_flush();
         mt_run_named(pbinary_mix_of_everything_check, tname);
-        test_cleanup();
+        rb_clear(expected_logs, 0);
     }
+
+    rb_destroy(expected_logs);
 }
 
 
@@ -942,6 +985,10 @@ static void prbinary_threaded(void)
 void el_pbinary_test_group(void)
 {
 #if ENABLE_BINARY_LOGS
+    pbinary_mix_of_everything();
+
+    store_to_file = 1;
+
 #if ENABLE_PTHREAD
 
     mt_run(prbinary_threaded);
@@ -949,7 +996,6 @@ void el_pbinary_test_group(void)
 #endif
 
     mt_run(pbinary_different_clocks);
-    pbinary_mix_of_everything();
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
