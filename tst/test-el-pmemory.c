@@ -58,6 +58,7 @@ static char  ascii[128];
 static int print_to_buffer
 (
     const char  *s,
+    size_t       slen,
     void        *user
 )
 {

@@ -110,7 +110,8 @@ enum el_option
     EL_PRINT_NL       = 7,
     EL_FINFO          = 8,
     EL_FUNCINFO       = 9,
-    EL_CUSTOM_PUTS    = 10,
+    EL_CUSTOM_PUTS    = 10,  /* deprecated */
+    EL_CUSTOM_PUT     = 10,
     EL_TTY_DEV        = 11,
     EL_PREFIX         = 12,
 
@@ -174,7 +175,7 @@ enum el_option_timestamp_fractions
     EL_TS_FRACT_ERROR = 4
 };
 
-typedef int (*el_custom_puts)(const char *s, void *user);
+typedef int (*el_custom_put)(const char *s, size_t slen, void *user);
 
 /* Main embedlog object that holds printing options and other data.
  * This definition is here so people that don't care about stable
@@ -226,8 +227,8 @@ struct el
 #endif
 
 #if @ENABLE_OUT_CUSTOM@
-    el_custom_puts  custom_puts;
-    void           *custom_puts_user;
+    el_custom_put   custom_put;
+    void           *custom_put_user;
 #endif
 
 #if @ENABLE_PTHREAD@

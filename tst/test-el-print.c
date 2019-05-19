@@ -133,8 +133,9 @@ static int thread_str_to_int
 
 static int print_to_buffer
 (
-    const char *s,
-    void       *user
+    const char  *s,
+    size_t       slen,
+    void        *user
 )
 {
     strcat(user, s);

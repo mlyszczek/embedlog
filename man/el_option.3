@@ -414,22 +414,40 @@ Input argument is different than 1 or 0
 .   RE
 .RE
 .PP
-.B EL_CUSTOM_PUTS (
-.IB "int (*" el_custom_puts ")(const char *s, void *user)" ,
+.B EL_CUSTOM_PUT (
+.IB "int (*" el_custom_put ")(const char *s, size_t slen, void *user)" ,
 .IB void\  *user
 .B )
 .RS
 Sets function pointer for custom message print.
-Function will receive complete messsage to print, just as it would be printed to
-ie. stderr or another facility.
-.I user
+Function will receive complete messsage (after processsing) to print, just as it
+would be printed to ie. stderr or another facility. Both binary and string data
+can be received this way.
+.   PP
+.   I s
+points to a data buffer, it can be null terminated string, or arbitrary binary
+data - depending on which functions has been called.
+.   PP
+.   I slen
+contains size of
+.   I s
+buffer.
+If
+.   I s
+is null terminated string, then
+.   I slen
+contains length of string including null terminator character.
+For binary data, it contains size of binary buffer.
+.   PP
+.   I user
 pointer can be used to pass own logger object where data shall be sent.
 For example it may contain pointer to
-.B el
+.   B el
 struct, if you don't use global el struct.
+.   PP
 Function cannot fail. If NULL is passed, custom function won't be called.
 It is still mandatory to enable custom printing with
-.   BR el_option (3)
+.   BR el_option (3)\ -\  EL_OUT .
 .RE
 .PP
 .BI "EL_FPATH (" const " " char " " * "path)"

@@ -108,7 +108,7 @@ static void options_init(void)
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    default_el.custom_puts         = NULL;
+    default_el.custom_put          = NULL;
 #endif
 
     mt_fail(el_oinit(&el) == 0);
@@ -544,7 +544,7 @@ static void options_global_el_after_el_cleanup(void)
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    default_el.custom_puts         = NULL;
+    default_el.custom_put          = NULL;
 #endif
 
 

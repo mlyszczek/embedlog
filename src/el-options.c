@@ -552,8 +552,8 @@ static int el_vooption
 
     case EL_CUSTOM_PUTS:
         el_lock(el);
-        el->custom_puts = va_arg(ap, el_custom_puts);
-        el->custom_puts_user = va_arg(ap, void *);
+        el->custom_put = va_arg(ap, el_custom_put);
+        el->custom_put_user = va_arg(ap, void *);
         el_unlock(el);
         return 0;
 

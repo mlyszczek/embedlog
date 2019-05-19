@@ -54,6 +54,7 @@ static char  logbuf[1024 * 1024];  /* output simulation */
 static int print_to_buffer
 (
     const char  *s,
+    size_t       slen,
     void        *user
 )
 {

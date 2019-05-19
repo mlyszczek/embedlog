@@ -31,6 +31,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 
 /* ==========================================================================
@@ -145,9 +146,9 @@ int el_oputs_nb
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    if (el->outputs & EL_OUT_CUSTOM && el->custom_puts)
+    if (el->outputs & EL_OUT_CUSTOM && el->custom_put)
     {
-        rv |= el->custom_puts(s, el->custom_puts_user);
+        rv |= el->custom_put(s, strlen(s) + 1, el->custom_put_user);
     }
 #endif
 
@@ -229,6 +230,15 @@ int el_oputb_nb
         rv |= el_file_putb(el, mem, mlen);
     }
 #endif
+
+#if ENABLE_OUT_CUSTOM
+    if (el->outputs & EL_OUT_CUSTOM && el->custom_put)
+    {
+        called = 1;
+        rv |= el->custom_put(mem, mlen, el->custom_put_user);
+    }
+#endif
+
 
     if (called == 0)
     {
