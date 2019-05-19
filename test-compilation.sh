@@ -37,6 +37,7 @@ build()
     project="${2}"
     slot="${3}"
     project_dir="${4}"
+    workdir="${5}"
 
     cd "${project}-${slot}"
     export AM_DISTCHECK_CONFIGURE_FLAGS="${opts}"
@@ -46,6 +47,13 @@ build()
     if [ ${ret} -eq 0 ]
     then
         echo "[ok]   ${opts}" >> "${project_dir}/compilation-test-results"
+
+        # also, if test was ok, remove stdout from workdir - stdout takes
+        # about 4megs of data, and with 60k possible compilation flags
+        # it will take 240GB of data! And this number will only go up
+        # in the future releses.
+
+        unlink "${workdir}/1/${opts}/stdout"
     else
         echo "[nok]  ${opts}" >> "${project_dir}/compilation-test-results"
     fi
@@ -157,4 +165,4 @@ parallel --output-as-files --bar --results "${workdir}" \
 # and run distcheck tests, will take a loooong time
 cat ${combination_file} | parallel --output-as-files --bar \
     --results "${workdir}" --halt-on-error now,fail=1 --jobs ${num_jobs} \
-    build {} "${project}" {%} "${project_dir}"
+    build {} "${project}" {%} "${project_dir}" "${workdir}"
