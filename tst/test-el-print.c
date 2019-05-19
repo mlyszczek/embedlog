@@ -865,17 +865,23 @@ static void print_different_clocks(void)
    ========================================================================== */
 
 
+static void print_mix_of_everything_check(void)
+{
+    mt_fok(print_check());
+}
+
 static void print_mix_of_everything(void)
 {
-    int level;
-    int timestamp;
-    int printlevel;
-    int finfo;
-    int funcinfo;
-    int colors;
-    int prefix;
-    int fract;
-    int nl;
+    int   level;
+    int   timestamp;
+    int   printlevel;
+    int   finfo;
+    int   funcinfo;
+    int   colors;
+    int   prefix;
+    int   fract;
+    int   nl;
+    char  tname[512];
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -908,7 +914,12 @@ static void print_mix_of_everything(void)
         add_log(ELI, "info message");
         add_log(ELD, "debug message");
 
-        mt_fok(print_check());
+        sprintf(tname, "print_mix_of_everything:  fract: %d, level: %d"
+                ", timestamp: %d, printlevel: %d, funcinfo: %d"
+                ", finfo: %d, colors: %d, prefix: %d, nl: %d", fract,
+                level, timestamp, printlevel, funcinfo ,finfo, colors, prefix,
+                nl);
+        mt_run_named(print_mix_of_everything_check, tname);
 
         test_cleanup();
     }
@@ -1171,7 +1182,7 @@ static void print_prefix_overflow(void)
 void el_print_test_group(void)
 {
     mt_run(print_different_clocks);
-    mt_run(print_mix_of_everything);
+    print_mix_of_everything();
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
