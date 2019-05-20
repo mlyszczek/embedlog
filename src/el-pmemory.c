@@ -304,7 +304,7 @@ static int el_pmem
     size_t           mlen      /* number of bytes to print */
 )
 {
-    return el_opmemory_table(file, num, func, level, &g_el, mem, mlen);
+    return el_pmem(file, num, func, level, &g_el, mem, mlen, 1);
 }
 
 /* ==========================================================================
@@ -342,5 +342,5 @@ static int el_pmem
     size_t           mlen      /* number of bytes to print */
 )
 {
-    return el_opmemory(file, num, func, level, &g_el, mem, mlen);
+    return el_pmem(file, num, func, level, &g_el, mem, mlen, 0);
 }
