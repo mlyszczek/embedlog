@@ -239,6 +239,72 @@ static void pmemory_print_ascii_table_with_table(void)
    ========================================================================== */
 
 
+static void pmemory_print_ascii_table_option(void)
+{
+    struct el  el;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_oinit(&el);
+    el_ooption(&el, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+    el_ooption(&el, EL_PRINT_LEVEL, 0);
+    el_ooption(&el, EL_OUT, EL_OUT_CUSTOM);
+    logbuf[0] = '\0';
+
+    el_opmemory(ELI, &el, ascii, sizeof(ascii));
+    mt_fok(strcmp(logbuf,
+"0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................\n"
+"0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................\n"
+"0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !\"#$%&'()*+,-./\n"
+"0x0030  30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f  0123456789:;<=>?\n"
+"0x0040  40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO\n"
+"0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[\\]^_\n"
+"0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno\n"
+"0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.\n"));
+
+    el_ocleanup(&el);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
+static void pmemory_print_ascii_table_with_table_option(void)
+{
+    struct el  el;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    el_oinit(&el);
+    el_ooption(&el, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+    el_ooption(&el, EL_PRINT_LEVEL, 0);
+    el_ooption(&el, EL_OUT, EL_OUT_CUSTOM);
+    logbuf[0] = '\0';
+
+    el_opmemory_table(ELI, &el, ascii, sizeof(ascii));
+    mt_fok(strcmp(logbuf,
+"------  -----------------------------------------------  ----------------\n"
+"offset  hex                                              ascii\n"
+"------  -----------------------------------------------  ----------------\n"
+"0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................\n"
+"0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................\n"
+"0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !\"#$%&'()*+,-./\n"
+"0x0030  30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f  0123456789:;<=>?\n"
+"0x0040  40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO\n"
+"0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[\\]^_\n"
+"0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno\n"
+"0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.\n"
+"------  -----------------------------------------------  ----------------\n"));
+
+    el_ocleanup(&el);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 #if ENABLE_PTHREAD
 
 static const char expected_out[] =
@@ -394,6 +460,9 @@ void el_pmemory_test_group(void)
 #if ENABLE_PTHREAD
     mt_run(pmemory_print_threaded);
 #endif
+
+    mt_run(pmemory_print_ascii_table_option);
+    mt_run(pmemory_print_ascii_table_with_table_option);
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
