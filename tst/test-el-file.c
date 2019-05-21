@@ -379,16 +379,6 @@ static void file_path_too_long(void)
    ========================================================================== */
 
 
-static void file_print_without_init(void)
-{
-    mt_ferr(el_puts("whatev..."), ENODEV);
-}
-
-
-/* ==========================================================================
-   ========================================================================== */
-
-
 static void file_print_after_cleanup(void)
 {
     el_init();
@@ -1830,7 +1820,6 @@ void el_file_test_group(void)
     mt_run(file_print_threaded);
 #endif
 
-    mt_run(file_print_without_init);
     mt_run(file_print_after_cleanup);
     mt_run(file_print_without_setting_file);
     mt_run(file_write_after_failed_open);
