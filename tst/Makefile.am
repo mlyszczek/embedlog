@@ -13,7 +13,7 @@ test_SOURCES += main.c \
 	mtest.h \
 	test-group-list.h
 
-test_CFLAGS = -I$(top_srcdir)/include \
+test_CFLAGS = -I$(top_builddir)/include \
 	-I$(top_srcdir)/src \
 	-I/usr/local/include \
 	-I/usr/include \

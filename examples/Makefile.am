@@ -1,5 +1,5 @@
 include $(top_srcdir)/embedlog-sources.mk
-CFLAGS += -I$(top_srcdir)/include -I$(top_srcdir)/src
+CFLAGS += -I$(top_builddir)/include -I$(top_srcdir)/src
 EXTRA_PROGRAMS = print_to_file \
 	print_options \
 	print_simple \
