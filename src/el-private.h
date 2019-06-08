@@ -249,8 +249,8 @@ extern struct el g_el;
 #   define EL_PREFIX_LEN 0
 #endif
 
-#define EL_PRE_LEN (EL_PRE_TS_MAX + EL_PRE_FINFO_LEN + EL_PREFIX_LEN + \
-    EL_PRE_LEVEL_LEN)
+#define EL_PRE_LEN (EL_PRE_TS_MAX + EL_PRE_FINFO_LEN + EL_PRE_FUNCINFO_LEN + \
+        EL_PREFIX_LEN + EL_PRE_LEVEL_LEN)
 
 
 /* ==========================================================================

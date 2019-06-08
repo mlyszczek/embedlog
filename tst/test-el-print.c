@@ -484,7 +484,7 @@ static int print_check(void)
             }
 
             tmp[i] = '\0';
-            if (strcmp(tmp, expected.func) != 0)
+            if (strncmp(tmp, expected.func, EL_FUNCLEN_MAX) != 0)
             {
                 /* function is different than what we expected
                  */
@@ -1236,6 +1236,7 @@ static void print_truncate_with_all_options(void)
 {
     char   msg[EL_LOG_MAX + 3];
     char   finfo[EL_FLEN_MAX + 3];
+    char   funcinfo[EL_FUNCLEN_MAX + 3];
     char   prefix[EL_PREFIX_MAX + 3];
     size_t fline;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -1245,14 +1246,17 @@ static void print_truncate_with_all_options(void)
     el_option(EL_TS_FRACT, EL_TS_FRACT_NS);
     el_option(EL_TS_TM, EL_TS_TM_REALTIME);
     el_option(EL_FINFO, 1);
+    el_option(EL_FUNCINFO, 1);
     el_option(EL_COLORS, 1);
     el_option(EL_PREFIX, prefix);
     el_option(EL_PRINT_LEVEL, 1);
     memset(msg, 'a', sizeof(msg));
     memset(finfo, 'b', sizeof(finfo));
     memset(prefix, 'c', sizeof(prefix));
+    memset(funcinfo, 'f', sizeof(funcinfo));
     finfo[sizeof(finfo) - 1] = '\0';
     prefix[sizeof(prefix) - 1] = '\0';
+    funcinfo[sizeof(funcinfo) - 1] = '\0';
     fline = (size_t)pow(10, EL_PRE_FINFO_LINE_MAX_LEN + 2) - 1;
     msg[sizeof(msg) - 1] = '\0';
     msg[sizeof(msg) - 2] = '3';
@@ -1261,9 +1265,10 @@ static void print_truncate_with_all_options(void)
     msg[sizeof(msg) - 4] = '0';
 
     add_log(ELI, "not truncated");
-    add_log(finfo, fline, "print_truncate_with_all_options", EL_FATAL, msg);
+    add_log(finfo, fline, funcinfo, EL_FATAL, msg);
 
     msg[sizeof(msg) - 3] = '\0';
+    puts(logbuf);
 
     mt_fok(print_check());
 }
