@@ -174,6 +174,16 @@ extern struct el g_el;
 
 
 /* ==========================================================================
+    Numerical limit of line max, its stringified strlen() should not exceed
+    EL_PRE_FINFO_LINE_MAX_LEN. So if EL_PRE_FINFO_LINE_MAX_LEN is 2, best to
+    define it to 99, when 5 -> 99999.
+   ========================================================================== */
+
+
+#define EL_PRE_FINFO_LINE_MAX_NUM 9999999l
+
+
+/* ==========================================================================
     maximum file info length. File info is a part with file name and line
     number, it looks like this
 
