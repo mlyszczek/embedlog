@@ -246,11 +246,20 @@ static size_t el_finfo
         return 0;
     }
 
+    if (num > EL_PRE_FINFO_LINE_MAX_NUM)
+    {
+        /* line number is too large and may overflow buffer, limit
+         * it to max value
+         */
+
+        num = EL_PRE_FINFO_LINE_MAX_NUM;
+    }
+
     base = el_basename(file);
 
     buf[0] = '[';
     buf[1] = '\0';
-    strncat(buf, base, EL_PRE_FINFO_LEN);
+    strncat(buf, base, EL_FLEN_MAX);
     fl  = strlen(buf);
     fl += sprintf(buf + fl, ":%d]", num);
 
