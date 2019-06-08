@@ -210,7 +210,7 @@ extern struct el g_el;
 
         [source-file.c:1337:foo()]
 
-    or if finfo is disabled
+    or if finfo is disabled. Last +1 is for closing ']'
 
         [foo()]
 
@@ -219,7 +219,7 @@ extern struct el g_el;
 
 
 #if ENABLE_FUNCINFO
-#   define EL_PRE_FUNCINFO_LEN ((EL_FUNCLEN_MAX) + 2 + 1)
+#   define EL_PRE_FUNCINFO_LEN ((EL_FUNCLEN_MAX) + 2 + 1 + 1)
 #else
 #   define EL_PRE_FUNCINFO_LEN 0
 #endif
