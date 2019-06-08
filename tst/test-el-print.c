@@ -300,7 +300,7 @@ static int print_check(void)
             tmp[i] = '\0';
             strcpy(expected_file, expected.file);
 
-            if (strcmp(tmp, basename(expected_file)) != 0)
+            if (strncmp(tmp, basename(expected_file), EL_FLEN_MAX) != 0)
             {
                 /*
                  * file name in printed log is different than what we set
@@ -333,6 +333,11 @@ static int print_check(void)
 
             msg++;  /* skip ']' character */
             tmp[i] = '\0';
+
+            if (expected.line > EL_PRE_FINFO_LINE_MAX_NUM)
+            {
+                expected.line = EL_PRE_FINFO_LINE_MAX_NUM;
+            }
 
             if ((size_t)atoi(tmp) != expected.line)
             {
@@ -932,8 +937,8 @@ static void print_truncate_with_date(void)
 static void print_truncate_with_all_options(void)
 {
     char   msg[EL_LOG_MAX + 3];
-    char   finfo[EL_FLEN_MAX + 1];
-    char   prefix[EL_PREFIX_MAX + 1];
+    char   finfo[EL_FLEN_MAX + 3];
+    char   prefix[EL_PREFIX_MAX + 3];
     size_t fline;
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -950,7 +955,7 @@ static void print_truncate_with_all_options(void)
     memset(prefix, 'c', sizeof(prefix));
     finfo[sizeof(finfo) - 1] = '\0';
     prefix[sizeof(prefix) - 1] = '\0';
-    fline = (size_t)pow(10, EL_PRE_FINFO_LINE_MAX_LEN) - 1;
+    fline = (size_t)pow(10, EL_PRE_FINFO_LINE_MAX_LEN + 2) - 1;
     msg[sizeof(msg) - 1] = '\0';
     msg[sizeof(msg) - 2] = '3';
     msg[sizeof(msg) - 3] = '2';
