@@ -120,6 +120,8 @@ enum el_option
     EL_FROTATE_SIZE   = 15,
     EL_FSYNC_EVERY    = 16,
     EL_FSYNC_LEVEL    = 17,
+    EL_FILE_SYNC_EVERY= 16,  /* deprecated */
+    EL_FILE_SYNC_LEVEL= 17,  /* deprecated */
 
     EL_THREAD_SAFE    = 18,
 
