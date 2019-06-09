@@ -554,6 +554,16 @@ int el_file_flush
     VALID(EBADF, el->fcurrent_log);
     VALID(EBADF, el->fcurrent_log[0] != '\0');
 
+    if (el->fwritten_after_sync == 0)
+    {
+        /* if now writes have been performed between consecutive
+         * flush, then don't flush - since there is nothing to
+         * flush anyway
+         */
+
+        return 0;
+    }
+
     /* first flush data from stdio library buffers into kernel
      */
 

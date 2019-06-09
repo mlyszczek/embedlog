@@ -1552,6 +1552,29 @@ static void file_sync_via_flush_function(void)
    ========================================================================== */
 
 
+static void file_consecutive_sync_with_flush_function(void)
+{
+    el_option(EL_FSYNC_EVERY, 16);
+    mt_fok(el_puts(s8));
+    mt_fail(file_synced == 0);
+    mt_fok(el_flush());
+    mt_fail(file_synced == 1);
+    file_synced = 0;
+    mt_fok(el_flush());
+    mt_fail(file_synced == 0);
+    mt_fok(el_flush());
+    mt_fail(file_synced == 0);
+    mt_fok(el_puts(s8));
+    mt_fail(file_synced == 0);
+    mt_fok(el_flush());
+    mt_fail(file_synced == 1);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 static void file_sync_periodic(void)
 {
     el_option(EL_FSYNC_EVERY, 8);
@@ -1889,6 +1912,7 @@ void el_file_test_group(void)
     mt_run(file_sync_periodic);
     mt_run(file_sync_level);
     mt_run(file_sync_via_flush_function);
+    mt_run(file_consecutive_sync_with_flush_function);
 
     rmdir(WORKDIR);
 #endif
