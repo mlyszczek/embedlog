@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libembedlog.la
 libembedlog_la_SOURCES = $(embedlog_sources)
 libembedlog_la_SOURCES += el-private.h \
 	valid.h
-libembedlog_la_LDFLAGS = -version-info 9999:0:0
+libembedlog_la_LDFLAGS = -version-info 5:0:5
 libembedlog_la_CFLAGS = -I$(top_builddir)/include
 
 # static code analyzer
