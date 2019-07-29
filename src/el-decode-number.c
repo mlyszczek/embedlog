@@ -62,7 +62,11 @@ size_t el_decode_number
          * - set current number into right position of out
          */
 
-        *out |= (n[i] & 0x7f) << (i * 7);
+#ifdef LLONG_MAX
+        *out |= (unsigned long long)(n[i] & 0x7f) << (i * 7);
+#else
+        *out |= (unsigned long)(n[i] & 0x7f) << (i * 7);
+#endif
 
         /* we do this until number lacks of continuation bit, which means
          * we are done
