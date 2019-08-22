@@ -26,7 +26,7 @@ rm -rf "${workdir}"
 mkdir "${workdir}"
 cd "${workdir}"
 
-wget "https://git.kurwinet.pl/${project}/snapshot/${project}-${git_version}.tar.gz"
+wget "https://git.bofc.pl/${project}/snapshot/${project}-${git_version}.tar.gz"
 tar xf "${project}-${git_version}.tar.gz"
 cd "${project}-${git_version}"
 

@@ -19,13 +19,13 @@ arch="${2}"
 host_os="${3}"
 
 cd "${HOME}/rpmbuild"
-pkg_version="$(curl "https://git.kurwinet.pl/${project}/plain/configure.ac?h=${git_version}" | \
+pkg_version="$(curl "https://git.bofc.pl/${project}/plain/configure.ac?h=${git_version}" | \
     grep "AC_INIT(" | cut -f3 -d\[ | cut -f1 -d\])"
-wget "https://git.kurwinet.pl/${project}/snapshot/${project}-${git_version}.tar.gz" \
+wget "https://git.bofc.pl/${project}/snapshot/${project}-${git_version}.tar.gz" \
     -O "SOURCES/${project}-${pkg_version}.tar.gz"
-wget "https://git.kurwinet.pl/${project}/plain/pkg/rpm/${project}.spec.template?h=${git_version}" \
+wget "https://git.bofc.pl/${project}/plain/pkg/rpm/${project}.spec.template?h=${git_version}" \
     -O "SPECS/${project}-${pkg_version}.spec"
-lt_version="$(curl "https://git.kurwinet.pl/${project}/plain/src/Makefile.am?h=${git_version}" | \
+lt_version="$(curl "https://git.bofc.pl/${project}/plain/src/Makefile.am?h=${git_version}" | \
     grep "${project}_la_LDFLAGS = -version-info" | cut -f4 -d\ )"
 
 current="$(echo ${lt_version} | cut -f1 -d:)"

@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: embedlog
-Source: https://git.kurwinet.pl/embedlog
+Source: https://git.bofc.pl/embedlog
 
 Files: *
 Copyright: 2017, 2018 Michał Łyszczek <michal.lyszczek@bofc.pl>

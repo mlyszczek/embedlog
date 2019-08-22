@@ -29,7 +29,7 @@ rm -rf "/tmp/${project}-${version}"
 mkdir "/tmp/${project}-${version}"
 
 cd "/tmp/${project}-${version}"
-git clone "https://git.kurwinet.pl/${project}"
+git clone "https://git.bofc.pl/${project}"
 cd "${project}"
 
 git checkout "${version}" || exit 1
