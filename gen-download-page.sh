@@ -2,9 +2,9 @@
 
 project='embedlog'
 out='www/downloads.html'
-remote="https://distfiles.kurwinet.pl/${project}"
-gpg="https://distfiles.kurwinet.pl/bofc-signing.pub.gpg"
-asc="https://distfiles.kurwinet.pl/bofc-signing.pub.asc"
+remote="https://distfiles.bofc.pl/${project}"
+gpg="https://distfiles.bofc.pl/bofc-signing.pub.gpg"
+asc="https://distfiles.bofc.pl/bofc-signing.pub.asc"
 
 get_files_from_remote()
 {
@@ -40,9 +40,9 @@ echo "be downloaded from: <a href=\"${remote}/\">${remote}</a><br>"
 echo "</p>"
 echo "<h1>git</h1>"
 echo "<p>"
-echo "git clone git@kurwinet.pl:${project}<br>"
-echo "git clone git://kurwinet.pl/${project}<br>"
-echo "git clone http://git.kurwinet.pl/${project}<br>"
+echo "git clone git@bofc.pl:${project}<br>"
+echo "git clone git://bofc.pl/${project}<br>"
+echo "git clone http://git.bofc.pl/${project}<br>"
 echo "</p>"
 
 echo "<h1>tarballs (source code)</h1>"

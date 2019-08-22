@@ -16,7 +16,7 @@ prepare()
     slot="${2}"
 
     # clone
-    if ! git clone git://kurwinet.pl/"${project}" "${project}-${slot}"
+    if ! git clone git://bofc.pl/"${project}" "${project}-${slot}"
     then
         echo "couldn't clone, sorry"
         exit 1

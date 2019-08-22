@@ -38,12 +38,12 @@ Functions description
 =====================
 
 For detailed description of every function check out
-[man pages](http://embedlog.kurwinet.pl/manuals.html)
+[man pages](https://embedlog.bofc.pl/manuals.html)
 
 Examples
 ========
 
-Check [examples](http://git.kurwinet.pl/embedlog/tree/examples) directory to get
+Check [examples](https://git.bofc.pl/embedlog/tree/examples) directory to get
 the idea of how to use **embedlog**. Examples can also be compiled to see how
 they work.
 
@@ -53,7 +53,7 @@ Dependencies
 Library is written in **C89** but some features require implemented **POSIX** to
 work. Also there are some additional features for users with **C99** compiler.
 
-To run unit tests, you also need [librb](http://librb.kurwinet.pl)
+To run unit tests, you also need [librb](https://librb.bofc.pl)
 
 Test results
 ============
@@ -174,7 +174,7 @@ needs.
 
 When enabled, logger will be able to add timestamp to every message. Timestamp
 can be in short or long format and timer source can be configured. Check out
-[man page](http://embedlog.kurwinet.pl/manuals/el_option.3.html) to read more
+[man page](https://embedlog.bofc.pl/manuals/el_option.3.html) to read more
 about it.
 
 --enable-fractions (default: enable)
@@ -254,46 +254,46 @@ License
 =======
 
 Library is licensed under BSD 2-clause license. See
-[LICENSE](http://git.kurwinet.pl/embedlog/tree/LICENSE) file for details
+[LICENSE](https://git.bofc.pl/embedlog/tree/LICENSE) file for details
 
 See also
 ========
 
 * [c89 snprintf function family](https://www.ijs.si/software/snprintf) by
   Mark Martinec
-* [mtest](http://mtest.kurwinet.pl) unit test framework **embedlog** uses
-* [librb](http://librb.kurwinet.pl) ring buffer used in unit tests
-* [git repository](http://git.kurwinet.pl/embedlog) to browse code online
-* [continous integration](http://ci.embedlog.kurwinet.pl) for project
+* [mtest](https://mtest.bofc.pl) unit test framework **embedlog** uses
+* [librb](https://librb.bofc.pl) ring buffer used in unit tests
+* [git repository](http://git.bofc.pl/embedlog) to browse code online
+* [continous integration](http://ci.embedlog.bofc.pl) for project
 * [polarhome](http://www.polarhome.com) nearly free shell accounts for virtually
   any unix there is.
 
-[a64lg]: http://ci.embedlog.kurwinet.pl/badges/aarch64-builder-linux-gnu-tests.svg
-[armv5]: http://ci.embedlog.kurwinet.pl/badges/armv5te926-builder-linux-gnueabihf-tests.svg
-[armv6]: http://ci.embedlog.kurwinet.pl/badges/armv6j1136-builder-linux-gnueabihf-tests.svg
-[armv7a15]: http://ci.embedlog.kurwinet.pl/badges/armv7a15-builder-linux-gnueabihf-tests.svg
-[armv7a9]: http://ci.embedlog.kurwinet.pl/badges/armv7a9-builder-linux-gnueabihf-tests.svg
-[x32fb]: http://ci.embedlog.kurwinet.pl/badges/i686-builder-freebsd-tests.svg
-[x32lg]: http://ci.embedlog.kurwinet.pl/badges/i686-builder-linux-gnu-tests.svg
-[x32lm]: http://ci.embedlog.kurwinet.pl/badges/i686-builder-linux-musl-tests.svg
-[x32lu]: http://ci.embedlog.kurwinet.pl/badges/i686-builder-linux-uclibc-tests.svg
-[x32nb]: http://ci.embedlog.kurwinet.pl/badges/i686-builder-netbsd-tests.svg
-[x32ob]: http://ci.embedlog.kurwinet.pl/badges/i686-builder-openbsd-tests.svg
-[m32lg]: http://ci.embedlog.kurwinet.pl/badges/mips-builder-linux-gnu-tests.svg
-[x64lg]: http://ci.embedlog.kurwinet.pl/badges/x86_64-builder-linux-gnu-tests.svg
-[x64lm]: http://ci.embedlog.kurwinet.pl/badges/x86_64-builder-linux-musl-tests.svg
-[x64lu]: http://ci.embedlog.kurwinet.pl/badges/x86_64-builder-linux-uclibc-tests.svg
-[x64ss]: http://ci.embedlog.kurwinet.pl/badges/x86_64-builder-solaris-tests.svg
-[prhpux]: http://ci.embedlog.kurwinet.pl/badges/parisc-polarhome-hpux-tests.svg
-[p4aix]: http://ci.embedlog.kurwinet.pl/badges/power4-polarhome-aix-tests.svg
-[x64debian9]: http://ci.embedlog.kurwinet.pl/badges/x86_64-debian-9-tests.svg
-[x64centos7]: http://ci.embedlog.kurwinet.pl/badges/x86_64-centos-7-tests.svg
-[x64fedora28]: http://ci.embedlog.kurwinet.pl/badges/x86_64-fedora-28-tests.svg
-[x64suse15]: http://ci.embedlog.kurwinet.pl/badges/x86_64-opensuse-15-tests.svg
-[x64rhel7]: http://ci.embedlog.kurwinet.pl/badges/x86_64-rhel-7-tests.svg
-[x64slackware142]: http://ci.embedlog.kurwinet.pl/badges/x86_64-slackware-142-tests.svg
-[x64ubuntu1804]: http://ci.embedlog.kurwinet.pl/badges/x86_64-ubuntu-1804-tests.svg
+[a64lg]: http://ci.embedlog.bofc.pl/badges/aarch64-builder-linux-gnu-tests.svg
+[armv5]: http://ci.embedlog.bofc.pl/badges/armv5te926-builder-linux-gnueabihf-tests.svg
+[armv6]: http://ci.embedlog.bofc.pl/badges/armv6j1136-builder-linux-gnueabihf-tests.svg
+[armv7a15]: http://ci.embedlog.bofc.pl/badges/armv7a15-builder-linux-gnueabihf-tests.svg
+[armv7a9]: http://ci.embedlog.bofc.pl/badges/armv7a9-builder-linux-gnueabihf-tests.svg
+[x32fb]: http://ci.embedlog.bofc.pl/badges/i686-builder-freebsd-tests.svg
+[x32lg]: http://ci.embedlog.bofc.pl/badges/i686-builder-linux-gnu-tests.svg
+[x32lm]: http://ci.embedlog.bofc.pl/badges/i686-builder-linux-musl-tests.svg
+[x32lu]: http://ci.embedlog.bofc.pl/badges/i686-builder-linux-uclibc-tests.svg
+[x32nb]: http://ci.embedlog.bofc.pl/badges/i686-builder-netbsd-tests.svg
+[x32ob]: http://ci.embedlog.bofc.pl/badges/i686-builder-openbsd-tests.svg
+[m32lg]: http://ci.embedlog.bofc.pl/badges/mips-builder-linux-gnu-tests.svg
+[x64lg]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-linux-gnu-tests.svg
+[x64lm]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-linux-musl-tests.svg
+[x64lu]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-linux-uclibc-tests.svg
+[x64ss]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-solaris-tests.svg
+[prhpux]: http://ci.embedlog.bofc.pl/badges/parisc-polarhome-hpux-tests.svg
+[p4aix]: http://ci.embedlog.bofc.pl/badges/power4-polarhome-aix-tests.svg
+[x64debian9]: http://ci.embedlog.bofc.pl/badges/x86_64-debian-9-tests.svg
+[x64centos7]: http://ci.embedlog.bofc.pl/badges/x86_64-centos-7-tests.svg
+[x64fedora28]: http://ci.embedlog.bofc.pl/badges/x86_64-fedora-28-tests.svg
+[x64suse15]: http://ci.embedlog.bofc.pl/badges/x86_64-opensuse-15-tests.svg
+[x64rhel7]: http://ci.embedlog.bofc.pl/badges/x86_64-rhel-7-tests.svg
+[x64slackware142]: http://ci.embedlog.bofc.pl/badges/x86_64-slackware-142-tests.svg
+[x64ubuntu1804]: http://ci.embedlog.bofc.pl/badges/x86_64-ubuntu-1804-tests.svg
 
-[fsan]: http://ci.embedlog.kurwinet.pl/badges/fsanitize-address.svg
-[fsleak]: http://ci.embedlog.kurwinet.pl/badges/fsanitize-leak.svg
-[fsun]: http://ci.embedlog.kurwinet.pl/badges/fsanitize-undefined.svg
+[fsan]: http://ci.embedlog.bofc.pl/badges/fsanitize-address.svg
+[fsleak]: http://ci.embedlog.bofc.pl/badges/fsanitize-leak.svg
+[fsun]: http://ci.embedlog.bofc.pl/badges/fsanitize-undefined.svg

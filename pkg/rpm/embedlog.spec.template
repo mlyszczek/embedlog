@@ -5,8 +5,8 @@ Summary:        highly portable c89 complaint logger
 
 Group:          System Environment/Libraries
 License:        BSD
-URL:            https://embedlog.kurwinet.pl
-Source0:        https://git.kurwinet.pl/embedlog/snapshot/embedlog-%{version}.tar.gz
+URL:            https://embedlog.bofc.pl
+Source0:        https://git.bofc.pl/embedlog/snapshot/embedlog-%{version}.tar.gz
 Vendor:         Bits of Code
 Packager:       Michał Łyszczek <michal.lyszczek@bofc.pl>
 
