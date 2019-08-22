@@ -4,9 +4,9 @@ Priority: optional
 Maintainer: Michał Łyszczek <michal.lyszczek@bofc.pl>
 Build-Depends: debhelper (>=10), autotools-dev, dh-autoreconf
 Standards-Version: 3.9.8
-Vcs-Git: https://git.kurwinet.pl/embedlog
-Vcs-browser: https://git.kurwinet.pl/embedlog
-Homepage: https://embedlog.kurwinet.pl
+Vcs-Git: https://git.bofc.pl/embedlog
+Vcs-browser: https://git.bofc.pl/embedlog
+Homepage: https://embedlog.bofc.pl
 
 Package: libembedlog@{ABI_VERSION}
 Section: libs
