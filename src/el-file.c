@@ -329,6 +329,9 @@ int el_file_open
          * Oldest file has suffix .0 while the newest one has
          * suffix .${frotate_number} (or less if there are less
          * files).
+         *
+         * Reason for such order is so user could do `cat logs.*`
+         * and in result concatenate all logs in order.
          */
 
         for (i = el->frotate_number - 1; i >= 0; --i)
