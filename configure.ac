@@ -78,6 +78,26 @@ AC_CONFIG_FILES(include/embedlog.h)
 #
 
 ###
+# --enable-dev
+#
+# Not to be used on production, this enables some macros that adds
+# some code to library that is completaly useless on production.
+# This is mainly code for marking some tests, which would be extra
+# hard to implement without extra code in production library.
+#
+
+
+AC_ARG_ENABLE([dev],
+    AS_HELP_STRING([--enable-dev], [Enable developer mode]),
+    [], [enable_dev="no"])
+
+AS_IF([test "x$enable_dev" = "xyes"],
+[
+    AC_DEFINE([RUN_TESTS], [1], [Enables extra code for testing purposes])
+])
+
+
+###
 # --enable-out-stderr
 #
 
@@ -520,3 +540,5 @@ echo "maximum function namelength. : $EL_FUNCLEN_MAX"
 echo "maximum log message......... : $EL_LOG_MAX"
 echo "maximum path length......... : $MAX_PATH"
 echo "pmemory line size........... : $EL_MEM_LINE_SIZE"
+echo
+echo "developer mode.............. : $enable_dev"

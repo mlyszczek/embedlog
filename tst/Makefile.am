@@ -1,9 +1,7 @@
 include Makefile.am.coverage
-include $(top_srcdir)/embedlog-sources.mk
 check_PROGRAMS = test
 
-test_SOURCES = $(embedlog_sources)
-test_SOURCES += main.c \
+test_SOURCES = main.c \
 	test-el-options.c \
 	test-el-print.c \
 	test-el-file.c \
@@ -15,14 +13,11 @@ test_SOURCES += main.c \
 
 test_CFLAGS = -I$(top_builddir)/include \
 	-I$(top_srcdir)/src \
-	-I/usr/local/include \
-	-I/usr/include \
-	-DRUN_TESTS=1 \
 	$(COVERAGE_CFLAGS)
 
-test_LDFLAGS = -L/usr/local/lib \
-	-L/usr/lib \
-	$(COVERAGE_LDFLAGS)
+test_LDFLAGS = \
+	$(COVERAGE_LDFLAGS) \
+	-Wl,-Bstatic $(top_builddir)/src/libembedlog.la -Wl,-Bdynamic
 test_LDADD = -lrb
 
 TESTS = $(check_PROGRAMS)
