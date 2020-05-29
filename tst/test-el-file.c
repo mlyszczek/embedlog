@@ -41,7 +41,7 @@
  * path of the code
  */
 
-int file_synced;
+extern int file_synced;
 
 
 /* ==========================================================================

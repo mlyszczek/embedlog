@@ -71,7 +71,7 @@
  * or not, so we introduce this helper variable to know if we
  * executed syncing code or not
  */
-extern int file_synced;
+int file_synced;
 
 #endif
 
