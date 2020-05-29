@@ -12,7 +12,7 @@ www:
 analyze:
 	make analyze -C src
 
-examples:
+examples: all
 	make examples -C examples
 
 .PHONY: www examples analyze
