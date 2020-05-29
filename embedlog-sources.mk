@@ -5,6 +5,7 @@ embedlog_sources = el-options.c \
 	el-puts.c \
 	el-ts.c \
 	el-flush.c \
+	el-utils.c \
 	snprintf.c
 
 if ENABLE_OUT_FILE

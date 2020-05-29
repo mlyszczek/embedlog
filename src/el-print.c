@@ -41,6 +41,7 @@
 
 
 #include "el-private.h"
+#include "el-utils.h"
 
 #include <errno.h>
 #include <stdarg.h>
@@ -162,42 +163,6 @@ static size_t el_color
     return 0;
 
 #endif
-}
-
-
-/* ==========================================================================
-    returns pointer to where basename of 's' starts
-
-    Examples:
-            path                 basename
-            /path/to/file.c      file.c
-            path/to/file.c       file.c
-            /file.c              file.c
-            file.c               file.c
-            ""                   ""
-            NULL                 segmentation fault
-   ========================================================================== */
-
-
-static const char *el_basename
-(
-    const char  *s      /* string to basename */
-)
-{
-    const char  *base;  /* pointer to base name of path */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-    base = s;
-
-    for (; *s; ++s)
-    {
-        if (s[0] == '/' && s[1] != '\0')
-        {
-            base = s + 1;
-        }
-    }
-
-    return base;
 }
 
 
