@@ -107,7 +107,7 @@ AS_IF([test "x$enable_out_file" = "xyes"],
 [
     AC_DEFINE([ENABLE_OUT_FILE], [1], [Enable printing to file])
     ENABLE_OUT_FILE=1
-    AC_CHECK_FUNCS(access stat fsync fileno)
+    AC_CHECK_FUNCS(access stat fsync fileno symlink)
 ])
 
 AC_SUBST(ENABLE_OUT_FILE)

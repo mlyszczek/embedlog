@@ -36,6 +36,7 @@
 
 
 #include "el-private.h"
+#include "el-utils.h"
 
 #if HAVE_UNISTD_H
 #   include <unistd.h>
@@ -161,6 +162,40 @@ static int el_file_exists
 
 
 /* ==========================================================================
+    create symlink without any suffix to newest log file.  Rationale: it's
+    very often that user wants to view newest log file, but with the fact
+    that newest file has non deterministic suffix, it may be hard and
+    unconvenient to first check newest file and then read it, so we create
+    that nice symlink in a way:
+
+        log.0
+        log.1
+        log.5
+        log.7
+        log -> log.7
+
+    Function does not return anything as errors are not checked here.
+    Symlink is optional and if it is not created no data is lost and
+    returning error would confuse caller.
+   ========================================================================== */
+
+
+static void el_symlink_to_newest_log
+(
+    struct el     *el  /* embedlog object to work on */
+)
+{
+#if HAVE_SYMLINK
+    if (el->frotate_symlink)
+    {
+        (void)remove(el->fname);
+        (void)symlink(el_basename(el->fcurrent_log), el->fname);
+    }
+#endif
+}
+
+
+/* ==========================================================================
     function rotates file, meaning if currently opened file has suffix .3,
     function will close that file and will open file with suffix .4. If
     creating new suffix is impossible (we reached frotate_number of
@@ -258,6 +293,7 @@ skip_rotate:
         return -1;
     }
 
+    el_symlink_to_newest_log(el);
     el->fpos = 0;
 
     return 0;
@@ -476,10 +512,12 @@ int el_file_open
 
 #endif /* HAVE_STAT */
 
+
             /* oldest file found, file is already opened so we
-             * simply return from the function
+             * simply update symlink to newest log file and return.
              */
 
+            el_symlink_to_newest_log(el);
             el->fcurrent_rotate = i;
             el->fpos = fsize;
             el->file = f;

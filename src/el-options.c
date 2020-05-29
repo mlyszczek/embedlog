@@ -491,6 +491,25 @@ static int el_vooption
 
 
     /* ==================================================================
+      ___           __         __                          __ _        __
+     / _/____ ___  / /_ ___ _ / /_ ___   ___ __ __ __ _   / /(_)___   / /__
+    / _// __// _ \/ __// _ `// __// -_) (_-</ // //  ' \ / // // _ \ /  '_/
+   /_/ /_/   \___/\__/ \_,_/ \__/ \__/ /___/\_, //_/_/_//_//_//_//_//_/\_\
+                                           /___/
+       ================================================================== */
+
+
+    case EL_FROTATE_SYMLINK:
+        value_int = va_arg(ap, int);
+        VALID(EINVAL, (value_int & ~1) == 0);
+
+        el_lock(el);
+        el->frotate_symlink = value_int;
+        el_unlock(el);
+        return 0;
+
+
+    /* ==================================================================
                ___
               / _/___ __ __ ___  ____  ___  _  __ ___  ____ __ __
              / _/(_-</ // // _ \/ __/ / -_)| |/ // -_)/ __// // /
@@ -506,6 +525,7 @@ static int el_vooption
         el->fsync_every = value_long;
         el_unlock(el);
         return 0;
+
 
 #   endif  /* ENABLE_OUT_FILE */
 
@@ -711,6 +731,7 @@ static int el_vooption
 #if ENABLE_OUT_FILE
     el->fsync_every = 32768;
     el->fsync_level = EL_FATAL;
+    el->frotate_symlink = 1;
 #endif
 
 #if ENABLE_PTHREAD

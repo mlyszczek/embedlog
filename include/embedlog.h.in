@@ -118,6 +118,7 @@ enum el_option
     EL_FPATH          = 13,
     EL_FROTATE_NUMBER = 14,
     EL_FROTATE_SIZE   = 15,
+    EL_FROTATE_SYMLINK= 19,
     EL_FSYNC_EVERY    = 16,
     EL_FSYNC_LEVEL    = 17,
     EL_FILE_SYNC_EVERY= 16,  /* deprecated */
@@ -130,7 +131,7 @@ enum el_option
      * options you add).
      */
 
-    EL_OPT_ERROR      = 19
+    EL_OPT_ERROR      = 20
 };
 
 enum el_option_timestamp
@@ -209,6 +210,7 @@ struct el
 
 #if @ENABLE_OUT_FILE@
     unsigned int    fsync_level:3;
+    unsigned int    frotate_symlink:1;
     unsigned int    frotate_number;
     unsigned int    fcurrent_rotate;
     unsigned long   frotate_size;
