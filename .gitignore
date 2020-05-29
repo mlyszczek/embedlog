@@ -53,3 +53,4 @@ coveragereport/
 pvs-studio.log
 report.tasks
 strace_out
+include/embedlog.h
