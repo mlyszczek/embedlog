@@ -529,6 +529,41 @@ Input parameter is less than 0
 .   RE
 .RE
 .PP
+.BI "EL_FROTATE_SYMLINK (" int " enable)"
+.RS
+When
+.   B EL_FROTATE_NUMBER
+is bigger than 0, this option is enabled and program runs on UNIX,
+.   B embedlog
+will create symlink file in the same directory as rest of the logs with base
+name of
+.   I path
+that is passed to
+.   BR EL_FPATH .
+So if "/var/log/program/program.log" path is passed, after some time more
+or less this file structure will be generated
+.   PP
+.   nf
+    /var/log/program/program.log.0
+    /var/log/program/program.log.1
+    /var/log/program/program.log.2
+    /var/log/program/program.log.3
+    /var/log/program/program.log -> program.log.3
+.   fi
+.   PP
+Symlink will always point to file directly in the same directory.
+Symlink file will always point to most recent log file. This option
+is enabled by default.
+.   PP
+.   B ERRORS
+.   RS
+.       B EINVAL
+.       RS
+Input parameter is not 0 or 1
+.       RE
+.   RE
+.RE
+.PP
 .BI "EL_FROTATE_SIZE (" long " size)"
 .RS
 This defines
