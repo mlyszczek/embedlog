@@ -11,6 +11,21 @@ AC_CONFIG_HEADERS([config.h])
 
 AC_SEARCH_LIBS([pow], [m])
 
+
+# gcc has unused-result bug since 2005 that unused-result warning
+# is rised even when return is casted to (void) like,
+#   (void)foo();
+# to prevent gcc from rising this warning we disable it
+# unused-result warning can still be checked with clang
+
+m4_include([m4/ax_compiler_vendor.m4])
+AX_COMPILER_VENDOR
+AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"],
+[
+    CFLAGS="$CFLAGS -Wno-unused-result"
+])
+
+
 ###
 # compile own snprintf if system doesn't provide one
 #
