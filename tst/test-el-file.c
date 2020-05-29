@@ -101,6 +101,36 @@ static int file_check
 
 
 /* ==========================================================================
+   ========================================================================== */
+
+
+static int symlink_check
+(
+    const char *t,
+    const char *n
+)
+{
+    char        dst[PATH_MAX];
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    /* if target does not exist, link 'n' should not exist too */
+
+    if (t == NULL)
+        return -!access(n, F_OK);
+
+    memset(dst, 0, sizeof(dst));
+    if (readlink(n, dst, sizeof(dst)) == -1)
+        return -1;
+
+    if (strcmp(t, dst) != 0)
+        return -1;
+
+    return 0;
+}
+
+
+/* ==========================================================================
 
    ========================================================================== */
 
@@ -418,6 +448,7 @@ static void file_rotate_1_no_rotate(void)
     el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s9));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
 }
 
 
@@ -431,6 +462,8 @@ static void file_rotate_1_exact_print(void)
     el_puts(s8);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
+    mt_fok(file_check(WORKDIR"/log", s8 s8));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -444,6 +477,8 @@ static void file_rotate_1_overflow_but_no_rotate(void)
     el_option(EL_FROTATE_NUMBER, 1);
     el_puts(s9 s5 s5);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5 "qw"));
+    mt_fok(file_check(WORKDIR"/log", s9 s5 "qw"));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -459,6 +494,8 @@ static void file_rotate_1_overflow(void)
     el_puts(s9);
     el_puts(s3);
     mt_fok(file_check(WORKDIR"/log.0", s9 s3));
+    mt_fok(file_check(WORKDIR"/log", s9 s3));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -474,6 +511,8 @@ static void file_rotate_1_overflow_exact(void)
     el_puts(s8);
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s5));
+    mt_fok(file_check(WORKDIR"/log", s5));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -497,6 +536,8 @@ static void file_rotate_1_reopen(void)
 
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s5 s8));
+    mt_fok(file_check(WORKDIR"/log", s5 s8));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -514,6 +555,8 @@ static void file_rotate_1_unexpected_third_party_remove(void)
     el_puts(s3);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s3 s8));
+    mt_fok(file_check(WORKDIR"/log", s3 s8));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -531,6 +574,8 @@ static void file_rotate_1_change_size_up(void)
     el_puts(s9);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5 s9 s8));
+    mt_fok(file_check(WORKDIR"/log", s9 s5 s9 s8));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -546,6 +591,8 @@ static void file_rotate_1_change_size_down(void)
     el_option(EL_FROTATE_SIZE, 8);
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s5));
+    mt_fok(file_check(WORKDIR"/log", s5));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -559,6 +606,8 @@ static void file_rotate_2_no_rotate(void)
     el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s9));
+    mt_fok(file_check(WORKDIR"/log", s9));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -573,6 +622,8 @@ static void file_rotate_2_exact_print(void)
     el_puts(s8);
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
+    mt_fok(file_check(WORKDIR"/log", s8 s8));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -586,6 +637,8 @@ static void file_rotate_2_overflow_but_no_rotate(void)
     el_option(EL_FROTATE_NUMBER, 2);
     el_puts(s9 s5 s5);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5 "qw"));
+    mt_fok(file_check(WORKDIR"/log", s9 s5 "qw"));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -602,6 +655,8 @@ static void file_rotate_2_overflow(void)
     el_puts(s3);
     mt_fok(file_check(WORKDIR"/log.0", s9));
     mt_fok(file_check(WORKDIR"/log.1", s9 s3));
+    mt_fok(file_check(WORKDIR"/log", s9 s3));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -617,6 +672,8 @@ static void file_rotate_2_overflow_exact(void)
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
     mt_fok(file_check(WORKDIR"/log.1", s5));
+    mt_fok(file_check(WORKDIR"/log", s5));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -641,6 +698,8 @@ static void file_rotate_2_reopen(void)
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s9));
     mt_fok(file_check(WORKDIR"/log.1", s8 s5));
+    mt_fok(file_check(WORKDIR"/log", s8 s5));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -659,6 +718,8 @@ static void file_rotate_2_unexpected_third_party_remove(void)
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s3 s8));
     mt_fok(file_check(WORKDIR"/log.1", s9));
+    mt_fok(file_check(WORKDIR"/log", s9));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -677,6 +738,8 @@ static void file_rotate_2_change_size_up(void)
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s9 s5));
     mt_fok(file_check(WORKDIR"/log.1", s9 s9 s8));
+    mt_fok(file_check(WORKDIR"/log", s9 s9 s8));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -693,6 +756,8 @@ static void file_rotate_2_change_size_down(void)
     el_puts(s5);
     mt_fok(file_check(WORKDIR"/log.0", s9));
     mt_fok(file_check(WORKDIR"/log.1", s5));
+    mt_fok(file_check(WORKDIR"/log", s5));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -711,6 +776,8 @@ static void file_rotate_2_many_rotates(void)
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s5 s3));
     mt_fok(file_check(WORKDIR"/log.1", s9));
+    mt_fok(file_check(WORKDIR"/log", s9));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -723,6 +790,8 @@ static void file_rotate_5_no_rotate(void)
     el_option(EL_FROTATE_NUMBER, 5);
     el_puts(s9);
     mt_fok(file_check(WORKDIR"/log.0", s9));
+    mt_fok(file_check(WORKDIR"/log", s9));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
     mt_fail(access(WORKDIR"/log.1", F_OK) == -1);
 }
 
@@ -740,6 +809,8 @@ static void file_rotate_5_exact_print_rotate(void)
     el_puts(s8);
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
     mt_fok(file_check(WORKDIR"/log.1", s8 s8));
+    mt_fok(file_check(WORKDIR"/log", s8 s8));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -755,6 +826,8 @@ static void file_rotate_5_overflow_but_no_rotate(void)
     el_puts(s9 s5 s5);
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
     mt_fok(file_check(WORKDIR"/log.1", s9 s5 "qw"));
+    mt_fok(file_check(WORKDIR"/log", s9 s5 "qw"));
+    mt_fok(symlink_check("log.1", WORKDIR"/log"));
 }
 
 
@@ -776,6 +849,8 @@ static void file_rotate_5_overflow(void)
     mt_fok(file_check(WORKDIR"/log.1", s9 s3 s3));
     mt_fok(file_check(WORKDIR"/log.2", s8 s5));
     mt_fok(file_check(WORKDIR"/log.3", s9));
+    mt_fok(file_check(WORKDIR"/log", s9));
+    mt_fok(symlink_check("log.3", WORKDIR"/log"));
 }
 
 
@@ -794,6 +869,8 @@ static void file_rotate_5_overflow_exact(void)
     mt_fok(file_check(WORKDIR"/log.0", s8 s8));
     mt_fok(file_check(WORKDIR"/log.1", s8 s8));
     mt_fok(file_check(WORKDIR"/log.2", s5));
+    mt_fok(file_check(WORKDIR"/log", s5));
+    mt_fok(symlink_check("log.2", WORKDIR"/log"));
 }
 
 
@@ -827,6 +904,8 @@ static void file_rotate_5_reopen(void)
     mt_fok(file_check(WORKDIR"/log.2", s8 s5));
     mt_fok(file_check(WORKDIR"/log.3", s9));
     mt_fok(file_check(WORKDIR"/log.4", s8));
+    mt_fok(file_check(WORKDIR"/log", s8));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 }
 
 
@@ -849,6 +928,8 @@ static void file_rotate_5_hole_in_log_rotate(void)
     mt_fok(file_check(WORKDIR"/log.2", "edc"));
     mt_fok(file_check(WORKDIR"/log.3", "rfv"));
     mt_fok(file_check(WORKDIR"/log.4", "tgb"));
+    mt_fok(file_check(WORKDIR"/log", "tgb"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.4");
@@ -859,6 +940,8 @@ static void file_rotate_5_hole_in_log_rotate(void)
     mt_fok(file_check(WORKDIR"/log.2", "edc"));
     mt_fok(file_check(WORKDIR"/log.3", "rfv"));
     mt_fok(file_check(WORKDIR"/log.4", "123"));
+    mt_fok(file_check(WORKDIR"/log", "123"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     el_puts("456");
 
@@ -867,6 +950,8 @@ static void file_rotate_5_hole_in_log_rotate(void)
     mt_fok(file_check(WORKDIR"/log.2", "rfv"));
     mt_fok(file_check(WORKDIR"/log.3", "123"));
     mt_fok(file_check(WORKDIR"/log.4", "456"));
+    mt_fok(file_check(WORKDIR"/log", "456"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     el_puts("789");
 
@@ -875,6 +960,8 @@ static void file_rotate_5_hole_in_log_rotate(void)
     mt_fok(file_check(WORKDIR"/log.2", "123"));
     mt_fok(file_check(WORKDIR"/log.3", "456"));
     mt_fok(file_check(WORKDIR"/log.4", "789"));
+    mt_fok(file_check(WORKDIR"/log", "789"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     el_puts("qwe");
 
@@ -883,6 +970,8 @@ static void file_rotate_5_hole_in_log_rotate(void)
     mt_fok(file_check(WORKDIR"/log.2", "456"));
     mt_fok(file_check(WORKDIR"/log.3", "789"));
     mt_fok(file_check(WORKDIR"/log.4", "qwe"));
+    mt_fok(file_check(WORKDIR"/log", "qwe"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     el_puts("asd");
 
@@ -891,6 +980,8 @@ static void file_rotate_5_hole_in_log_rotate(void)
     mt_fok(file_check(WORKDIR"/log.2", "789"));
     mt_fok(file_check(WORKDIR"/log.3", "qwe"));
     mt_fok(file_check(WORKDIR"/log.4", "asd"));
+    mt_fok(file_check(WORKDIR"/log", "asd"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 }
 
 
@@ -921,12 +1012,16 @@ static void file_rotate_5_rename_file_halfway(void)
     mt_fok(file_check(WORKDIR"/log.2", "edc"));
     mt_fok(file_check(WORKDIR"/log.3", "rfv"));
     mt_fok(file_check(WORKDIR"/log.4", "tgb"));
+    mt_fok(file_check(WORKDIR"/log", "tgb"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     mt_fok(file_check(WORKDIR"/log-another.0", "123"));
     mt_fok(file_check(WORKDIR"/log-another.1", "456"));
     mt_fok(file_check(WORKDIR"/log-another.2", "789"));
     mt_fok(file_check(WORKDIR"/log-another.3", "qwe"));
     mt_fok(file_check(WORKDIR"/log-another.4", "asd"));
+    mt_fok(file_check(WORKDIR"/log-another", "asd"));
+    mt_fok(symlink_check("log-another.4", WORKDIR"/log-another"));
 }
 
 
@@ -954,6 +1049,7 @@ static void file_rotate_directory_deleted(void)
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log");
     rmdir(WORKDIR);
     mt_ferr(el_puts("rfv"), ENOENT);
 
@@ -986,6 +1082,7 @@ static void file_rotate_directory_reappear_after_delete(void)
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log");
     rmdir(WORKDIR);
     mt_ferr(el_puts("rfv"), ENOENT);
 
@@ -999,11 +1096,14 @@ static void file_rotate_directory_reappear_after_delete(void)
     mt_fok(file_check(WORKDIR"/log.1", "tgb"));
     mt_fok(file_check(WORKDIR"/log.2", "yhn"));
     mt_fok(file_check(WORKDIR"/log.3", "ujm"));
+    mt_fok(file_check(WORKDIR"/log", "ujm"));
+    mt_fok(symlink_check("log.3", WORKDIR"/log"));
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
     unlink(WORKDIR"/log.3");
     unlink(WORKDIR"/log.4");
+    unlink(WORKDIR"/log");
     el_cleanup();
 }
 
@@ -1029,8 +1129,11 @@ static void file_rotate_write_after_failed_open(void)
     mkdir(WORKDIR, 0755);
     mt_fok(el_puts("qaz"));
     mt_fok(file_check(WORKDIR"/log.0", "qaz"));
+    mt_fok(file_check(WORKDIR"/log", "qaz"));
+    mt_fok(symlink_check("log.0", WORKDIR"/log"));
 
     unlink(WORKDIR"/log.0");
+    unlink(WORKDIR"/log");
     el_cleanup();
 }
 
@@ -1060,10 +1163,13 @@ static void file_rotate_write_after_failed_open_to_existing_file(void)
     mt_fok(file_check(WORKDIR"/log.0", "qa\n"));
     mt_fok(file_check(WORKDIR"/log.1", "w\n"));
     mt_fok(file_check(WORKDIR"/log.2", "edc"));
+    mt_fok(file_check(WORKDIR"/log", "edc"));
+    mt_fok(symlink_check("log.2", WORKDIR"/log"));
 
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log");
     el_cleanup();
 }
 
@@ -1097,12 +1203,15 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes(void
     mt_fok(file_check(WORKDIR"/log.2", "e\n"));
     mt_fok(file_check(WORKDIR"/log.3", "123"));
     mt_fok(file_check(WORKDIR"/log.4", "456"));
+    mt_fok(file_check(WORKDIR"/log", "456"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
     unlink(WORKDIR"/log.3");
     unlink(WORKDIR"/log.4");
+    unlink(WORKDIR"/log");
     el_cleanup();
 }
 
@@ -1137,12 +1246,15 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes2(voi
     mt_fok(file_check(WORKDIR"/log.2", "e\n"));
     mt_fok(file_check(WORKDIR"/log.3", "123"));
     mt_fok(file_check(WORKDIR"/log.4", "456"));
+    mt_fok(file_check(WORKDIR"/log", "456"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
     unlink(WORKDIR"/log.3");
     unlink(WORKDIR"/log.4");
+    unlink(WORKDIR"/log");
     el_cleanup();
 }
 
@@ -1177,12 +1289,15 @@ static void file_rotate_write_after_failed_open_to_existing_file_with_holes3(voi
     mt_fok(file_check(WORKDIR"/log.2", "123"));
     mt_fok(file_check(WORKDIR"/log.3", "456"));
     mt_fok(file_check(WORKDIR"/log.4", "789"));
+    mt_fok(file_check(WORKDIR"/log", "789"));
+    mt_fok(symlink_check("log.4", WORKDIR"/log"));
 
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
     unlink(WORKDIR"/log.3");
     unlink(WORKDIR"/log.4");
+    unlink(WORKDIR"/log");
     el_cleanup();
 }
 
@@ -1211,6 +1326,7 @@ static void file_rotate_and_directory_reappear(void)
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
+    unlink(WORKDIR"/log");
 
     rmdir(WORKDIR);
     mt_ferr(el_puts(s9), ENOENT);
@@ -1225,12 +1341,15 @@ static void file_rotate_and_directory_reappear(void)
     mt_fok(file_check(WORKDIR"/log.1", "45\n"));
     mt_fok(file_check(WORKDIR"/log.2", "78\n"));
     mt_fok(file_check(WORKDIR"/log.3", "qaz"));
+    mt_fok(file_check(WORKDIR"/log", "qaz"));
+    mt_fok(symlink_check("log.3", WORKDIR"/log"));
 
     unlink(WORKDIR"/log.0");
     unlink(WORKDIR"/log.1");
     unlink(WORKDIR"/log.2");
     unlink(WORKDIR"/log.3");
     unlink(WORKDIR"/log.4");
+    unlink(WORKDIR"/log");
     el_cleanup();
 }
 
@@ -1379,6 +1498,7 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
     mt_fok(el_puts(s5));
 
     mt_fok(file_check(WORKDIR"/log.0", s8 s5));
+    mt_fok(file_check(WORKDIR"/log", s8 s5));
 
     mt_fok(el_puts(s8));
     mt_fok(el_puts(s3));
@@ -1386,6 +1506,7 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
 
     mt_fok(file_check(WORKDIR"/log.0", s8 s5));
     mt_fok(file_check(WORKDIR"/log.1", s8 s3 s5));
+    mt_fok(file_check(WORKDIR"/log", s8 s3 s5));
 
     mt_fok(el_puts(s9));
     mt_fok(el_puts(s5));
@@ -1393,6 +1514,7 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
     mt_fok(file_check(WORKDIR"/log.0", s8 s5));
     mt_fok(file_check(WORKDIR"/log.1", s8 s3 s5));
     mt_fok(file_check(WORKDIR"/log.2", s9 s5));
+    mt_fok(file_check(WORKDIR"/log", s9 s5));
 
     mt_fok(el_puts(s3));
     mt_fok(el_puts(s8));
@@ -1401,6 +1523,7 @@ static void file_rotate_dir_removed_after_open_then_created_back_again(void)
     mt_fok(file_check(WORKDIR"/log.1", s8 s3 s5));
     mt_fok(file_check(WORKDIR"/log.2", s9 s5));
     mt_fok(file_check(WORKDIR"/log.3", s3 s8));
+    mt_fok(file_check(WORKDIR"/log", s3 s8));
 }
 
 
@@ -1519,6 +1642,7 @@ static void file_rotate_fail(void)
     mt_fok(el_puts(s8));
 
     mt_fok(file_check(WORKDIR"/log.0", s8));
+    mt_fok(file_check(WORKDIR"/log", s8));
 }
 
 
@@ -1785,6 +1909,7 @@ static void file_print_threaded(void)
 
     el_option(EL_FROTATE_SIZE, max_file_size);
     el_option(EL_FROTATE_NUMBER, 99);
+    el_option(EL_FROTATE_SYMLINK, 0);
     el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FSYNC_EVERY, max_file_size / 4);
 
