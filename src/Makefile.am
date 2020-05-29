@@ -32,7 +32,17 @@ libembedlog_la_SOURCES = $(embedlog_sources)
 libembedlog_la_SOURCES += el-private.h \
 	el-utils.h \
 	valid.h
-libembedlog_la_LDFLAGS = -version-info 9999:0:0
+LIBRARY_VERSION=9999:0:0
+#           .------' | `---.
+#        current:revision:age
+#           |        |     `- increment if interfaces have been added
+#           |        |        set to zero if interfaces have been removed
+#           |        |        or changed
+#           |        `- increment if source code has changed
+#           |           set to zero if current is incremented
+#           `- increment if interfaces have been added, removed or changed
+libembedlog_la_LDFLAGS = -version-info $(LIBRARY_VERSION)
+
 libembedlog_la_CFLAGS = -I$(top_builddir)/include
 
 # static code analyzer
