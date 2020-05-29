@@ -286,6 +286,8 @@ See also
 * [continous integration](http://ci.embedlog.bofc.pl) for project
 * [polarhome](http://www.polarhome.com) nearly free shell accounts for virtually
   any unix there is.
+* [pvs studio](https://www.viva64.com/en/pvs-studio) static code analyzer with
+  free licenses for open source projects
 
 [a64lg]: http://ci.embedlog.bofc.pl/badges/aarch64-builder-linux-gnu-tests.svg
 [armv5]: http://ci.embedlog.bofc.pl/badges/armv5te926-builder-linux-gnueabihf-tests.svg
