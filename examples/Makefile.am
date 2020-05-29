@@ -1,5 +1,5 @@
 CFLAGS += -I$(top_builddir)/include -I$(top_srcdir)/src
-VLDFLAGS = -static
+VLDFLAGS =
 VLDADD = $(top_builddir)/src/libembedlog.la
 
 EXTRA_PROGRAMS = print_to_file \
