@@ -37,11 +37,14 @@
    ========================================================================== */
 
 
+#ifdef RUN_TESTS
+
 /* variable is set in el-file.c when we successfully executed fsync
  * path of the code
  */
 
 extern int file_synced;
+#endif
 
 
 /* ==========================================================================
@@ -143,7 +146,9 @@ static void test_prepare(void)
     el_option(EL_FROTATE_NUMBER, 0);
     el_option(EL_FPATH, WORKDIR"/log");
     el_option(EL_FSYNC_EVERY, 0);
+#ifdef RUN_TESTS
     file_synced = 0;
+#endif
 }
 
 
@@ -1650,18 +1655,21 @@ static void file_rotate_fail(void)
    ========================================================================== */
 
 
+#ifdef RUN_TESTS
 static void file_sync_always(void)
 {
     el_option(EL_FSYNC_EVERY, 0);
     mt_fok(el_puts(s8));
     mt_fail(file_synced == 1);
 }
+#endif
 
 
 /* ==========================================================================
    ========================================================================== */
 
 
+#ifdef RUN_TESTS
 static void file_sync_via_flush_function(void)
 {
     el_option(EL_FSYNC_EVERY, 16);
@@ -1670,12 +1678,14 @@ static void file_sync_via_flush_function(void)
     mt_fok(el_flush());
     mt_fail(file_synced == 1);
 }
+#endif
 
 
 /* ==========================================================================
    ========================================================================== */
 
 
+#ifdef RUN_TESTS
 static void file_consecutive_sync_with_flush_function(void)
 {
     el_option(EL_FSYNC_EVERY, 16);
@@ -1693,12 +1703,14 @@ static void file_consecutive_sync_with_flush_function(void)
     mt_fok(el_flush());
     mt_fail(file_synced == 1);
 }
+#endif
 
 
 /* ==========================================================================
    ========================================================================== */
 
 
+#ifdef RUN_TESTS
 static void file_sync_periodic(void)
 {
     el_option(EL_FSYNC_EVERY, 8);
@@ -1719,12 +1731,14 @@ static void file_sync_periodic(void)
     mt_fok(el_puts(s5));
     mt_fail(file_synced == 1);
 }
+#endif
 
 
 /* ==========================================================================
    ========================================================================== */
 
 
+#ifdef RUN_TESTS
 static void file_sync_level(void)
 {
     el_option(EL_FSYNC_EVERY, 1024);
@@ -1771,6 +1785,7 @@ static void file_sync_level(void)
     mt_fok(el_pmemory_table(ELF, s8, sizeof(s8)));
     mt_fail(file_synced == 1);
 }
+#endif
 
 
 /* ==========================================================================
@@ -2033,11 +2048,13 @@ void el_file_test_group(void)
     mt_run(file_rotate_filename_too_long);
     mt_run(file_rotate_path_too_long);
     mt_run(file_rotate_fail);
+#ifdef RUN_TESTS
     mt_run(file_sync_always);
     mt_run(file_sync_periodic);
     mt_run(file_sync_level);
     mt_run(file_sync_via_flush_function);
     mt_run(file_consecutive_sync_with_flush_function);
+#endif
 
     rmdir(WORKDIR);
 #endif
