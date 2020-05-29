@@ -50,3 +50,6 @@ www/manuals
 www/out
 coverage.info
 coveragereport/
+pvs-studio.log
+report.tasks
+strace_out
