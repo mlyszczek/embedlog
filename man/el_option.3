@@ -520,11 +520,25 @@ and so on).
 User can also pass 1 here, but if file reaches its size limit, it will be
 deleted and printing will continue from the empty file
 .   PP
+When
+.   I number
+is bigger than 10, padded zeroes will be added to rotated logs like
+.   IR log.02\  ,\  log.004\  or\  log.076 .
+Actual number of padded zeroes depends in
+.   I number
+passed.
+For bigger than 10 it will be 1 zero, for bigger than 100 it will be 0
+zeroes and so on.
+This is done to ease up sorting when one would want to concat all files
+with one simple
+.   BR cat\ * .
+.   PP
 .   B ERRORS
 .   RS
 .       B EINVAL
 .       RS
-Input parameter is less than 0
+Input parameter is less than 0 or bigger than
+.           BR USHRT_MAX (65535).
 .       RE
 .   RE
 .RE
