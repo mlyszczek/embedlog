@@ -212,8 +212,8 @@ struct el
     unsigned int    fsync_level:3;
     unsigned int    frotate_symlink:1;
     unsigned int    frotate_number_count:3;
-    unsigned int    frotate_number;
-    unsigned int    fcurrent_rotate;
+    unsigned short  frotate_number;
+    unsigned short  fcurrent_rotate;
     unsigned long   frotate_size;
     unsigned long   fsync_every;
     unsigned long   fwritten_after_sync;
