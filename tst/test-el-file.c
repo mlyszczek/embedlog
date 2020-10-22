@@ -1792,6 +1792,72 @@ static void file_sync_level(void)
    ========================================================================== */
 
 
+static void file_rotate_with_padding_in_name
+(
+    int            *arg
+)
+{
+    int            i;
+    int            rotate_number_count;
+    int            rotate_number;
+    struct dirent  *dirent;
+    DIR            *dir;
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+    /* rotate number = 10, will produce single digit number
+     * from .0 to .9. Smart counting logic is in production
+     * code so avoid it here to make sure we do not make
+     * same bug in prod and test code which could make test
+     * do false pasitive.
+     */
+    rotate_number = *arg;
+    if (rotate_number <= 10)
+        rotate_number_count = 1;
+    else if (rotate_number <= 100)
+        rotate_number_count = 2;
+    else if (rotate_number <= 1000)
+        rotate_number_count = 3;
+    else if (rotate_number <= 10000)
+        rotate_number_count = 4;
+
+    el_option(EL_FROTATE_SIZE, 1);
+    el_option(EL_FROTATE_NUMBER, rotate_number);
+
+    /* perform some more rotation to make sure we create all
+     * possible files
+     */
+    for (i = 0; i != rotate_number + 5; ++i)
+        el_puts(s1);
+
+    for (i = 0; i != rotate_number; ++i)
+    {
+        char expected_file[PATH_MAX];
+
+        sprintf(expected_file, WORKDIR"/log.%0*d", rotate_number_count, i);
+        mt_fail(access(expected_file, F_OK) == 0);
+        unlink(expected_file);
+    }
+
+    unlink(WORKDIR"/log");
+
+    dir = opendir(WORKDIR);
+    while ((dirent = readdir(dir)))
+    {
+        if (strcmp(dirent->d_name, ".") == 0 ||
+                strcmp(dirent->d_name, "..") == 0)
+            continue;
+        mt_fail(0 && "unexpected file left in WORKDIR");
+        fprintf(stderr, "# %s\n", dirent->d_name);
+    }
+    system("rm -f "WORKDIR"/*");
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+
+
 #if ENABLE_PTHREAD
 
 #define max_file_size 200000 /* 200kB */
@@ -1953,7 +2019,7 @@ static void file_print_threaded(void)
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-        sprintf(path, WORKDIR"/log.%d", i);
+        sprintf(path, WORKDIR"/log.%02d", i);
         unlink(path);
     }
 
@@ -1976,6 +2042,10 @@ static void file_print_threaded(void)
 
 void el_file_test_group(void)
 {
+    int  arg;   /* argument for tests */
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
 #if ENABLE_OUT_FILE
     mkdir(WORKDIR, 0755);
 
@@ -1999,6 +2069,23 @@ void el_file_test_group(void)
 
     mt_prepare_test = &test_prepare;
     mt_cleanup_test = &test_cleanup;
+
+#define FILE_ROTATE_WITH_PADDING_IN_NAME(ARG) \
+    arg = ARG; \
+    mt_run_param_named(file_rotate_with_padding_in_name, &arg, \
+            "file_rotate_with_padding_in_name_" #ARG);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(4);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(9);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(10);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(11);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(41);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(99);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(100);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(101);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(242);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(999);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(1000);
+    FILE_ROTATE_WITH_PADDING_IN_NAME(1001);
 
     mt_run(file_single_message);
     mt_run(file_multi_message);
