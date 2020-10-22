@@ -120,7 +120,7 @@ static int el_vooption
 {
     int             ret;         /* return code from various functions */
     int             value_int;   /* ap value treated as integer */
-    long            value_long;  /* ap value treated as long */
+    unsigned long   value_ulong; /* ap value treated as unsigned long */
     const char     *value_str;   /* ap value treated as string */
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -491,10 +491,10 @@ static int el_vooption
 
 
     case EL_FROTATE_SIZE:
-        value_long = va_arg(ap, long);
-        VALID(EINVAL, value_long >= 1);
+        value_ulong = va_arg(ap, unsigned long);
+        VALID(EINVAL, value_ulong >= 1);
         el_lock(el);
-        el->frotate_size = value_long;
+        el->frotate_size = value_ulong;
         el_unlock(el);
         return 0;
 
@@ -528,10 +528,10 @@ static int el_vooption
 
 
     case EL_FSYNC_EVERY:
-        value_long = va_arg(ap, long);
-        VALID(EINVAL, value_long >= 0);
+        value_ulong = va_arg(ap, unsigned long);
+        VALID(EINVAL, value_ulong >= 0);
         el_lock(el);
-        el->fsync_every = value_long;
+        el->fsync_every = value_ulong;
         el_unlock(el);
         return 0;
 
@@ -683,7 +683,7 @@ static int el_vooption
 
     (void)value_str;
     (void)value_int;
-    (void)value_long;
+    (void)value_ulong;
 }
 
 
