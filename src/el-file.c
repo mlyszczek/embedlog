@@ -249,8 +249,9 @@ static int el_file_rotate
 
         for (i = 1; i != el->frotate_number; ++i)
         {
-            char  old_name[PATH_MAX + 1];  /* ie .2 suffix */
-            char  new_name[PATH_MAX + 1];  /* ie .3 suffix */
+            char  old_name[PATH_MAX + 6];  /* ie .2 suffix */
+            char  new_name[PATH_MAX + 6];  /* ie .3 suffix */
+            int   pad_len;
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
             /* we do not check for overflow here, as overflow is
@@ -259,8 +260,9 @@ static int el_file_rotate
              * it works there, it will work here as well
              */
 
-            sprintf(old_name, "%s.%d", el->fname, i);
-            sprintf(new_name, "%s.%d", el->fname, i - 1);
+            pad_len = el->frotate_number_count;
+            sprintf(old_name, "%s.%0*d", el->fname, pad_len, i);
+            sprintf(new_name, "%s.%0*d", el->fname, pad_len, i - 1);
 
             rename(old_name, new_name);
 
@@ -285,7 +287,8 @@ skip_rotate:
      * there, it will pass here as well
      */
 
-    sprintf(el->fcurrent_log, "%s.%d", el->fname, el->fcurrent_rotate);
+    sprintf(el->fcurrent_log, "%s.%0*d", el->fname,
+            el->frotate_number_count, el->fcurrent_rotate);
 
     if ((el->file = fopen(el->fcurrent_log, "w")) == NULL)
     {
@@ -321,21 +324,21 @@ int el_file_open
     struct el  *el  /* el object with file information */
 )
 {
+    /* we need current_log filename for ourself - we modify its
+     * last digit when we rotate file. In theory this could be
+     * done in struct declaration, but PATH_MAX is such a waste
+     * of memory and programs usually do not get even close to
+     * that ammount. Allocate enough memory for fname and max
+     * of 5 digits for rotate + null character
+     *
+     * realloc needs to be done each time open() is called, in
+     * case log file is being changed via EL_FPATH option.
+     */
+    el->fcurrent_log = realloc(el->fcurrent_log, strlen(el->fname) + 6);
     if (el->fcurrent_log == NULL)
     {
-        /* yes, we need to dynamically allocate memory here. It's
-         * because we need to keep current log privately in each of
-         * el_el objects or there will be problems in embedded
-         * systems that use flat memory. Since when working with
-         * files, OS will always make some dynamic allocation, we
-         * will be doing one too.
-         */
-
-        if ((el->fcurrent_log = malloc(PATH_MAX + 1)) == NULL)
-        {
-            errno = ENOMEM;
-            return -1;
-        }
+        errno = ENOMEM;
+        return -1;
     }
 
     if (el->file)
@@ -372,8 +375,8 @@ int el_file_open
 
         for (i = el->frotate_number - 1; i >= 0; --i)
         {
-            pathl = snprintf(el->fcurrent_log, PATH_MAX + 1, "%s.%d",
-                el->fname, i);
+            pathl = snprintf(el->fcurrent_log, strlen(el->fname) + 6,
+                    "%s.%0*d", el->fname, el->frotate_number_count, i);
 
             if (pathl > PATH_MAX)
             {

@@ -449,12 +449,21 @@ static int el_vooption
 
 
         value_int = va_arg(ap, int);
-        VALID(EINVAL, value_int >= 0);
+        VALID(EINVAL, 0 <= value_int && value_int <= USHRT_MAX);
         el_lock(el);
         previous_frotate = el->frotate_number;
-        el->frotate_number = value_int;
-        ret = 0;
+        el->frotate_number = (unsigned short)value_int;
 
+        if (value_int > 0)
+        {
+            /* count number of digits in value_int */
+            value_int--;
+            el->frotate_number_count = 1;
+            while ((value_int /= 10))
+                el->frotate_number_count++;
+        }
+
+        ret = 0;
         if (previous_frotate == 0 && el->file)
         {
             /* user turned on file rotation when file is already
