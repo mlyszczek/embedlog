@@ -8,5 +8,4 @@
 set encoding=utf-8      " utf-8 for the win!
 set tabstop=4           " tab character is 4 spaces wide
 set shiftwidth=4        " hitting ">>" will move line by 4 spaces
-set expandtab           " produce spaces when <tab> is hit
-set softtabstop=4       " when <tab> is hit, produce 4 spaces
+set noexpandtab         " produce tabs when <tab> is hit

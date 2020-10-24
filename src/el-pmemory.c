@@ -59,60 +59,49 @@
 
 static int el_print_line
 (
-    const char            *file,        /* file name where log is printed */
-    size_t                 num,         /* line number where log is printed */
-    const char            *func,        /* function name to print */
-    enum el_level          level,       /* log level to print message with */
-    struct el             *el,          /* el defining printing style */
-    const unsigned char   *buf,         /* memory location to print */
-    size_t                 line_size,   /* size of line in bytes */
-    size_t                 line_number  /* line number beign processed */
+	const char            *file,        /* file name where log is printed */
+	size_t                 num,         /* line number where log is printed */
+	const char            *func,        /* function name to print */
+	enum el_level          level,       /* log level to print message with */
+	struct el             *el,          /* el defining printing style */
+	const unsigned char   *buf,         /* memory location to print */
+	size_t                 line_size,   /* size of line in bytes */
+	size_t                 line_number  /* line number beign processed */
 )
 {
-    /* buffers to hold whole line of bytes representation in hex
-     * and char
-     */
+	/* buffers to hold whole line of bytes
+	 * representation in hex and char */
+	char hex_data[EL_MEM_HEX_LEN + 1] = {0};
+	char char_data[EL_MEM_CHAR_LEN + 1] = {0};
 
-    char hex_data[EL_MEM_HEX_LEN + 1] = {0};
-    char char_data[EL_MEM_CHAR_LEN + 1] = {0};
+	/* calculate buf offset value */
+	const unsigned int offset = EL_MEM_LINE_SIZE * line_number;
 
-    /* calculate buf offset value
-     */
-
-    const unsigned int offset = EL_MEM_LINE_SIZE * line_number;
-
-    /* fill data buffers with representation of bytes
-     */
-
-    size_t bn;  /* byte number */
-
-    for (bn = 0; bn < line_size; ++bn)
-    {
-        unsigned char  current_byte;
-        char          *current_hex_pos;
-        char          *current_char_pos;
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	size_t bn;  /* byte number */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-        current_byte = *buf++;
-        current_hex_pos = hex_data + bn * EL_MEM_SINGLE_HEX_LEN;
-        current_char_pos = char_data + bn;
+	/* fill data buffers with representation of bytes */
+	for (bn = 0; bn < line_size; ++bn)
+	{
+		unsigned char  current_byte;
+		char          *current_hex_pos;
+		char          *current_char_pos;
+		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        sprintf(current_hex_pos, "%02x ", current_byte);
 
-        if (isprint(current_byte) == 0)
-        {
-            current_byte = '.';
-        }
+		current_byte = *buf++;
+		current_hex_pos = hex_data + bn * EL_MEM_SINGLE_HEX_LEN;
+		current_char_pos = char_data + bn;
 
-        *current_char_pos = current_byte;
-    }
+		sprintf(current_hex_pos, "%02x ", current_byte);
+		if (isprint(current_byte) == 0)  current_byte = '.';
+		*current_char_pos = current_byte;
+	}
 
-    /* print constructed line
-     */
-
-    return el_oprint_nb(file, num, func, level, el, "0x%04x  %-*s %s",
-        offset, EL_MEM_HEX_LEN, hex_data, char_data);
+	/* print constructed line */
+	return el_oprint_nb(file, num, func, level, el, "0x%04x  %-*s %s",
+			offset, EL_MEM_HEX_LEN, hex_data, char_data);
 }
 
 
@@ -147,115 +136,99 @@ static int el_print_line
 
 static int el_pmem
 (
-    const char     *file,   /* file name where log is printed */
-    size_t          num,    /* line number where log is printed */
-    const char     *func,   /* function name to print */
-    enum el_level   level,  /* log level to print message with */
-    struct el      *el,     /* el defining printing style */
-    const void     *mem,    /* memory location to print */
-    size_t          mlen,   /* number of bytes to print */
-    int             table   /* print table? or not to print table? */
+	const char     *file,   /* file name where log is printed */
+	size_t          num,    /* line number where log is printed */
+	const char     *func,   /* function name to print */
+	enum el_level   level,  /* log level to print message with */
+	struct el      *el,     /* el defining printing style */
+	const void     *mem,    /* memory location to print */
+	size_t          mlen,   /* number of bytes to print */
+	int             table   /* print table? or not to print table? */
 )
 {
-    /* String needed to print separator for array-like formating
-     */
+	/* String needed to print separator for array-like formating */
+	static const char *separator =
+		"-----------------------------------------------------------------------------";
 
-    static const char *separator =
-"-----------------------------------------------------------------------------";
+	/* calculate some constants for this call based on mlen */
+	const size_t msg_size = mlen;
+	const size_t lines_count = msg_size / EL_MEM_LINE_SIZE;
+	const size_t last_line_size = msg_size % EL_MEM_LINE_SIZE;
 
-    /* calculate some constants for this call based on mlen
-     */
-
-    const size_t msg_size = mlen;
-    const size_t lines_count = msg_size / EL_MEM_LINE_SIZE;
-    const size_t last_line_size = msg_size % EL_MEM_LINE_SIZE;
-
-    size_t  line_number;  /* current line number being printed */
-    int     rv;           /* return value of print functions */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	size_t  line_number;  /* current line number being printed */
+	int     rv;           /* return value of print functions */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    rv = 0;
+	rv = 0;
 
-    /* let's first check if logs are enabled for passed level, if
-     * not, there is no need to waste cycles on useless string
-     * preparation
-     */
-
-    VALID(EINVAL, mem);
-    VALID(EINVAL, mlen);
-    VALID(EINVAL, el);
-    el_lock(el);
-    VALIDC(ERANGE, el_log_allowed(el, level), el_unlock(el));
+	/* let's first check if logs are enabled for passed level, if
+	 * not, there is no need to waste cycles on useless string
+	 * preparation */
+	VALID(EINVAL, mem);
+	VALID(EINVAL, mlen);
+	VALID(EINVAL, el);
+	el_lock(el);
+	VALIDC(ERANGE, el_log_allowed(el, level), el_unlock(el));
 
 
-    /* print log table preamble that is:
-     *
-     * ------  -----------------------------------------------  ----------------
-     * offset  hex                                              ascii
-     * ------  -----------------------------------------------  ----------------
-     */
+	/* print log table preamble that is:
+	 *
+	 * ------  -----------------------------------------------  ----------------
+	 * offset  hex                                              ascii
+	 * ------  -----------------------------------------------  ----------------
+	 */
 
-    if (table)
-    {
-        rv = 0;
-        rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
-            EL_MEM_OFFSET_LEN - 2, separator,
-            EL_MEM_HEX_LEN - 1, separator,
-            EL_MEM_CHAR_LEN, separator);
+	if (table)
+	{
+		rv = 0;
+		rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
+				EL_MEM_OFFSET_LEN - 2, separator,
+				EL_MEM_HEX_LEN - 1, separator,
+				EL_MEM_CHAR_LEN, separator);
 
-        rv |= el_oprint_nb(file, num, func, level, el, "%-*s%-*s%s",
-            EL_MEM_OFFSET_LEN, "offset",
-            EL_MEM_HEX_LEN + 1, "hex", "ascii");
+		rv |= el_oprint_nb(file, num, func, level, el, "%-*s%-*s%s",
+				EL_MEM_OFFSET_LEN, "offset",
+				EL_MEM_HEX_LEN + 1, "hex", "ascii");
 
-        rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
-            EL_MEM_OFFSET_LEN - 2, separator,
-            EL_MEM_HEX_LEN - 1, separator,
-            EL_MEM_CHAR_LEN, separator);
-    }
+		rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
+				EL_MEM_OFFSET_LEN - 2, separator,
+				EL_MEM_HEX_LEN - 1, separator,
+				EL_MEM_CHAR_LEN, separator);
+	}
 
-    /* print all lines that contains EL_MEM_LINE_SIZE bytes,
-     * meaning we print all whole lines
-     */
+	/* print all lines that contains EL_MEM_LINE_SIZE bytes,
+	 * meaning we print all whole lines */
+	for (line_number = 0; line_number < lines_count; ++line_number)
+	{
+		rv |= el_print_line(file, num, func, level, el,
+				mem, EL_MEM_LINE_SIZE, line_number);
 
-    for (line_number = 0; line_number < lines_count; ++line_number)
-    {
-        rv |= el_print_line(file, num, func, level, el,
-            mem, EL_MEM_LINE_SIZE, line_number);
+		/* move memory pointer to point to next chunk of data to
+		 * print */
+		mem = (const unsigned char *)mem + EL_MEM_LINE_SIZE;
+	}
 
-        /* move memory pointer to point to next chunk of data to
-         * print
-         */
+	/* if buflen is not divisible by EL_MEM_LINE_SIZE we still need
+	 * to print last line which has less bytes then
+	 * EL_MEM_LINE_SIZE. */
+	if (last_line_size)
+		rv |= el_print_line(file, num, func, level, el,
+				mem, last_line_size, line_number);
 
-        mem = (const unsigned char *)mem + EL_MEM_LINE_SIZE;
-    }
+	/* print ending line
+	 *
+	 * ------  -----------------------------------------------  ----------------
+	 */
 
-    /* if buflen is not divisible by EL_MEM_LINE_SIZE we still need
-     * to print last line which has less bytes then
-     * EL_MEM_LINE_SIZE.
-     */
+	if (table)
+		rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
+				EL_MEM_OFFSET_LEN - 2, separator,
+				EL_MEM_HEX_LEN - 1, separator,
+				EL_MEM_CHAR_LEN, separator);
 
-    if (last_line_size)
-    {
-        rv |= el_print_line(file, num, func, level, el,
-            mem, last_line_size, line_number);
-    }
-
-    /* print ending line
-     *
-     * ------  -----------------------------------------------  ----------------
-     */
-
-    if (table)
-    {
-        rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
-            EL_MEM_OFFSET_LEN - 2, separator,
-            EL_MEM_HEX_LEN - 1, separator,
-            EL_MEM_CHAR_LEN, separator);
-    }
-
-    el_unlock(el);
-    return rv;
+	el_unlock(el);
+	return rv;
 }
 
 
@@ -276,16 +249,16 @@ static int el_pmem
 
 /* public api */ int el_opmemory_table
 (
-    const char     *file,   /* file name where log is printed */
-    size_t          num,    /* line number where log is printed */
-    const char     *func,   /* function name to print */
-    enum el_level   level,  /* log level to print message with */
-    struct el      *el,     /* el defining printing style */
-    const void     *mem,    /* memory location to print */
-    size_t          mlen    /* number of bytes to print */
+	const char     *file,   /* file name where log is printed */
+	size_t          num,    /* line number where log is printed */
+	const char     *func,   /* function name to print */
+	enum el_level   level,  /* log level to print message with */
+	struct el      *el,     /* el defining printing style */
+	const void     *mem,    /* memory location to print */
+	size_t          mlen    /* number of bytes to print */
 )
 {
-    return el_pmem(file, num, func, level, el, mem, mlen, 1);
+	return el_pmem(file, num, func, level, el, mem, mlen, 1);
 }
 
 
@@ -296,15 +269,15 @@ static int el_pmem
 
 /* public api */ int el_pmemory_table
 (
-    const char      *file,     /* file name where log is printed */
-    size_t           num,      /* line number where log is printed */
-    const char      *func,     /* function name to print */
-    enum el_level    level,    /* log level to print message with */
-    const void      *mem,      /* memory location to print */
-    size_t           mlen      /* number of bytes to print */
+	const char      *file,     /* file name where log is printed */
+	size_t           num,      /* line number where log is printed */
+	const char      *func,     /* function name to print */
+	enum el_level    level,    /* log level to print message with */
+	const void      *mem,      /* memory location to print */
+	size_t           mlen      /* number of bytes to print */
 )
 {
-    return el_pmem(file, num, func, level, &g_el, mem, mlen, 1);
+	return el_pmem(file, num, func, level, &g_el, mem, mlen, 1);
 }
 
 /* ==========================================================================
@@ -314,16 +287,16 @@ static int el_pmem
 
 /* public api */ int el_opmemory
 (
-    const char    *file,   /* file name where log is printed */
-    size_t         num,    /* line number where log is printed */
-    const char    *func,   /* function name to print */
-    enum el_level  level,  /* log level to print message with */
-    struct el     *el,     /* el defining printing style */
-    const void    *mem,    /* memory location to print */
-    size_t         mlen    /* number of bytes to print */
+	const char    *file,   /* file name where log is printed */
+	size_t         num,    /* line number where log is printed */
+	const char    *func,   /* function name to print */
+	enum el_level  level,  /* log level to print message with */
+	struct el     *el,     /* el defining printing style */
+	const void    *mem,    /* memory location to print */
+	size_t         mlen    /* number of bytes to print */
 )
 {
-    return el_pmem(file, num, func, level, el, mem, mlen, 0);
+	return el_pmem(file, num, func, level, el, mem, mlen, 0);
 }
 
 
@@ -334,13 +307,13 @@ static int el_pmem
 
 /* public api */ int el_pmemory
 (
-    const char      *file,     /* file name where log is printed */
-    size_t           num,      /* line number where log is printed */
-    const char      *func,     /* function name to print */
-    enum el_level    level,    /* log level to print message with */
-    const void      *mem,      /* memory location to print */
-    size_t           mlen      /* number of bytes to print */
+	const char      *file,     /* file name where log is printed */
+	size_t           num,      /* line number where log is printed */
+	const char      *func,     /* function name to print */
+	enum el_level    level,    /* log level to print message with */
+	const void      *mem,      /* memory location to print */
+	size_t           mlen      /* number of bytes to print */
 )
 {
-    return el_pmem(file, num, func, level, &g_el, mem, mlen, 0);
+	return el_pmem(file, num, func, level, &g_el, mem, mlen, 0);
 }

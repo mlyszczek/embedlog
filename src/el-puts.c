@@ -52,10 +52,10 @@
 
 /* public api */ int el_puts
 (
-    const char  *s  /* string to put into output */
+	const char  *s  /* string to put into output */
 )
 {
-    return el_oputs(&g_el, s);
+	return el_oputs(&g_el, s);
 }
 
 
@@ -66,18 +66,18 @@
 
 /* public api */ int el_oputs
 (
-    struct el   *el,   /* el defining printing style */
-    const char  *s     /* string to put into output */
+	struct el   *el,   /* el defining printing style */
+	const char  *s     /* string to put into output */
 )
 {
-    int          ret;  /* return from el_oputs_nb() */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int          ret;  /* return from el_oputs_nb() */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_lock(el);
-    ret = el_oputs_nb(el, s);
-    el_unlock(el);
-    return ret;
+	el_lock(el);
+	ret = el_oputs_nb(el, s);
+	el_unlock(el);
+	return ret;
 }
 
 
@@ -90,69 +90,56 @@
 
 int el_oputs_nb
 (
-    struct el   *el,  /* el defining printing style */
-    const char  *s    /* string to put into output */
+	struct el   *el,  /* el defining printing style */
+	const char  *s    /* string to put into output */
 )
 {
-    int          rv;  /* return value from function */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int          rv;  /* return value from function */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    VALID(EINVAL, s);
-    VALID(EINVAL, el);
-    VALID(ENODEV, el->outputs != 0);
 
-    rv = 0;
+	VALID(EINVAL, s);
+	VALID(EINVAL, el);
+	VALID(ENODEV, el->outputs != 0);
+
+	rv = 0;
 
 #if ENABLE_OUT_STDERR
-    if (el->outputs & EL_OUT_STDERR)
-    {
-        rv |= fputs(s, stderr) == EOF ? -1 : 0;
-    }
+	if (el->outputs & EL_OUT_STDERR)
+		rv |= fputs(s, stderr) == EOF ? -1 : 0;
 #endif
 
 #if ENABLE_OUT_STDERR
-    if (el->outputs & EL_OUT_STDOUT)
-    {
-        rv |= fputs(s, stdout) == EOF ? -1 : 0;
-    }
+	if (el->outputs & EL_OUT_STDOUT)
+		rv |= fputs(s, stdout) == EOF ? -1 : 0;
 #endif
 
 #if ENABLE_OUT_SYSLOG
-    if (el->outputs & EL_OUT_SYSLOG)
-    {
-        syslog(el->level, s);
-    }
+	if (el->outputs & EL_OUT_SYSLOG)
+		syslog(el->level, s);
 #endif
 
 #if ENABLE_OUT_FILE
-    if (el->outputs & EL_OUT_FILE)
-    {
-        rv |= el_file_puts(el, s);
-    }
+	if (el->outputs & EL_OUT_FILE)
+		rv |= el_file_puts(el, s);
 #endif
 
 #if 0
-    if (el->outputs & EL_OUT_NET)
-    {
-        el_puts_net(s);
-    }
+	if (el->outputs & EL_OUT_NET)
+		el_puts_net(s);
 #endif
 
 #if ENABLE_OUT_TTY
-    if (el->outputs & EL_OUT_TTY)
-    {
-        rv |= el_tty_puts(el, s);
-    }
+	if (el->outputs & EL_OUT_TTY)
+		rv |= el_tty_puts(el, s);
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    if (el->outputs & EL_OUT_CUSTOM && el->custom_put)
-    {
-        rv |= el->custom_put(s, strlen(s) + 1, el->custom_put_user);
-    }
+	if (el->outputs & EL_OUT_CUSTOM && el->custom_put)
+		rv |= el->custom_put(s, strlen(s) + 1, el->custom_put_user);
 #endif
 
-    return rv;
+	return rv;
 }
 
 
@@ -164,11 +151,11 @@ int el_oputs_nb
 
 /* public api */ int el_putb
 (
-    const void  *mem,  /* memory location to 'print' */
-    size_t       mlen  /* size of the mem buffer */
+	const void  *mem,  /* memory location to 'print' */
+	size_t       mlen  /* size of the mem buffer */
 )
 {
-    return el_oputb(&g_el, mem, mlen);
+	return el_oputb(&g_el, mem, mlen);
 }
 
 
@@ -179,19 +166,19 @@ int el_oputs_nb
 
 /* public api */ int el_oputb
 (
-    struct el   *el,   /* el defining printing style */
-    const void  *mem,  /* memory location to 'print' */
-    size_t       mlen  /* size of the mem buffer */
+	struct el   *el,   /* el defining printing style */
+	const void  *mem,  /* memory location to 'print' */
+	size_t       mlen  /* size of the mem buffer */
 )
 {
-    int          ret;  /* return value from el_oputb_nb() */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int          ret;  /* return value from el_oputb_nb() */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_lock(el);
-    ret = el_oputb_nb(el, mem, mlen);
-    el_unlock(el);
-    return ret;
+	el_lock(el);
+	ret = el_oputb_nb(el, mem, mlen);
+	el_unlock(el);
+	return ret;
 }
 
 
@@ -205,49 +192,48 @@ int el_oputs_nb
 
 int el_oputb_nb
 (
-    struct el   *el,      /* el defining printing style */
-    const void  *mem,     /* memory location to 'print' */
-    size_t       mlen     /* size of the mem buffer */
+	struct el   *el,      /* el defining printing style */
+	const void  *mem,     /* memory location to 'print' */
+	size_t       mlen     /* size of the mem buffer */
 )
 {
-    int          rv;      /* return value from function */
-    int          called;  /* at least one output was called */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int          rv;      /* return value from function */
+	int          called;  /* at least one output was called */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    VALID(EINVAL, mem);
-    VALID(EINVAL, mlen);
-    VALID(EINVAL, el);
-    VALID(ENODEV, el->outputs != 0);
+	VALID(EINVAL, mem);
+	VALID(EINVAL, mlen);
+	VALID(EINVAL, el);
+	VALID(ENODEV, el->outputs != 0);
 
-    rv = 0;
-    called = 0;
+	rv = 0;
+	called = 0;
 
 #if ENABLE_OUT_FILE
-    if (el->outputs & EL_OUT_FILE)
-    {
-        called = 1;
-        rv |= el_file_putb(el, mem, mlen);
-    }
+	if (el->outputs & EL_OUT_FILE)
+	{
+		called = 1;
+		rv |= el_file_putb(el, mem, mlen);
+	}
 #endif
 
 #if ENABLE_OUT_CUSTOM
-    if (el->outputs & EL_OUT_CUSTOM && el->custom_put)
-    {
-        called = 1;
-        rv |= el->custom_put(mem, mlen, el->custom_put_user);
-    }
+	if (el->outputs & EL_OUT_CUSTOM && el->custom_put)
+	{
+		called = 1;
+		rv |= el->custom_put(mem, mlen, el->custom_put_user);
+	}
 #endif
 
 
-    if (called == 0)
-    {
-        /* couldn't find any supported output for binary logging
-         */
+	if (called == 0)
+	{
+		/* couldn't find any supported output for
+		 * binary logging */
+		errno = ENODEV;
+		return -1;
+	}
 
-        errno = ENODEV;
-        return -1;
-    }
-
-    return rv;
+	return rv;
 }

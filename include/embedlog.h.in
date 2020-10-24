@@ -70,112 +70,104 @@ extern "C" {
 #endif
 
 /* enum values, new enums can be added, but values of already
- * existing enums *must* stay unchanged, to keep ABI stable!
- */
+ * existing enums *must* stay unchanged, to keep ABI stable! */
 
 enum el_output
 {
-    EL_OUT_NONE   = 0x0000,
-    EL_OUT_STDERR = 0x0001,
-    EL_OUT_STDOUT = 0x0002,
-    EL_OUT_SYSLOG = 0x0004,
-    EL_OUT_FILE   = 0x0008,
-    EL_OUT_NET    = 0x0010,
-    EL_OUT_TTY    = 0x0020,
-    EL_OUT_CUSTOM = 0x0040,
-    EL_OUT_ALL    = 0x7fff
+	EL_OUT_NONE   = 0x0000,
+	EL_OUT_STDERR = 0x0001,
+	EL_OUT_STDOUT = 0x0002,
+	EL_OUT_SYSLOG = 0x0004,
+	EL_OUT_FILE   = 0x0008,
+	EL_OUT_NET    = 0x0010,
+	EL_OUT_TTY    = 0x0020,
+	EL_OUT_CUSTOM = 0x0040,
+	EL_OUT_ALL    = 0x7fff
 };
 
 enum el_level
 {
-    EL_FATAL  = 0,
-    EL_ALERT  = 1,
-    EL_CRIT   = 2,
-    EL_ERROR  = 3,
-    EL_WARN   = 4,
-    EL_NOTICE = 5,
-    EL_INFO   = 6,
-    EL_DBG    = 7
+	EL_FATAL  = 0,
+	EL_ALERT  = 1,
+	EL_CRIT   = 2,
+	EL_ERROR  = 3,
+	EL_WARN   = 4,
+	EL_NOTICE = 5,
+	EL_INFO   = 6,
+	EL_DBG    = 7
 };
 
 enum el_option
 {
-    EL_LEVEL          = 0,
-    EL_OUT            = 1,
-    EL_COLORS         = 2,
-    EL_TS             = 3,
-    EL_TS_TM          = 4,
-    EL_TS_FRACT       = 5,
-    EL_PRINT_LEVEL    = 6,
-    EL_PRINT_NL       = 7,
-    EL_FINFO          = 8,
-    EL_FUNCINFO       = 9,
-    EL_CUSTOM_PUTS    = 10,  /* deprecated */
-    EL_CUSTOM_PUT     = 10,
-    EL_TTY_DEV        = 11,
-    EL_PREFIX         = 12,
+	EL_LEVEL          = 0,
+	EL_OUT            = 1,
+	EL_COLORS         = 2,
+	EL_TS             = 3,
+	EL_TS_TM          = 4,
+	EL_TS_FRACT       = 5,
+	EL_PRINT_LEVEL    = 6,
+	EL_PRINT_NL       = 7,
+	EL_FINFO          = 8,
+	EL_FUNCINFO       = 9,
+	EL_CUSTOM_PUTS    = 10,  /* deprecated */
+	EL_CUSTOM_PUT     = 10,
+	EL_TTY_DEV        = 11,
+	EL_PREFIX         = 12,
 
-    EL_FPATH          = 13,
-    EL_FROTATE_NUMBER = 14,
-    EL_FROTATE_SIZE   = 15,
-    EL_FROTATE_SYMLINK= 19,
-    EL_FSYNC_EVERY    = 16,
-    EL_FSYNC_LEVEL    = 17,
-    EL_FILE_SYNC_EVERY= 16,  /* deprecated */
-    EL_FILE_SYNC_LEVEL= 17,  /* deprecated */
+	EL_FPATH          = 13,
+	EL_FROTATE_NUMBER = 14,
+	EL_FROTATE_SIZE   = 15,
+	EL_FROTATE_SYMLINK= 19,
+	EL_FSYNC_EVERY    = 16,
+	EL_FSYNC_LEVEL    = 17,
+	EL_FILE_SYNC_EVERY= 16,  /* deprecated */
+	EL_FILE_SYNC_LEVEL= 17,  /* deprecated */
 
-    EL_THREAD_SAFE    = 18,
+	EL_THREAD_SAFE    = 18,
 
-    /* internal use only, should represent number of options, if
-     * you add option, increment this by one (or by the number of
-     * options you add).
-     */
-
-    EL_OPT_ERROR      = 20
+	/* internal use only, should represent number of options, if
+	 * you add option, increment this by one (or by the number of
+	 * options you add). */
+	EL_OPT_ERROR      = 20
 };
 
 enum el_option_timestamp
 {
-    EL_TS_OFF   = 0,
-    EL_TS_SHORT = 1,
-    EL_TS_LONG  = 2,
+	EL_TS_OFF   = 0,
+	EL_TS_SHORT = 1,
+	EL_TS_LONG  = 2,
 
-    /* internal use only, should represent number of options, if
-     * you add option, increment this by one (or by the number of
-     * options you add).
-     */
-
-    EL_TS_ERROR = 3
+	/* internal use only, should represent number of options, if
+	 * you add option, increment this by one (or by the number of
+	 * options you add). */
+	EL_TS_ERROR = 3
 };
 
 enum el_option_timestamp_timer
 {
-    EL_TS_TM_TIME      = 0,
-    EL_TS_TM_CLOCK     = 1,
-    EL_TS_TM_REALTIME  = 2,
-    EL_TS_TM_MONOTONIC = 3,
+	EL_TS_TM_TIME      = 0,
+	EL_TS_TM_CLOCK     = 1,
+	EL_TS_TM_REALTIME  = 2,
+	EL_TS_TM_MONOTONIC = 3,
 
-    /* internal use only, should represent number of options, if
-     * you add option, increment this by one (or by the number of
-     * options you add).
-     */
-
-    EL_TS_TM_ERROR     = 4
+	/* internal use only, should represent number of options, if
+	 * you add option, increment this by one (or by the number of
+	 * options you add). */
+	EL_TS_TM_ERROR     = 4
 };
 
 enum el_option_timestamp_fractions
 {
-    EL_TS_FRACT_OFF   = 0,
-    EL_TS_FRACT_MS    = 1,
-    EL_TS_FRACT_US    = 2,
-    EL_TS_FRACT_NS    = 3,
+	EL_TS_FRACT_OFF   = 0,
+	EL_TS_FRACT_MS    = 1,
+	EL_TS_FRACT_US    = 2,
+	EL_TS_FRACT_NS    = 3,
 
-    /* internal use only, should represent number of options, if
-     * you add option, increment this by one (or by the number of
-     * options you add).
-     */
+	/* internal use only, should represent number of options, if
+	 * you add option, increment this by one (or by the number of
+	 * options you add). */
 
-    EL_TS_FRACT_ERROR = 4
+	EL_TS_FRACT_ERROR = 4
 };
 
 typedef int (*el_custom_put)(const char *s, size_t slen, void *user);
@@ -192,53 +184,52 @@ typedef int (*el_custom_put)(const char *s, size_t slen, void *user);
  * It's generated as #if [0,1] so this is applied system-wide, if
  * it were to be defined like #if ENABLE_OUT_FILE, then every
  * compilation unit that uses embedlog would have to define that to
- * either 1 or 0. Easy for mistakes and hard to find bugs.
- */
+ * either 1 or 0. Easy for mistakes and hard to find bugs. */
 struct el
 {
-    unsigned int    outputs:7;
-    unsigned int    colors:1;
-    unsigned int    timestamp:2;
-    unsigned int    timestamp_timer:3;
-    unsigned int    timestamp_fractions:2;
-    unsigned int    print_log_level:1;
-    unsigned int    print_newline:1;
-    unsigned int    finfo:1;
-    unsigned int    funcinfo:1;
-    unsigned int    level:3;
-    unsigned int    level_current_msg:3;
+	unsigned int    outputs:7;
+	unsigned int    colors:1;
+	unsigned int    timestamp:2;
+	unsigned int    timestamp_timer:3;
+	unsigned int    timestamp_fractions:2;
+	unsigned int    print_log_level:1;
+	unsigned int    print_newline:1;
+	unsigned int    finfo:1;
+	unsigned int    funcinfo:1;
+	unsigned int    level:3;
+	unsigned int    level_current_msg:3;
 
 #if @ENABLE_OUT_FILE@
-    unsigned int    fsync_level:3;
-    unsigned int    frotate_symlink:1;
-    unsigned int    frotate_number_count:3;
-    unsigned short  frotate_number;
-    unsigned short  fcurrent_rotate;
-    unsigned long   frotate_size;
-    unsigned long   fsync_every;
-    unsigned long   fwritten_after_sync;
-    unsigned long   fpos;
-    FILE           *file;
-    char           *fcurrent_log;
-    const char     *fname;
+	unsigned int    fsync_level:3;
+	unsigned int    frotate_symlink:1;
+	unsigned int    frotate_number_count:3;
+	unsigned short  frotate_number;
+	unsigned short  fcurrent_rotate;
+	unsigned long   frotate_size;
+	unsigned long   fsync_every;
+	unsigned long   fwritten_after_sync;
+	unsigned long   fpos;
+	FILE           *file;
+	char           *fcurrent_log;
+	const char     *fname;
 #endif
 
 #if @ENABLE_OUT_TTY@
-    int             serial_fd;
+	int             serial_fd;
 #endif
 
 #if @ENABLE_PREFIX@
-    const char     *prefix;
+	const char     *prefix;
 #endif
 
 #if @ENABLE_OUT_CUSTOM@
-    el_custom_put   custom_put;
-    void           *custom_put_user;
+	el_custom_put   custom_put;
+	void           *custom_put_user;
 #endif
 
 #if @ENABLE_PTHREAD@
-    pthread_mutex_t lock;
-    int             lock_initialized;
+	pthread_mutex_t lock;
+	int             lock_initialized;
 #endif
 };
 
@@ -247,15 +238,15 @@ int el_cleanup(void);
 int el_option(int option, ...);
 int el_puts(const char *string);
 int el_print(const char *file, size_t line, const char *func,
-        enum el_level level, const char *fmt, ...);
+		enum el_level level, const char *fmt, ...);
 int el_vprint(const char *file, size_t line, const char *func,
-        enum el_level level, const char *fmt, va_list ap);
+		enum el_level level, const char *fmt, va_list ap);
 int el_pmemory(const char *file, size_t line, const char *func,
-        enum el_level level, const void *memory, size_t mlen);
+		enum el_level level, const void *memory, size_t mlen);
 int el_pmemory_table(const char *file, size_t line, const char *func,
-        enum el_level level, const void *memory, size_t mlen);
+		enum el_level level, const void *memory, size_t mlen);
 int el_perror(const char *file, size_t line, const char *func,
-        enum el_level level, const char *fmt, ...);
+		enum el_level level, const char *fmt, ...);
 int el_putb(const void *memory, size_t mlen);
 int el_pbinary(enum el_level level, const void *memory, size_t mlen);
 const struct el *el_get_el(void);
@@ -269,21 +260,21 @@ int el_ocleanup(struct el *el);
 int el_ooption(struct el *el, int option, ...);
 int el_oputs(struct el *el, const char *string);
 int el_oprint(const char *file, size_t line, const char *func,
-        enum el_level level, struct el *el, const char *fnt, ...);
+		enum el_level level, struct el *el, const char *fnt, ...);
 int el_ovprint(const char *file, size_t line, const char *func,
-        enum el_level level, struct el *el, const char *fmt,
-        va_list ap);
+		enum el_level level, struct el *el, const char *fmt,
+		va_list ap);
 int el_opmemory(const char *file, size_t line, const char *func,
-        enum el_level level, struct el *el, const void *memory,
-        size_t mlen);
+		enum el_level level, struct el *el, const void *memory,
+		size_t mlen);
 int el_opmemory_table(const char *file, size_t line, const char *func,
-        enum el_level level, struct el *el, const void *memory,
-        size_t mlen);
+		enum el_level level, struct el *el, const void *memory,
+		size_t mlen);
 int el_operror(const char *file, size_t line, const char *func,
-        enum el_level level, struct el *el, const char *fmt, ...);
+		enum el_level level, struct el *el, const char *fmt, ...);
 int el_oputb(struct el *el, const void *memory, size_t mlen);
 int el_opbinary(enum el_level level, struct el *el,
-        const void *memory, size_t mlen);
+		const void *memory, size_t mlen);
 int el_oflush(struct el *el);
 
 #ifdef __cplusplus

@@ -19,8 +19,8 @@
 #   include <stddef.h>
 #   include <stdarg.h>
 
-    int snprintf(char *str, size_t str_m, const char *fmt, ...);
-    int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
+int snprintf(char *str, size_t str_m, const char *fmt, ...);
+int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
 #endif
 
 
@@ -323,9 +323,9 @@ int el_file_flush(struct el *el);
 int el_oputb_nb(struct el *el, const void *mem, size_t mlen);
 int el_oputs_nb(struct el *el, const char *s);
 int el_ovprint_nb(const char *file, size_t num, const char *func,
-        enum el_level level, struct el *el, const char *fmt, va_list ap);
+		enum el_level level, struct el *el, const char *fmt, va_list ap);
 int el_oprint_nb(const char *file, size_t num, const char *func,
-        enum el_level level, struct el *el, const char *fmt, ...);
+		enum el_level level, struct el *el, const char *fmt, ...);
 
 
 #if ENABLE_PTHREAD

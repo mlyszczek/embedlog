@@ -36,46 +36,42 @@
 
 size_t el_decode_number
 (
-    const void          *number,  /* number to decode */
+	const void          *number,  /* number to decode */
 #ifdef LLONG_MAX
-    unsigned long long  *out      /* decoded number */
+	unsigned long long  *out      /* decoded number */
 #else
-    unsigned long       *out      /* decoded number */
+	unsigned long       *out      /* decoded number */
 #endif
 )
 {
-    const unsigned char *n;       /* just a 'number' as unsigned cahr */
-    size_t               i;       /* temporary index */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	const unsigned char *n;       /* just a 'number' as unsigned cahr */
+	size_t               i;       /* temporary index */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    i = 0;
-    *out = 0;
-    n = number;
+	i = 0;
+	*out = 0;
+	n = number;
 
-    do
-    {
-        /* multiple stuff is happening in this one-liner
-         *
-         * - first we take 7 bits of number
-         * - calculate weigth of current number
-         * - set current number into right position of out
-         */
+	do
+	{
+		/* multiple stuff is happening in this one-liner
+		 *
+		 * - first we take 7 bits of number
+		 * - calculate weigth of current number
+		 * - set current number into right position of out */
 
 #ifdef LLONG_MAX
-        *out |= (unsigned long long)(n[i] & 0x7f) << (i * 7);
+		*out |= (unsigned long long)(n[i] & 0x7f) << (i * 7);
 #else
-        *out |= (unsigned long)(n[i] & 0x7f) << (i * 7);
+		*out |= (unsigned long)(n[i] & 0x7f) << (i * 7);
 #endif
 
-        /* we do this until number lacks of continuation bit, which means
-         * we are done
-         */
-    }
-    while (n[i++] & 0x80);
+		/* we do this until number lacks of continuation bit, which
+		 * means we are done */
+	}
+	while (n[i++] & 0x80);
 
-    /* return number of bytes processed from 'number'
-     */
-
-    return i;
+	/* return number of bytes processed from 'number' */
+	return i;
 }

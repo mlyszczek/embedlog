@@ -82,31 +82,29 @@
 
 static size_t el_flags
 (
-    enum el_level   level,
-    struct el      *el,
-    unsigned char  *buf
+	enum el_level   level,
+	struct el      *el,
+	unsigned char  *buf
 )
 {
-    *buf = 0;
+	*buf = 0;
 
 #if ENABLE_TIMESTAMP
-    if (el->timestamp != EL_TS_OFF)
-    {
-        *buf |= FLAG_TS;
+	if (el->timestamp != EL_TS_OFF)
+	{
+		*buf |= FLAG_TS;
 
 #   if ENABLE_FRACTIONS
-        /* fraction of seconds can be printed only when timestamp
-         * is on
-         */
+		/* fraction of seconds can be printed only when timestamp
+		 * is on */
 
-        *buf |= el->timestamp_fractions << FLAG_TS_FRACT_SHIFT;
+		*buf |= el->timestamp_fractions << FLAG_TS_FRACT_SHIFT;
 #   endif
-    }
+	}
 #endif
 
-    *buf |= level << FLAG_LEVEL_SHIFT;
-
-    return 1;
+	*buf |= level << FLAG_LEVEL_SHIFT;
+	return 1;
 }
 
 
@@ -162,73 +160,69 @@ static size_t el_flags
 
 /* public api */ int el_opbinary
 (
-    enum el_level   level,            /* log severity level */
-    struct el      *el,               /* el object with info how to print */
-    const void     *memory,           /* binary data to store to print */
-    size_t          mlen              /* length of "memory" buffer */
+	enum el_level   level,            /* log severity level */
+	struct el      *el,               /* el object with info how to print */
+	const void     *memory,           /* binary data to store to print */
+	size_t          mlen              /* length of "memory" buffer */
 )
 {
-    unsigned char   buf[EL_BUF_MAX];  /* buffer for message to print */
-    size_t          l;                /* length of encoded mlen */
-    size_t          w;                /* bytes written to buf */
-    int             e;                /* cache for errno */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	unsigned char   buf[EL_BUF_MAX];  /* buffer for message to print */
+	size_t          l;                /* length of encoded mlen */
+	size_t          w;                /* bytes written to buf */
+	int             e;                /* cache for errno */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    VALID(EINVAL, mlen);
-    VALID(EINVAL, memory);
-    VALID(EINVAL, el);
-    el_lock(el);
-    VALIDC(ENODEV, el->outputs, el_unlock(el));
-    VALIDC(ERANGE, el_log_allowed(el, level), el_unlock(el));
+	VALID(EINVAL, mlen);
+	VALID(EINVAL, memory);
+	VALID(EINVAL, el);
+	el_lock(el);
+	VALIDC(ENODEV, el->outputs, el_unlock(el));
+	VALIDC(ERANGE, el_log_allowed(el, level), el_unlock(el));
 
-    e = 0;
-    w  = el_flags(level, el, buf);
-    w += el_timestamp(el, buf + w, TS_BINARY);
+	e = 0;
+	w  = el_flags(level, el, buf);
+	w += el_timestamp(el, buf + w, TS_BINARY);
 
-    /* encode mlen to know how much bytes we are going to need
-     */
+	/* encode mlen to know how much bytes we are
+	 * going to need */
+	l = el_encode_number(mlen, buf + w);
 
-    l = el_encode_number(mlen, buf + w);
+	if (w + l + mlen > sizeof(buf))
+	{
+		/* user tries to print more that than we
+		 * can hold in our buffer, buffer overflow
+		 * attack? Not going to happen! We
+		 * truncate it. */
+		mlen = EL_BUF_MAX - w - l;
+		e = ENOBUFS;
+	}
 
-    if (w + l + mlen > sizeof(buf))
-    {
-        /* user tries to print more that than we can hold in our
-         * buffer, buffer overflow attack? Not going to happen! We
-         * truncate it.
-         */
+	/* now that we know real value of mlen, we can
+	 * encode mlen again */
+	w += el_encode_number(mlen, buf + w);
+	memcpy(buf + w, memory, mlen);
+	el->level_current_msg = level;
+	w += mlen;
 
-        mlen = EL_BUF_MAX - w - l;
-        e = ENOBUFS;
-    }
+	if (el_oputb_nb(el, buf, w) != 0)
+	{
+		el->level_current_msg = EL_DBG;
+		el_unlock(el);
+		return -1;
+	}
 
-    /* now that we know real value of mlen, we can encode mlen
-     * again
-     */
+	el->level_current_msg = EL_DBG;
 
-    w += el_encode_number(mlen, buf + w);
-    memcpy(buf + w, memory, mlen);
-    el->level_current_msg = level;
-    w += mlen;
+	if (e)
+	{
+		errno = e;
+		el_unlock(el);
+		return -1;
+	}
 
-    if (el_oputb_nb(el, buf, w) != 0)
-    {
-        el->level_current_msg = EL_DBG;
-        el_unlock(el);
-        return -1;
-    }
-
-    el->level_current_msg = EL_DBG;
-
-    if (e)
-    {
-        errno = e;
-        el_unlock(el);
-        return -1;
-    }
-
-    el_unlock(el);
-    return 0;
+	el_unlock(el);
+	return 0;
 }
 
 
@@ -239,11 +233,10 @@ static size_t el_flags
 
 /* public api */ int el_pbinary
 (
-
-    enum el_level   level,   /* log severity level */
-    const void     *memory,  /* binary data to store to print */
-    size_t          mlen     /* length of "memory" buffer */
+	enum el_level   level,   /* log severity level */
+	const void     *memory,  /* binary data to store to print */
+	size_t          mlen     /* length of "memory" buffer */
 )
 {
-    return el_opbinary(level, &g_el, memory, mlen);
+	return el_opbinary(level, &g_el, memory, mlen);
 }

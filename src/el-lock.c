@@ -43,13 +43,10 @@
 
 void el_lock
 (
-    struct el  *el  /* el object to lock */
+	struct el  *el  /* el object to lock */
 )
 {
-    if (el->lock_initialized)
-    {
-        pthread_mutex_lock(&el->lock);
-    }
+	if (el->lock_initialized) pthread_mutex_lock(&el->lock);
 }
 
 
@@ -61,11 +58,8 @@ void el_lock
 
 void el_unlock
 (
-    struct el  *el  /* el object to unlock */
+	struct el  *el  /* el object to unlock */
 )
 {
-    if (el->lock_initialized)
-    {
-        pthread_mutex_unlock(&el->lock);
-    }
+	if (el->lock_initialized) pthread_mutex_unlock(&el->lock);
 }

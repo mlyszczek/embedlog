@@ -10,14 +10,14 @@ mt_defs();  /* definitions for mtest */
 
 int main(void)
 {
-    (void)mt_prepare_test;
-    (void)mt_cleanup_test;
+	(void)mt_prepare_test;
+	(void)mt_cleanup_test;
 
-    el_options_test_group();
-    el_print_test_group();
-    el_file_test_group();
-    el_perror_test_group();
-    el_pmemory_test_group();
-    el_pbinary_test_group();
-    mt_return();
+	el_options_test_group();
+	el_print_test_group();
+	el_file_test_group();
+	el_perror_test_group();
+	el_pmemory_test_group();
+	el_pbinary_test_group();
+	mt_return();
 }

@@ -42,56 +42,48 @@
 size_t el_encode_number
 (
 #ifdef LLONG_MAX
-    unsigned long long  number,  /* value to encode */
+	unsigned long long  number,  /* value to encode */
 #else
-    unsigned long       number,  /* value to encode */
+	unsigned long       number,  /* value to encode */
 #endif
-    void               *out      /* memory where encoded value will be set */
+	void               *out      /* memory where encoded value will be set */
 )
 {
-    unsigned char      *o;       /* just 'out' as unsigned char */
-    size_t              n;       /* number of bytes stored in 'out' */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	unsigned char      *o;       /* just 'out' as unsigned char */
+	size_t              n;       /* number of bytes stored in 'out' */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    o = out;
-    n = 0;
+	o = out;
+	n = 0;
 
-    do
-    {
-        /* put only youngest 7 bits into out - that's a max number
-         * single byte can hold
-         */
+	do
+	{
+		/* put only youngest 7 bits into out -
+		 * that's a max number single byte can
+		 * hold */
+		o[n] = number & 0x7f;
 
-        o[n] = number & 0x7f;
+		/* remove those 7 bits from number, they
+		 * are used and no longer needed */
+		number >>= 7;
 
-        /* remove those 7 bits from number, they are used and no
-         * longer needed
-         */
+		/* if we didn't process whole number, set
+		 * oldest bit to 1, this is continuation
+		 * bit, it will tell decoder that next
+		 * bytes will hold next 7bits of number */
+		if (number)
+			o[n] |= 0x80;
 
-        number >>= 7;
+		/* increment n to indicate we store a byte
+		 * in 'out' buffer */
+		++n;
 
-        /* if we didn't process whole number, set oldest bit to 1,
-         * this is continuation bit, it will tell decoder that next
-         * bytes will hold next 7bits of number
-         */
+		/* do this until there is anyting else
+		 * left in number */
+	}
+	while (number);
 
-        if (number)
-        {
-            o[n] |= 0x80;
-        }
-
-        /* increment n to indicate we store a byte in 'out' buffer
-         */
-
-        ++n;
-
-        /* do this until there is anyting else left in number
-         */
-    }
-    while (number);
-
-    /* after job's done, return number of bytes stored in 'out'
-     */
-
-    return n;
+	/* after job's done, return number of bytes
+	 * stored in 'out' */
+	return n;
 }

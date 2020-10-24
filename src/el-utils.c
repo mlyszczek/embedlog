@@ -53,21 +53,16 @@
 
 const char *el_basename
 (
-    const char  *s      /* string to basename */
+	const char  *s      /* string to basename */
 )
 {
-    const char  *base;  /* pointer to base name of path */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	const char  *base;  /* pointer to base name of path */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    base = s;
 
-    for (; *s; ++s)
-    {
-        if (s[0] == '/' && s[1] != '\0')
-        {
-            base = s + 1;
-        }
-    }
+	for (base = s; *s; ++s)
+		if (s[0] == '/' && s[1] != '\0')
+			base = s + 1;
 
-    return base;
+	return base;
 }

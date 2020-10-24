@@ -57,13 +57,13 @@ static char  ascii[128];
 
 static int print_to_buffer
 (
-    const char  *s,
-    size_t       slen,
-    void        *user
+	const char  *s,
+	size_t       slen,
+	void        *user
 )
 {
-    strcat(user, s);
-    return 0;
+	strcat(user, s);
+	return 0;
 }
 
 
@@ -73,11 +73,11 @@ static int print_to_buffer
 
 static void test_prepare(void)
 {
-    el_init();
-    el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
-    el_option(EL_PRINT_LEVEL, 0);
-    el_option(EL_OUT, EL_OUT_CUSTOM);
-    logbuf[0] = '\0';
+	el_init();
+	el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+	el_option(EL_PRINT_LEVEL, 0);
+	el_option(EL_OUT, EL_OUT_CUSTOM);
+	logbuf[0] = '\0';
 }
 
 
@@ -87,7 +87,7 @@ static void test_prepare(void)
 
 static void test_cleanup(void)
 {
-    el_cleanup();
+	el_cleanup();
 }
 
 
@@ -103,12 +103,12 @@ static void test_cleanup(void)
 
 static void pmemory_one_byte(void)
 {
-    static const char c = 'a';
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	static const char c = 'a';
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_pmemory(ELI, &c, sizeof(c));
-    mt_fok(strcmp(logbuf,
+	el_pmemory(ELI, &c, sizeof(c));
+	mt_fok(strcmp(logbuf,
 "0x0000  61                                               a\n"));
 }
 
@@ -119,11 +119,11 @@ static void pmemory_one_byte(void)
 
 static void pmemory_one_line_not_full(void)
 {
-    static const char  *s = "test string";
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	static const char  *s = "test string";
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    el_pmemory(ELI, s, strlen(s));
-    mt_fok(strcmp(logbuf,
+	el_pmemory(ELI, s, strlen(s));
+	mt_fok(strcmp(logbuf,
 "0x0000  74 65 73 74 20 73 74 72 69 6e 67                 test string\n"));
 }
 
@@ -134,12 +134,12 @@ static void pmemory_one_line_not_full(void)
 
 static void pmemory_one_line_full(void)
 {
-    static const char  *s = "qwertyuiopasdfgh";
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	static const char  *s = "qwertyuiopasdfgh";
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_pmemory(ELI, s, strlen(s));
-    mt_fok(strcmp(logbuf,
+	el_pmemory(ELI, s, strlen(s));
+	mt_fok(strcmp(logbuf,
 "0x0000  71 77 65 72 74 79 75 69 6f 70 61 73 64 66 67 68  qwertyuiopasdfgh\n"));
 }
 
@@ -150,12 +150,12 @@ static void pmemory_one_line_full(void)
 
 static void pmemory_two_line_not_full(void)
 {
-    static const char  *s = "first line i am and i am 2";
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	static const char  *s = "first line i am and i am 2";
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_pmemory(ELI, s, strlen(s));
-    mt_fok(strcmp(logbuf,
+	el_pmemory(ELI, s, strlen(s));
+	mt_fok(strcmp(logbuf,
 "0x0000  66 69 72 73 74 20 6c 69 6e 65 20 69 20 61 6d 20  first line i am \n"
 "0x0010  61 6e 64 20 69 20 61 6d 20 32                    and i am 2\n"));
 }
@@ -167,12 +167,12 @@ static void pmemory_two_line_not_full(void)
 
 static void pmemory_two_line_full(void)
 {
-    static const char  *s = "first line i am and i am 2nd lin";
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	static const char  *s = "first line i am and i am 2nd lin";
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_pmemory(ELI, s, strlen(s));
-    mt_fok(strcmp(logbuf,
+	el_pmemory(ELI, s, strlen(s));
+	mt_fok(strcmp(logbuf,
 "0x0000  66 69 72 73 74 20 6c 69 6e 65 20 69 20 61 6d 20  first line i am \n"
 "0x0010  61 6e 64 20 69 20 61 6d 20 32 6e 64 20 6c 69 6e  and i am 2nd lin\n"));
 }
@@ -180,15 +180,15 @@ static void pmemory_two_line_full(void)
 
 static void pmemory_binary_data_with_nulls(void)
 {
-    static const unsigned char  data[] = {
-        0x05, 0x02, 0x10, 0x50, 0x53, 0x8f, 0xff, 0x3d,
-        0x00, 0x00, 0x4a, 0xab, 0xfc, 0x04, 0x00, 0xfa,
-        0xfd, 0xfa, 0x7f, 0x80 };
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	static const unsigned char  data[] = {
+		0x05, 0x02, 0x10, 0x50, 0x53, 0x8f, 0xff, 0x3d,
+		0x00, 0x00, 0x4a, 0xab, 0xfc, 0x04, 0x00, 0xfa,
+		0xfd, 0xfa, 0x7f, 0x80 };
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_pmemory(ELI, data, sizeof(data));
-    mt_fok(strcmp(logbuf,
+	el_pmemory(ELI, data, sizeof(data));
+	mt_fok(strcmp(logbuf,
 "0x0000  05 02 10 50 53 8f ff 3d 00 00 4a ab fc 04 00 fa  ...PS..=..J.....\n"
 "0x0010  fd fa 7f 80                                      ....\n"));
 }
@@ -199,8 +199,8 @@ static void pmemory_binary_data_with_nulls(void)
 
 static void pmemory_print_ascii_table(void)
 {
-    el_pmemory(ELI, ascii, sizeof(ascii));
-    mt_fok(strcmp(logbuf,
+	el_pmemory(ELI, ascii, sizeof(ascii));
+	mt_fok(strcmp(logbuf,
 "0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................\n"
 "0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................\n"
 "0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !\"#$%&'()*+,-./\n"
@@ -218,8 +218,8 @@ static void pmemory_print_ascii_table(void)
 
 static void pmemory_print_ascii_table_with_table(void)
 {
-    el_pmemory_table(ELI, ascii, sizeof(ascii));
-    mt_fok(strcmp(logbuf,
+	el_pmemory_table(ELI, ascii, sizeof(ascii));
+	mt_fok(strcmp(logbuf,
 "------  -----------------------------------------------  ----------------\n"
 "offset  hex                                              ascii\n"
 "------  -----------------------------------------------  ----------------\n"
@@ -241,18 +241,18 @@ static void pmemory_print_ascii_table_with_table(void)
 
 static void pmemory_print_ascii_table_option(void)
 {
-    struct el  el;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	struct el  el;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_oinit(&el);
-    el_ooption(&el, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
-    el_ooption(&el, EL_PRINT_LEVEL, 0);
-    el_ooption(&el, EL_OUT, EL_OUT_CUSTOM);
-    logbuf[0] = '\0';
+	el_oinit(&el);
+	el_ooption(&el, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+	el_ooption(&el, EL_PRINT_LEVEL, 0);
+	el_ooption(&el, EL_OUT, EL_OUT_CUSTOM);
+	logbuf[0] = '\0';
 
-    el_opmemory(ELI, &el, ascii, sizeof(ascii));
-    mt_fok(strcmp(logbuf,
+	el_opmemory(ELI, &el, ascii, sizeof(ascii));
+	mt_fok(strcmp(logbuf,
 "0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................\n"
 "0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................\n"
 "0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !\"#$%&'()*+,-./\n"
@@ -262,7 +262,7 @@ static void pmemory_print_ascii_table_option(void)
 "0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno\n"
 "0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.\n"));
 
-    el_ocleanup(&el);
+	el_ocleanup(&el);
 }
 
 
@@ -272,18 +272,18 @@ static void pmemory_print_ascii_table_option(void)
 
 static void pmemory_print_ascii_table_with_table_option(void)
 {
-    struct el  el;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	struct el  el;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_oinit(&el);
-    el_ooption(&el, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
-    el_ooption(&el, EL_PRINT_LEVEL, 0);
-    el_ooption(&el, EL_OUT, EL_OUT_CUSTOM);
-    logbuf[0] = '\0';
+	el_oinit(&el);
+	el_ooption(&el, EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+	el_ooption(&el, EL_PRINT_LEVEL, 0);
+	el_ooption(&el, EL_OUT, EL_OUT_CUSTOM);
+	logbuf[0] = '\0';
 
-    el_opmemory_table(ELI, &el, ascii, sizeof(ascii));
-    mt_fok(strcmp(logbuf,
+	el_opmemory_table(ELI, &el, ascii, sizeof(ascii));
+	mt_fok(strcmp(logbuf,
 "------  -----------------------------------------------  ----------------\n"
 "offset  hex                                              ascii\n"
 "------  -----------------------------------------------  ----------------\n"
@@ -297,7 +297,7 @@ static void pmemory_print_ascii_table_with_table_option(void)
 "0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.\n"
 "------  -----------------------------------------------  ----------------\n"));
 
-    el_ocleanup(&el);
+	el_ocleanup(&el);
 }
 
 
@@ -325,88 +325,78 @@ static const char expected_out[] =
 
 static int print_check(void)
 {
-    int    i;
-    char  *msg;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int    i;
+	char  *msg;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    /* all we care about is that there are no interlaces
-     */
+	/* all we care about is that there are no interlaces
+	*/
 
-    for (msg = logbuf, i = 0; i != number_of_prints; ++i, msg += print_length)
-    {
-        if (strncmp(msg, expected_out, print_length) != 0)
-        {
-            fprintf(stderr, "message does not match (pass %d) msg: %s\n",
-                    i, msg);
-            return -1;
-        }
-    }
+	for (msg = logbuf, i = 0; i != number_of_prints; ++i, msg += print_length)
+	{
+		if (strncmp(msg, expected_out, print_length) != 0)
+		{
+			fprintf(stderr, "message does not match (pass %d) msg: %s\n",
+					i, msg);
+			return -1;
+		}
+	}
 
-    if (*msg != '\0')
-    {
-        fprintf(stderr, "expected null terminator on last msg byte\n");
-        return -1;
-    }
+	if (*msg != '\0')
+	{
+		fprintf(stderr, "expected null terminator on last msg byte\n");
+		return -1;
+	}
 
-    return 0;
+	return 0;
 }
 
 
 static void *print_t
 (
-    void *arg
+	void *arg
 )
 {
-    int   i;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int   i;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    (void)arg;
+	(void)arg;
 
+	for (i = 0; i != prints_per_thread; ++i)
+		el_pmemory(ELN, ascii, sizeof(ascii));
 
-    for (i = 0; i != prints_per_thread; ++i)
-    {
-        el_pmemory(ELN, ascii, sizeof(ascii));
-    }
-
-    return NULL;
+	return NULL;
 }
 
 
 static void pmemory_print_threaded(void)
 {
-    pthread_t  pt[number_of_threads];
-    int        i;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	pthread_t  pt[number_of_threads];
+	int        i;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    el_init();
-    el_option(EL_THREAD_SAFE, 1);
-    el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
-    el_option(EL_PRINT_LEVEL, 0);
-    el_option(EL_OUT, EL_OUT_CUSTOM);
-    logbuf[0] = '\0';
+	el_init();
+	el_option(EL_THREAD_SAFE, 1);
+	el_option(EL_CUSTOM_PUTS, print_to_buffer, logbuf);
+	el_option(EL_PRINT_LEVEL, 0);
+	el_option(EL_OUT, EL_OUT_CUSTOM);
+	logbuf[0] = '\0';
 
-    for (i = 0; i != number_of_threads; ++i)
-    {
-        pthread_create(&pt[i], NULL, print_t, NULL);
-    }
+	for (i = 0; i != number_of_threads; ++i)
+		pthread_create(&pt[i], NULL, print_t, NULL);
 
-    for (i = 0; i != number_of_threads; ++i)
-    {
-        pthread_join(pt[i], NULL);
-    }
+	for (i = 0; i != number_of_threads; ++i)
+		pthread_join(pt[i], NULL);
 
-    /* do it before print_check() so any buffered data is flushed
-     * to disk, otherwise files will be incomplete
-     */
+	/* do it before print_check() so any buffered data is flushed
+	 * to disk, otherwise files will be incomplete */
 
-    el_flush();
-
-    mt_fok(print_check());
-
-    el_cleanup();
+	el_flush();
+	mt_fok(print_check());
+	el_cleanup();
 }
 
 #endif /* ENABLE_PTHREAD */
@@ -418,7 +408,7 @@ static void pmemory_print_threaded(void)
 
 static void pmemory_null_memory(void)
 {
-    mt_ferr(el_pmemory(ELI, NULL, 10), EINVAL);
+	mt_ferr(el_pmemory(ELI, NULL, 10), EINVAL);
 }
 
 
@@ -428,11 +418,11 @@ static void pmemory_null_memory(void)
 
 static void pmemory_zero_size(void)
 {
-    static const char  *s = "some data";
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	static const char  *s = "some data";
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    mt_ferr(el_pmemory(ELI, s, 0), EINVAL);
+	mt_ferr(el_pmemory(ELI, s, 0), EINVAL);
 }
 
 
@@ -448,33 +438,30 @@ static void pmemory_zero_size(void)
 
 void el_pmemory_test_group(void)
 {
-    int  i;
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int  i;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-    for (i = 0; i != 0x80; ++i)
-    {
-        ascii[i] = (char)i;
-    }
+	for (i = 0; i != 0x80; ++i)  ascii[i] = (char)i;
 
 #if ENABLE_PTHREAD
-    mt_run(pmemory_print_threaded);
+	mt_run(pmemory_print_threaded);
 #endif
 
-    mt_run(pmemory_print_ascii_table_option);
-    mt_run(pmemory_print_ascii_table_with_table_option);
+	mt_run(pmemory_print_ascii_table_option);
+	mt_run(pmemory_print_ascii_table_with_table_option);
 
-    mt_prepare_test = &test_prepare;
-    mt_cleanup_test = &test_cleanup;
+	mt_prepare_test = &test_prepare;
+	mt_cleanup_test = &test_cleanup;
 
-    mt_run(pmemory_one_byte);
-    mt_run(pmemory_one_line_not_full);
-    mt_run(pmemory_one_line_full);
-    mt_run(pmemory_two_line_not_full);
-    mt_run(pmemory_two_line_full);
-    mt_run(pmemory_binary_data_with_nulls);
-    mt_run(pmemory_print_ascii_table);
-    mt_run(pmemory_print_ascii_table_with_table);
-    mt_run(pmemory_null_memory);
-    mt_run(pmemory_zero_size);
+	mt_run(pmemory_one_byte);
+	mt_run(pmemory_one_line_not_full);
+	mt_run(pmemory_one_line_full);
+	mt_run(pmemory_two_line_not_full);
+	mt_run(pmemory_two_line_full);
+	mt_run(pmemory_binary_data_with_nulls);
+	mt_run(pmemory_print_ascii_table);
+	mt_run(pmemory_print_ascii_table_with_table);
+	mt_run(pmemory_null_memory);
+	mt_run(pmemory_zero_size);
 }

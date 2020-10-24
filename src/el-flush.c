@@ -47,10 +47,10 @@
 
 /* public api */ int el_flush
 (
-    void
+	void
 )
 {
-    return el_oflush(&g_el);
+	return el_oflush(&g_el);
 }
 
 
@@ -61,47 +61,35 @@
 
 /* public api */ int el_oflush
 (
-    struct el  *el   /* options defining printing style */
+	struct el  *el   /* options defining printing style */
 )
 {
-    int         rv;  /* return value from function */
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	int         rv;  /* return value from function */
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-    VALID(EINVAL, el);
-    el_lock(el);
-    VALIDC(ENODEV, el->outputs != 0, el_unlock(el));
+	VALID(EINVAL, el);
+	el_lock(el);
+	VALIDC(ENODEV, el->outputs != 0, el_unlock(el));
 
-    rv = 0;
+	rv = 0;
 
 
 #if ENABLE_OUT_STDERR
-    if (el->outputs & EL_OUT_STDERR)
-    {
-        rv |= fflush(stderr);
-    }
+	if (el->outputs & EL_OUT_STDERR) rv |= fflush(stderr);
 #endif
 
 #if ENABLE_OUT_STDERR
-    if (el->outputs & EL_OUT_STDOUT)
-    {
-        rv |= fflush(stdout);
-    }
+	if (el->outputs & EL_OUT_STDOUT) rv |= fflush(stdout);
 #endif
 
 #if ENABLE_OUT_FILE
-    if (el->outputs & EL_OUT_FILE)
-    {
-        rv |= el_file_flush(el);
-    }
+	if (el->outputs & EL_OUT_FILE) rv |= el_file_flush(el);
 #endif
 
 #if 0
-    if (el->outputs & EL_OUT_NET)
-    {
-        el_net_flush(el);
-    }
+	if (el->outputs & EL_OUT_NET) el_net_flush(el);
 #endif
 
-    el_unlock(el);
-    return rv;
+	el_unlock(el);
+	return rv;
 }
