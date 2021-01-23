@@ -22,7 +22,25 @@ m4_include([m4/ax_compiler_vendor.m4])
 AX_COMPILER_VENDOR
 AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"],
 [
-    CFLAGS="$CFLAGS -Wno-unused-result"
+    dnl old gcc do not support -Wno-unused-result, what's more,
+    dnl it causes compilation for abort with error, so explicitly
+    dnl check if we can use that flag. Unecessary warning about
+    dnl uneeded result value is better then error.
+    AC_CACHE_CHECK([whether -Wno-unused-result is supported],
+        [el_cv_cc_no_unused_result_supported],
+        [save_CFLAGS="$CFLAGS"
+        CFLAGS="$CFLAGS -Wno-unused-result"
+        AC_COMPILE_IFELSE(
+            [AC_LANG_PROGRAM([[]], [[]])],
+            [el_cv_cc_no_unused_result_supported=yes],
+            [el_cv_cc_no_unused_result_supported=no])
+        CFLAGS="$save_CFLAGS"
+        ])
+
+    AS_IF([test "$el_cv_cc_no_unused_result_supported" = yes],
+    [
+        CFLAGS="$CFLAGS -Wno-unused-result"
+    ])
 ])
 
 
