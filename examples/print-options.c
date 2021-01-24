@@ -7,9 +7,9 @@
 
 #define EL_OPTIONS_OBJECT &opts
 
-void like_this() { el_print(ELN, "yup, I really like this!"); }
-void or_this()   { el_print(ELN, "this I like too"); }
-void too_long_function_to_present_trimming_but_it_could_be_impossible()
+void like_this(void) { el_print(ELN, "yup, I really like this!"); }
+void or_this(void)   { el_print(ELN, "this I like too"); }
+void too_long_function_to_present_trimming_but_it_could_be_impossible(void)
 {
 	el_print(ELN, "trimmed (I hope) function name");
 }
