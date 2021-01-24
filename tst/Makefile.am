@@ -16,7 +16,7 @@ test_CFLAGS = -I$(top_builddir)/include \
 	$(COVERAGE_CFLAGS)
 
 test_LDFLAGS = $(COVERAGE_LDFLAGS)
-test_LDADD = -lrb $(top_builddir)/src/libembedlog.la
+test_LDADD = -lrb $(top_builddir)/src/.libs/libembedlog.a
 
 TESTS = $(check_PROGRAMS)
 LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
