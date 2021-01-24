@@ -27,6 +27,7 @@ int main(void)
 	if (el_option(EL_TTY_DEV, "/dev/ttyUSB1", B9600) != 0)
 	{
 		perror("tty set failed");
+		el_cleanup();
 		return 1;
 	}
 
