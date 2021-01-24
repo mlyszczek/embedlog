@@ -33,6 +33,7 @@ Value inside parenthesis determines argument types of variadic arguments
 .I ...
 .PP
 .BI "EL_LEVEL (" enum " " el_level " level)"
+.RB "[default: " EL_INFO "]"
 .RS
 .   B EL_LEVEL
 sets what the current logging level shall be.
@@ -75,6 +76,7 @@ is invalid (bigger than EL_DBG).
 .RE
 .PP
 .BI "EL_OUT (" enum " " el_output " outputs)"
+.RB "[default: " EL_OUT_STDERR "]"
 .RS
 .   B EL_OUT
 simply sets to what
@@ -179,6 +181,7 @@ is not implemented on current system (support was not compiled into library)
 .RE
 .PP
 .BI "EL_PRINT_NL (" int " nl)"
+.RB "[default: " 1 "]"
 .RS
 When enables, new line marker will be added to each print.
 If you disable it, you will be able to create very long lines
@@ -186,6 +189,7 @@ with consecutive print calls.
 .RE
 .PP
 .BI "EL_PREFIX (" const " " char " " * "prefix)"
+.RB "[default: " unset " (won't be printed)]"
 .RS
 You can configure logger to add
 .   I prefix
@@ -212,6 +216,7 @@ to
 .RE
 .PP
 .BI "EL_COLORS (" int " colors)"
+.RB "[default: " 0 "]"
 .RS
 If this is set to 1, output will be enriched with ANSI colors depending on the
 message severity.
@@ -230,6 +235,7 @@ Input argument is different than 1 or 0
 .RE
 .PP
 .BI "EL_TS (" enum " " el_option_timestamp " timestamp)"
+.RB "[default: " EL_TS_OFF "]"
 .RS
 Allows timestamp to be added to each log message. Possible values for
 .I timestamp
@@ -267,6 +273,7 @@ Timestamp support was not compiled in and setting this option is disabled.
 .RE
 .PP
 .BI "EL_TS_TM (" enum " " el_option_timestamp_timer " timer)"
+.RB "[default: " EL_TS_TM_TIME "]"
 .RS
 Sets the timer source for the timestamp print.
 .   PP
@@ -338,6 +345,7 @@ Specified timer source was not compiled in and is not available
 .RE
 .PP
 .BI "EL_TS_FRACT (" enum " " el_option_timestamp_fraction " fraction)
+.RB "[default: " EL_TS_FRACT_OFF "]"
 .RS
 This option controls how to display fractions of seconds.
 If high resolution is not needed or not supported, it's best to set this to
@@ -358,6 +366,7 @@ Example uses long timestamp, interesting part is after date after dot '.'.
 .RE
 .PP
 .BI "EL_PRINT_LEVEL (" int " print)"
+.RB "[default: " 1 "]"
 .RS
 If this is set to 1, each log will have log level information prefix in format
 "l/" where 'l' is first character of level message is printed with, for example:
@@ -391,6 +400,7 @@ Input argument is different than 1 or 0
 .RE
 .PP
 .BI "EL_FINFO (" int " finfo)"
+.RB "[default: " 0 "]"
 .RS
 If set to 1, adds information about log location to each message in format
 [some_file.c:123]. Setting this to 0, will result in no file information at all
@@ -405,12 +415,13 @@ Input argument is different than 1 or 0
 .RE
 .PP
 .BI "EL_FUNCINFO (" int " funcinfo)"
+.RB "[default: " 0 "]"
 .RS
 If set to 1, adds information about function from which message has been
 printed in format [funcname()] or if
 .   B EL_FINFO
 is enabled [some_file.c:123:funcname()].
-Settint this to 0 will result in no function information.
+Setting this to 0 will result in no function information.
 .   PP
 .   B ERRORS
 .   RS
@@ -425,6 +436,7 @@ Input argument is different than 1 or 0
 .IB "int (*" el_custom_put ")(const char *s, size_t slen, void *user)" ,
 .IB void\  *user
 .B )
+.RB "[default: " unset "]"
 .RS
 Sets function pointer for custom message print.
 Function will receive complete messsage (after processsing) to print, just as it
@@ -458,6 +470,7 @@ It is still mandatory to enable custom printing with
 .RE
 .PP
 .BI "EL_FPATH (" const " " char " " * "path)"
+.RB "[default: " unset "]"
 .RS
 Sets the
 .I path
@@ -495,6 +508,7 @@ opened now, but embedlog will try to reopen in each time it logs to file.
 .RE
 .PP
 .BI "EL_FROTATE_NUMBER (" int " number)"
+.RB "[default: " 0 "]"
 .RS
 If set to 0, file rotation will be disabled and logs will be printed into
 specified file without size limit.
@@ -551,6 +565,7 @@ Input parameter is less than 0 or bigger than
 .RE
 .PP
 .BI "EL_FROTATE_SYMLINK (" int " enable)"
+.RB "[default: " 1 "]"
 .RS
 When
 .   B EL_FROTATE_NUMBER
@@ -586,6 +601,7 @@ Input parameter is not 0 or 1
 .RE
 .PP
 .BI "EL_FROTATE_SIZE (" unsigned\ long " size)"
+.RB "[default: " 0 "]"
 .RS
 This defines
 .I size
@@ -609,6 +625,7 @@ Value is less than 1
 .RE
 .PP
 .BI "EL_FSYNC_EVERY (" unsigned\ long " size)"
+.RB "[default: " 32768 "]"
 .RS
 Simply writing data to file descriptor is not enough, metadata also has to be
 synced or you are facing data loose on unexpected power loose.
@@ -632,6 +649,7 @@ Value is less than 0
 .RE
 .PP
 .BI "EL_FSYNC_LEVEL (" enum " " el_level " level)"
+.RB "[default: " EL_FATAL "]"
 .RS
 If level of printed message is
 .   I level
@@ -667,6 +685,7 @@ is invalid (bigger than EL_DBG).
 .RE
 .PP
 .BI "EL_TTY_DEV (" const\ char\ * "dev, " speed_t " speed)"
+.RB "[default: " unset "]"
 .RS
 Tells
 .I embedlog
@@ -699,6 +718,7 @@ and
 .RE
 .PP
 .BI "EL_THREAD_SAFE (" int " safe)"
+.RB "[default: " 0 "]"
 .RS
 By default,
 .   B embedlog
