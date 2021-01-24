@@ -1,1 +1,1 @@
-include_HEADERS = embedlog.h
+nodist_include_HEADERS = embedlog.h
