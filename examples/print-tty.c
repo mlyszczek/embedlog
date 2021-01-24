@@ -6,7 +6,11 @@
 #include "embedlog.h"
 #include <termios.h>
 
+#ifdef EMBEDLOG_DEMO_LIBRARY
+int el_demo_print_tty(void)
+#else
 int main(void)
+#endif
 {
 	/* first we nned to initialize logger to known state */
 	el_init();

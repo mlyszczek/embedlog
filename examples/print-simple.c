@@ -5,7 +5,11 @@
 
 #include "embedlog.h"
 
+#ifdef EMBEDLOG_DEMO_LIBRARY
+int el_demo_print_simple(void)
+#else
 int main(void)
+#endif
 {
 	/* first we nned to initialize logger to known state, embedlog
 	 * will print to stdout by default */

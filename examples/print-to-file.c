@@ -11,7 +11,11 @@
 
 #define WORKDIR "/tmp/embedlog-example"
 
+#ifdef EMBEDLOG_DEMO_LIBRARY
+int el_demo_print_to_file(void)
+#else
 int main(void)
+#endif
 {
 	el_init();
 	el_option(EL_TS, EL_TS_LONG);
