@@ -5,7 +5,11 @@
 
 #include "embedlog.h"
 
+#ifdef EMBEDLOG_DEMO_LIBRARY
+int el_demo_print_memory(void)
+#else
 int main(void)
+#endif
 {
 	char   s[] = "some message\0that contains\0null characters";
 	char   ascii[128];

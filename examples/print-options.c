@@ -14,7 +14,11 @@ void too_long_function_to_present_trimming_but_it_could_be_impossible()
 	el_print(ELN, "trimmed (I hope) function name");
 }
 
+#ifdef EMBEDLOG_DEMO_LIBRARY
+int el_demo_print_options(void)
+#else
 int main(void)
+#endif
 {
 	struct el  opts;
 
