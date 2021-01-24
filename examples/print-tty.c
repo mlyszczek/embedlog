@@ -14,13 +14,19 @@
 #endif
 
 #ifdef EMBEDLOG_DEMO_LIBRARY
-int el_demo_print_tty(void)
+int el_demo_print_tty(int argc, const char *argv[])
 #else
-int main(void)
+int main(int argc, const char *argv[])
 #endif
 {
 	/* first we nned to initialize logger to known state */
 	el_init();
+
+	if (argc != 2)
+	{
+		el_print(ELF, "usage: %s <path-to-serial-device>", argv[0]);
+		return 1;
+	}
 
 	/* to use logger you need to enable at least one output,
 	 * without it logs will be printed to /dev/null. Here we set
@@ -32,13 +38,13 @@ int main(void)
 	 * configure which device we want to use and at what speed.
 	 * Transmission parameters are 8N1 by default. Baudrate should
 	 * be taken from termios (3). */
-	if (el_option(EL_TTY_DEV, "/dev/ttyUSB1", B9600) != 0)
+	if (el_option(EL_TTY_DEV, argv[1], B9600) != 0)
 #else
 	/* if termios is not available on your system, you can specify
 	 * 0 as baund rate, this will tell embedlog not to configure
 	 * serial port and use it as is - ie. it can be configured
 	 * at system startup or even during compile time */
-	if (el_option(EL_TTY_DEV, "/dev/ttyUSB1", 0) != 0)
+	if (el_option(EL_TTY_DEV, argv[1], 0) != 0)
 #endif
 	{
 		perror("tty set failed");
