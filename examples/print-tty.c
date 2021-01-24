@@ -4,7 +4,14 @@
    ========================================================================== */
 
 #include "embedlog.h"
-#include <termios.h>
+
+#if HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
+#if HAVE_TERMIOS_H
+#   include <termios.h>
+#endif
 
 #ifdef EMBEDLOG_DEMO_LIBRARY
 int el_demo_print_tty(void)
@@ -20,11 +27,19 @@ int main(void)
 	 * output to serial device. */
 	el_option(EL_OUT, EL_OUT_TTY);
 
+#if HAVE_TERMIOS_H
 	/* enbaling tty output is not enough, we still need to
 	 * configure which device we want to use and at what speed.
 	 * Transmission parameters are 8N1 by default. Baudrate should
 	 * be taken from termios (3). */
 	if (el_option(EL_TTY_DEV, "/dev/ttyUSB1", B9600) != 0)
+#else
+	/* if termios is not available on your system, you can specify
+	 * 0 as baund rate, this will tell embedlog not to configure
+	 * serial port and use it as is - ie. it can be configured
+	 * at system startup or even during compile time */
+	if (el_option(EL_TTY_DEV, "/dev/ttyUSB1", 0) != 0)
+#endif
 	{
 		perror("tty set failed");
 		el_cleanup();
