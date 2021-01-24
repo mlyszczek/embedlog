@@ -1834,6 +1834,7 @@ static void file_rotate_with_padding_in_name
 		mt_fail(0 && "unexpected file left in WORKDIR");
 		fprintf(stderr, "# %s\n", dirent->d_name);
 	}
+	closedir(dir);
 	system("rm -f "WORKDIR"/*");
 }
 
