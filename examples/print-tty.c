@@ -14,7 +14,7 @@
 #endif
 
 #ifdef EMBEDLOG_DEMO_LIBRARY
-int el_demo_print_tty(int argc, const char *argv[])
+int el_demo_print_tty_main(int argc, const char *argv[])
 #else
 int main(int argc, const char *argv[])
 #endif
