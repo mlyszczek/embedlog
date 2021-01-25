@@ -12,7 +12,7 @@
 #define WORKDIR "/tmp/embedlog-example"
 
 #ifdef EMBEDLOG_DEMO_LIBRARY
-int el_demo_print_to_file(void)
+int el_demo_print_to_file_main(void)
 #else
 int main(void)
 #endif

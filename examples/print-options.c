@@ -15,7 +15,7 @@ void too_long_function_to_present_trimming_but_it_could_be_impossible(void)
 }
 
 #ifdef EMBEDLOG_DEMO_LIBRARY
-int el_demo_print_options(void)
+int el_demo_print_options_main(void)
 #else
 int main(void)
 #endif
@@ -108,4 +108,6 @@ int main(void)
 	el_oprint(OELF, "able to print messages without passing el object");
 	el_oprint(OELW, "each time to print functions");
 	el_ocleanup(&opts);
+
+	return 0;
 }

@@ -6,7 +6,7 @@
 #include "embedlog.h"
 
 #ifdef EMBEDLOG_DEMO_LIBRARY
-int el_demo_print_thread_safe(void)
+int el_demo_print_thread_safe_main(void)
 #else
 int main(void)
 #endif
