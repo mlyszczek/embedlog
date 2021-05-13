@@ -26,7 +26,7 @@ wget "https://git.bofc.pl/${project}/snapshot/${project}-${git_version}.tar.gz" 
 wget "https://git.bofc.pl/${project}/plain/pkg/rpm/${project}.spec.template?h=${git_version}" \
     -O "SPECS/${project}-${pkg_version}.spec"
 lt_version="$(curl "https://git.bofc.pl/${project}/plain/src/Makefile.am?h=${git_version}" | \
-    grep "${project}_la_LDFLAGS = -version-info" | cut -f4 -d\ )"
+    grep "LIBRARY_VERSION=" | cut -f2 -d=)"
 
 current="$(echo ${lt_version} | cut -f1 -d:)"
 revision="$(echo ${lt_version} | cut -f2 -d:)"
