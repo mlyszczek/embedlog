@@ -60,50 +60,48 @@ To run unit tests, you also need [librb](https://librb.bofc.pl)
 Test results
 ============
 
-NOTE: these represent test results from *master* branch and may from time to
-time show failures. Tagged versions *always* pass all tests on all
-architectures. No exceptions.
+Project has been tested on following systems/architectures
 
 operating system tests
 ----------------------
 
-* arm-cortex-m4-nuttx-7.24 (manual) ![test-result-svg][fsan]
-* parisc-polarhome-hpux-11.11 ![test-result-svg][prhpux]
-* power4-polarhome-aix-7.1 ![test-result-svg][p4aix]
-* i686-builder-freebsd-11.1 ![test-result-svg][x32fb]
-* i686-builder-netbsd-8.0 ![test-result-svg][x32nb]
-* i686-builder-openbsd-6.2 ![test-result-svg][x32ob]
-* x86_64-builder-solaris-11.3 ![test-result-svg][x64ss]
-* i686-builder-linux-gnu-4.9 ![test-result-svg][x32lg]
-* i686-builder-linux-musl-4.9 ![test-result-svg][x32lm]
-* i686-builder-linux-uclibc-4.9 ![test-result-svg][x32lu]
-* x86_64-builder-linux-gnu-4.9 ![test-result-svg][x64lg]
-* x86_64-builder-linux-musl-4.9 ![test-result-svg][x64lm]
-* x86_64-builder-linux-uclibc-4.9 ![test-result-svg][x64lu]
-* x86_64-bofc-debian-9 ![test-result-svg][x64debian9]
-* x86_64-bofc-centos-7 ![test-result-svg][x64centos7]
-* x86_64-bofc-fedora-28 ![test-result-svg][x64fedora28]
-* x86_64-bofc-opensuse-15 ![test-result-svg][x64suse15]
-* x86_64-bofc-rhel-7 ![test-result-svg][x64rhel7]
-* x86_64-bofc-slackware-14.2 ![test-result-svg][x64slackware142]
-* x86_64-bofc-ubuntu-18.04 ![test-result-svg][x64ubuntu1804]
+* arm-cortex-m4-nuttx-7.24 (manual)
+* parisc-polarhome-hpux-11.11
+* power4-polarhome-aix-7.1
+* i686-builder-freebsd-11.1
+* i686-builder-netbsd-8.0
+* i686-builder-openbsd-6.2
+* x86_64-builder-solaris-11.3
+* i686-builder-linux-gnu-4.9
+* i686-builder-linux-musl-4.9
+* i686-builder-linux-uclibc-4.9
+* x86_64-builder-linux-gnu-4.9
+* x86_64-builder-linux-musl-4.9
+* x86_64-builder-linux-uclibc-4.9
+* x86_64-bofc-debian-9
+* x86_64-bofc-centos-7
+* x86_64-bofc-fedora-28
+* x86_64-bofc-opensuse-15
+* x86_64-bofc-rhel-7
+* x86_64-bofc-slackware-14.2
+* x86_64-bofc-ubuntu-18.04
 
 machine tests
 -------------
 
-* aarch64-builder-linux-gnu ![test-result-svg][a64lg]
-* armv5te926-builder-linux-gnueabihf ![test-result-svg][armv5]
-* armv6j1136-builder-linux-gnueabihf ![test-result-svg][armv6]
-* armv7a15-builder-linux-gnueabihf ![test-result-svg][armv7a15]
-* armv7a9-builder-linux-gnueabihf ![test-result-svg][armv7a9]
-* mips-builder-linux-gnu ![test-result-svg][m32lg]
+* aarch64-builder-linux-gnu
+* armv5te926-builder-linux-gnueabihf
+* armv6j1136-builder-linux-gnueabihf
+* armv7a15-builder-linux-gnueabihf
+* armv7a9-builder-linux-gnueabihf
+* mips-builder-linux-gnu
 
 sanitizers
 ----------
 
-* -fsanitize=address ![test-result-svg][fsan]
-* -fsanitize=leak ![test-result-svg][fsleak]
-* -fsanitize=undefined ![test-result-svg][fsun]
+* -fsanitize=address
+* -fsanitize=leak
+* -fsanitize=undefined
 
 Compiling and installing
 ========================
@@ -282,39 +280,8 @@ See also
   Mark Martinec
 * [mtest](https://mtest.bofc.pl) unit test framework **embedlog** uses
 * [librb](https://librb.bofc.pl) ring buffer used in unit tests
-* [git repository](http://git.bofc.pl/embedlog) to browse code online
-* [continous integration](http://ci.embedlog.bofc.pl) for project
+* [git repository](https://git.bofc.pl/embedlog) to browse code online
 * [polarhome](http://www.polarhome.com) nearly free shell accounts for virtually
   any unix there is.
 * [pvs studio](https://www.viva64.com/en/pvs-studio) static code analyzer with
   free licenses for open source projects
-
-[a64lg]: http://ci.embedlog.bofc.pl/badges/aarch64-builder-linux-gnu-tests.svg
-[armv5]: http://ci.embedlog.bofc.pl/badges/armv5te926-builder-linux-gnueabihf-tests.svg
-[armv6]: http://ci.embedlog.bofc.pl/badges/armv6j1136-builder-linux-gnueabihf-tests.svg
-[armv7a15]: http://ci.embedlog.bofc.pl/badges/armv7a15-builder-linux-gnueabihf-tests.svg
-[armv7a9]: http://ci.embedlog.bofc.pl/badges/armv7a9-builder-linux-gnueabihf-tests.svg
-[x32fb]: http://ci.embedlog.bofc.pl/badges/i686-builder-freebsd-tests.svg
-[x32lg]: http://ci.embedlog.bofc.pl/badges/i686-builder-linux-gnu-tests.svg
-[x32lm]: http://ci.embedlog.bofc.pl/badges/i686-builder-linux-musl-tests.svg
-[x32lu]: http://ci.embedlog.bofc.pl/badges/i686-builder-linux-uclibc-tests.svg
-[x32nb]: http://ci.embedlog.bofc.pl/badges/i686-builder-netbsd-tests.svg
-[x32ob]: http://ci.embedlog.bofc.pl/badges/i686-builder-openbsd-tests.svg
-[m32lg]: http://ci.embedlog.bofc.pl/badges/mips-builder-linux-gnu-tests.svg
-[x64lg]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-linux-gnu-tests.svg
-[x64lm]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-linux-musl-tests.svg
-[x64lu]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-linux-uclibc-tests.svg
-[x64ss]: http://ci.embedlog.bofc.pl/badges/x86_64-builder-solaris-tests.svg
-[prhpux]: http://ci.embedlog.bofc.pl/badges/parisc-polarhome-hpux-tests.svg
-[p4aix]: http://ci.embedlog.bofc.pl/badges/power4-polarhome-aix-tests.svg
-[x64debian9]: http://ci.embedlog.bofc.pl/badges/x86_64-debian-9-tests.svg
-[x64centos7]: http://ci.embedlog.bofc.pl/badges/x86_64-centos-7-tests.svg
-[x64fedora28]: http://ci.embedlog.bofc.pl/badges/x86_64-fedora-28-tests.svg
-[x64suse15]: http://ci.embedlog.bofc.pl/badges/x86_64-opensuse-15-tests.svg
-[x64rhel7]: http://ci.embedlog.bofc.pl/badges/x86_64-rhel-7-tests.svg
-[x64slackware142]: http://ci.embedlog.bofc.pl/badges/x86_64-slackware-142-tests.svg
-[x64ubuntu1804]: http://ci.embedlog.bofc.pl/badges/x86_64-ubuntu-1804-tests.svg
-
-[fsan]: http://ci.embedlog.bofc.pl/badges/fsanitize-address.svg
-[fsleak]: http://ci.embedlog.bofc.pl/badges/fsanitize-leak.svg
-[fsun]: http://ci.embedlog.bofc.pl/badges/fsanitize-undefined.svg
