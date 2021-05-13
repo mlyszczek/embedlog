@@ -32,7 +32,7 @@ libembedlog_la_SOURCES = $(embedlog_sources)
 libembedlog_la_SOURCES += el-private.h \
 	el-utils.h \
 	valid.h
-LIBRARY_VERSION=9999:0:0
+LIBRARY_VERSION=6:0:6
 #           .------' | `---.
 #        current:revision:age
 #           |        |     `- increment if interfaces have been added
