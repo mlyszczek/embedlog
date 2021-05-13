@@ -1545,6 +1545,7 @@ static void file_rotate_dir_no_access(void)
 	}
 
 	unlink(WORKDIR"/embedlog-no-write/log.0");
+	unlink(WORKDIR"/embedlog-no-write/log");
 	rmdir(WORKDIR"/embedlog-no-write");
 }
 
@@ -1577,6 +1578,7 @@ static void file_rotate_no_access_to_file(void)
 	}
 
 	unlink(WORKDIR"/embedlog-no-write/log.0");
+	unlink(WORKDIR"/embedlog-no-write/log");
 	rmdir(WORKDIR"/embedlog-no-write");
 }
 
