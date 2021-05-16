@@ -17,7 +17,7 @@ prepare()
     project_dir="${3}"
 
     # clone
-    if ! git clone git://git.bofc.pl/"${project}" "${project}-${slot}"
+    if ! git clone "${project}-base" "${project}-${slot}"
     then
         echo "couldn't clone, sorry"
         exit 1
@@ -159,6 +159,13 @@ for i in $(seq 1 1 ${num_jobs})
 do
     slots+="${i} "
 done
+
+# we will clone $job-number times, no need to bash the server with so much
+# clone jobs, clone once and then we will use that local repo to clone from
+if ! git clone git://git.bofc.pl/"${project}" "${project}-base"; then
+    echo "couldn't clone, sorry"
+    exit 1
+fi
 
 # run preparation
 parallel --output-as-files --bar --results "${workdir}" \
