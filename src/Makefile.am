@@ -41,9 +41,9 @@ LIBRARY_VERSION=6:0:6
 #           |        `- increment if source code has changed
 #           |           set to zero if current is incremented
 #           `- increment if interfaces have been added, removed or changed
-libembedlog_la_LDFLAGS = -version-info $(LIBRARY_VERSION)
+libembedlog_la_LDFLAGS = $(COVERAGE_CFLAGS) -version-info $(LIBRARY_VERSION)
 
-libembedlog_la_CFLAGS = -I$(top_builddir)/include
+libembedlog_la_CFLAGS = $(COVERAGE_CFLAGS) -I$(top_builddir)/include
 
 # static code analyzer
 
