@@ -15,6 +15,10 @@
 #   include <pthread.h>
 #endif
 
+#if HAVE_TERMIOS_H
+#   include <termios.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -276,6 +280,39 @@ int el_oputb(struct el *el, const void *memory, size_t mlen);
 int el_opbinary(enum el_level level, struct el *el,
 		const void *memory, size_t mlen);
 int el_oflush(struct el *el);
+
+/* Shortcut for most frequently used options */
+
+int el_set_log_level(enum el_level level);
+int el_enable_output(enum el_output output);
+int el_disable_output(enum el_output output);
+int el_set_prefix(const char *prefix);
+int el_set_timestamp(enum el_option_timestamp timestamp,
+		enum el_option_timestamp_timer timer,
+		enum el_option_timestamp_fractions fraction);
+int el_enable_colors(int enable);
+int el_print_extra_info(int print);
+int el_set_custom_put(el_custom_put clbk, void *user);
+int el_enable_file_log(const char *path, long rotate_number, long rotate_size);
+int el_set_file_sync(long sync_every, enum el_level level);
+int el_set_tty_dev(const char *dev, speed_t speed);
+int el_enable_thread_safe(int enable);
+
+int el_oset_log_level(struct el *el, enum el_level level);
+int el_oenable_output(struct el *el, enum el_output output);
+int el_odisable_output(struct el *el, enum el_output output);
+int el_oset_prefix(struct el *el, const char *prefix);
+int el_oset_timestamp(struct el *el, enum el_option_timestamp timestamp,
+		enum el_option_timestamp_timer timer,
+		enum el_option_timestamp_fractions fraction);
+int el_oenable_colors(struct el *el, int enable);
+int el_oprint_extra_info(struct el *el, int print);
+int el_oset_custom_put(struct el *el, el_custom_put clbk, void *user);
+int el_oenable_file_log(struct el *el, const char *path, long rotate_number,
+		long rotate_size);
+int el_oset_file_sync(struct el *el, long sync_every, enum el_level level);
+int el_oset_tty_dev(struct el *el, const char *dev, speed_t speed);
+int el_oenable_thread_safe(struct el *el, int enable);
 
 #ifdef __cplusplus
 }

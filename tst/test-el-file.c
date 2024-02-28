@@ -2002,6 +2002,15 @@ static void file_print_threaded(void)
 
 #endif /* ENABLE_PTHREAD */
 
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_enable_file_log(void)
+{
+	mt_fok(el_enable_file_log(WORKDIR"/log", 25, 4326));
+	mt_fail(g_el.frotate_number == 25);
+	mt_fail(g_el.frotate_size == 4326);
+}
+
 
 /* ==========================================================================
              __               __
@@ -2108,6 +2117,7 @@ void el_file_test_group(void)
 	mt_run(file_rotate_filename_too_long);
 	mt_run(file_rotate_path_too_long);
 	mt_run(file_rotate_fail);
+	mt_run(options_f_enable_file_log);
 #ifdef RUN_TESTS
 	mt_run(file_sync_always);
 	mt_run(file_sync_periodic);

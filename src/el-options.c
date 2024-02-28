@@ -48,6 +48,7 @@
 
    ========================================================================== */
 
+#define OK_OR_RETURN(x) { int ret; if((ret = x)) return ret; }
 
 /* global el object, used with all functions that does not take "el"
  * as argument
@@ -895,4 +896,314 @@ int el_log_allowed
 )
 {
 	return (const struct el *)&g_el;
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oset_log_level
+(
+	struct el     *el,    /* el object to set option to */
+	enum el_level  level
+)
+{
+	return el_ooption(el, EL_LEVEL, level);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_set_log_level
+(
+	enum el_level level
+)
+{
+	return el_oset_log_level(&g_el, level);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oenable_output
+(
+	struct el      *el,    /* el object to set option to */
+	enum el_output  output
+)
+{
+	return el_ooption(el, EL_OUT, el->outputs | output);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_enable_output
+(
+	enum el_output output
+)
+{
+	return el_oenable_output(&g_el, output);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_odisable_output
+(
+	struct el     *el,    /* el object to set option to */
+	enum el_output output
+)
+{
+	return el_ooption(el, EL_OUT, el->outputs & ~output);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_disable_output
+(
+	enum el_output output
+)
+{
+	return el_odisable_output(&g_el, output);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oset_prefix
+(
+	struct el     *el,    /* el object to set option to */
+	const char    *prefix
+)
+{
+	return el_ooption(el, EL_PREFIX, prefix);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_set_prefix
+(
+	const char *prefix
+)
+{
+	return el_oset_prefix(&g_el, prefix);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oset_timestamp
+(
+	struct el                          *el,    /* el object to set option to */
+	enum el_option_timestamp           timestamp,
+	enum el_option_timestamp_timer     timer,
+	enum el_option_timestamp_fractions fraction
+)
+{
+	OK_OR_RETURN(el_ooption(el, EL_TS, timestamp));
+	OK_OR_RETURN(el_ooption(el, EL_TS_TM, timer));
+	OK_OR_RETURN(el_ooption(el, EL_TS_FRACT, fraction));
+
+	return 0;
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_set_timestamp
+(
+	enum el_option_timestamp           timestamp,
+	enum el_option_timestamp_timer     timer,
+	enum el_option_timestamp_fractions fraction
+)
+{
+	return el_oset_timestamp(&g_el, timestamp, timer, fraction);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oenable_colors
+(
+	struct el     *el,    /* el object to set option to */
+	int            enable
+)
+{
+	return el_ooption(el, EL_COLORS, enable);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_enable_colors
+(
+	int enable
+)
+{
+	return el_oenable_colors(&g_el, enable);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oprint_extra_info
+(
+	struct el     *el,    /* el object to set option to */
+	int            print
+)
+{
+	OK_OR_RETURN(el_ooption(el, EL_FINFO, print));
+	OK_OR_RETURN(el_ooption(el, EL_FUNCINFO, print));
+	OK_OR_RETURN(el_ooption(el, EL_PRINT_LEVEL, print));
+
+	return 0;
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_print_extra_info
+(
+	int  print
+)
+{
+	return el_oprint_extra_info(&g_el, print);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oset_custom_put
+(
+	struct el     *el,    /* el object to set option to */
+	el_custom_put  clbk,
+	void          *user
+)
+{
+	return el_ooption(el, EL_CUSTOM_PUT, clbk, user);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_set_custom_put
+(
+	el_custom_put  clbk,
+	void          *user
+)
+{
+	return el_oset_custom_put(&g_el, clbk, user);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oenable_file_log
+(
+	struct el     *el,    /* el object to set option to */
+	const char    *path,
+	long           rotate_number,
+	long           rotate_size
+
+)
+{
+	OK_OR_RETURN(el_ooption(el, EL_FPATH, path));
+	OK_OR_RETURN(el_ooption(el, EL_FROTATE_NUMBER, rotate_number));
+	OK_OR_RETURN(el_ooption(el, EL_FROTATE_SIZE, rotate_size));
+	OK_OR_RETURN(el_enable_output(EL_OUT_FILE));
+
+	return 0;
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_enable_file_log
+(
+	const char    *path,
+	long           rotate_number,
+	long           rotate_size
+)
+{
+	return el_oenable_file_log(&g_el, path, rotate_number, rotate_size);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+int el_oset_file_sync
+(
+	struct el    *el,
+	long          sync_every,
+	enum el_level sync_level
+)
+{
+	OK_OR_RETURN(el_ooption(el, EL_FSYNC_EVERY, sync_every));
+	OK_OR_RETURN(el_ooption(el, EL_FSYNC_LEVEL, sync_level));
+
+	return 0;
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+int el_set_file_sync
+(
+	long          sync_every,
+	enum el_level sync_level
+)
+{
+	return el_oset_file_sync(&g_el, sync_every, sync_level);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oset_tty_dev
+(
+	struct el     *el,    /* el object to set option to */
+	const char    *dev,
+	speed_t        speed
+)
+{
+	OK_OR_RETURN(el_ooption(el, EL_TTY_DEV, dev, speed));
+	OK_OR_RETURN(el_enable_output(EL_OUT_TTY));
+
+	return 0;
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_set_tty_dev
+(
+	const char    *dev,
+	speed_t        speed
+)
+{
+	return el_oset_tty_dev(&g_el, dev, speed);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_oenable_thread_safe
+(
+	struct el     *el,    /* el object to set option to */
+	int            enable
+)
+{
+	return el_ooption(el, EL_THREAD_SAFE, enable);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+/* public api */ int el_enable_thread_safe
+(
+	int enable
+)
+{
+	return el_oenable_thread_safe(&g_el, enable);
 }

@@ -19,6 +19,7 @@
 #include "mtest.h"
 #include "test-group-list.h"
 #include "config.h"
+#include "embedlog.h"
 
 
 /* ==========================================================================
@@ -569,6 +570,176 @@ static void options_set_funcinfo(void)
 
 /* ==========================================================================
    ========================================================================== */
+static void options_f_set_log_level(void)
+{
+	mt_fok(el_set_log_level(EL_WARN));
+	mt_fail(g_el.level == EL_WARN);
+	mt_fok(el_set_log_level(EL_FATAL));
+	mt_fail(g_el.level == EL_FATAL);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_enable_output(void)
+{
+	int expected_outputs;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+	expected_outputs = EL_OUT_STDERR;
+
+	mt_fok(el_enable_output(EL_OUT_STDOUT));
+	expected_outputs |= EL_OUT_STDOUT;
+	mt_fail(g_el.outputs == expected_outputs);
+
+	/* Set same output again, nothing should change */
+	mt_fok(el_enable_output(EL_OUT_STDOUT));
+	mt_fail(g_el.outputs == expected_outputs);
+
+	mt_fok(el_enable_output(EL_OUT_TTY | EL_OUT_CUSTOM));
+	expected_outputs |= EL_OUT_TTY | EL_OUT_CUSTOM;
+	mt_fail(g_el.outputs == expected_outputs);
+
+	/* Set same output again, nothing should change */
+	mt_fok(el_enable_output(EL_OUT_TTY | EL_OUT_CUSTOM));
+	mt_fail(g_el.outputs == expected_outputs);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_disable_output(void)
+{
+	int expected_outputs;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+	expected_outputs = EL_OUT_STDERR | EL_OUT_STDOUT | EL_OUT_FILE | EL_OUT_TTY;
+	mt_fok(el_enable_output(expected_outputs));
+	mt_fail(g_el.outputs == expected_outputs);
+
+	mt_fok(el_disable_output(EL_OUT_STDERR));
+	expected_outputs &= ~EL_OUT_STDERR;
+	mt_fail(g_el.outputs == expected_outputs);
+
+	mt_fok(el_disable_output(EL_OUT_FILE | EL_OUT_STDOUT));
+	expected_outputs &= ~(EL_OUT_FILE | EL_OUT_STDOUT);
+	mt_fail(g_el.outputs == expected_outputs);
+
+	/* Disable same output again, nothing should change */
+	mt_fok(el_disable_output(EL_OUT_STDERR));
+	mt_fail(g_el.outputs == expected_outputs);
+
+	mt_fok(el_disable_output(EL_OUT_FILE | EL_OUT_STDOUT));
+	mt_fail(g_el.outputs == expected_outputs);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_set_prefix(void)
+{
+	mt_fok(el_set_prefix("prefixon"));
+	mt_fail(strcmp(g_el.prefix, "prefixon") == 0);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_set_timestamp(void)
+{
+	mt_fok(el_set_timestamp(EL_TS_SHORT, EL_TS_TM_CLOCK, EL_TS_FRACT_US));
+	mt_fail(g_el.timestamp == EL_TS_SHORT);
+	mt_fail(g_el.timestamp_timer == EL_TS_TM_CLOCK);
+	mt_fail(g_el.timestamp_fractions == EL_TS_FRACT_US);
+
+	mt_fok(el_set_timestamp(EL_TS_LONG, EL_TS_TM_TIME, EL_TS_FRACT_OFF));
+	mt_fail(g_el.timestamp == EL_TS_LONG);
+	mt_fail(g_el.timestamp_timer == EL_TS_TM_TIME);
+	mt_fail(g_el.timestamp_fractions == EL_TS_FRACT_OFF);
+
+	mt_fok(el_set_timestamp(EL_TS_OFF, EL_TS_TM_TIME, EL_TS_FRACT_OFF));
+	mt_fail(g_el.timestamp == EL_TS_OFF);
+	mt_fail(g_el.timestamp_timer == EL_TS_TM_TIME);
+	mt_fail(g_el.timestamp_fractions == EL_TS_FRACT_OFF);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_enable_colors(void)
+{
+	mt_fok(el_enable_colors(1));
+	mt_fail(g_el.colors == 1);
+	mt_fok(el_enable_colors(0));
+	mt_fail(g_el.colors == 0);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_oprint_extra_info(void)
+{
+	mt_fok(el_print_extra_info(1));
+	mt_fail(g_el.finfo == 1);
+	mt_fail(g_el.funcinfo == 1);
+	mt_fail(g_el.print_log_level == 1);
+
+	mt_fok(el_print_extra_info(0));
+	mt_fail(g_el.finfo == 0);
+	mt_fail(g_el.funcinfo == 0);
+	mt_fail(g_el.print_log_level == 0);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+int custom_put(const char *s, size_t slen, void *user)
+{ (void)s; (void)slen; (void)user; return 0; }
+
+static void options_f_custom_put(void)
+{
+	void *user = (void *)0xdeadbeef;
+
+	mt_fok(el_set_custom_put(custom_put, user));
+	mt_fail(g_el.custom_put == custom_put);
+	mt_fail(g_el.custom_put_user == (void *)0xdeadbeef);
+
+	mt_fok(el_set_custom_put(NULL, NULL));
+	mt_fail(g_el.custom_put == NULL);
+	mt_fail(g_el.custom_put_user == NULL);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_sync_every(void)
+{
+	mt_fok(el_set_file_sync(1337, EL_WARN));
+	mt_fail(g_el.fsync_every == 1337);
+	mt_fail(g_el.fsync_level == EL_WARN);
+
+	mt_fok(el_set_file_sync(INT_MAX, EL_FATAL));
+	mt_fail(g_el.fsync_every == INT_MAX);
+	mt_fail(g_el.fsync_level == EL_FATAL);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_enable_thread_safe(void)
+{
+#if ENABLE_PTHREAD
+	mt_fok(el_enable_thread_safe(1));
+	mt_fail(g_el.lock_initialized == 1);
+	mt_fok(el_enable_thread_safe(0));
+	mt_fail(g_el.lock_initialized == 0);
+#endif
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
 
 
 static void options_get_global_el(void)
@@ -614,4 +785,15 @@ void el_options_test_group(void)
 	mt_run(options_global_el_after_el_cleanup);
 	mt_run(options_set_funcinfo);
 	mt_run(options_get_global_el);
+
+	mt_run(options_f_set_log_level);
+	mt_run(options_f_enable_output);
+	mt_run(options_f_disable_output);
+	mt_run(options_f_set_prefix);
+	mt_run(options_f_set_timestamp);
+	mt_run(options_f_enable_colors);
+	mt_run(options_f_oprint_extra_info);
+	mt_run(options_f_custom_put);
+	mt_run(options_f_sync_every);
+	mt_run(options_f_enable_thread_safe);
 }
