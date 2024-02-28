@@ -47,32 +47,8 @@ AC_DEFUN([AC_TDD_GCOV],
     AC_MSG_ERROR([ccache must be disabled when --enable-gcov option is used. You can disable ccache by setting environment variable CCACHE_DISABLE=1.])
   fi
 
-  lcov_version_list="1.6 1.7 1.8 1.9 1.11"
   AC_CHECK_PROG(LCOV, lcov, lcov)
   AC_CHECK_PROG(GENHTML, genhtml, genhtml)
-
-  if test "$LCOV"; then
-    AC_CACHE_CHECK([for lcov version], glib_cv_lcov_version, [
-      glib_cv_lcov_version=invalid
-      lcov_version=`$LCOV -v 2>/dev/null | $SED -e 's/^.* //'`
-      for lcov_check_version in $lcov_version_list; do
-        if test "$lcov_version" = "$lcov_check_version"; then
-          glib_cv_lcov_version="$lcov_check_version (ok)"
-        fi
-      done
-    ])
-  else
-    lcov_msg="To enable code coverage reporting you must have one of the following lcov versions installed: $lcov_version_list"
-    AC_MSG_ERROR([$lcov_msg])
-  fi
-
-  case $glib_cv_lcov_version in
-    ""|invalid[)]
-      lcov_msg="You must have one of the following versions of lcov: $lcov_version_list (found: $lcov_version)."
-      AC_MSG_ERROR([$lcov_msg])
-      LCOV="exit 0;"
-      ;;
-  esac
 
   if test -z "$GENHTML"; then
     AC_MSG_ERROR([Could not find genhtml from the lcov package])
