@@ -1,0 +1,3 @@
+Sets the *path* for the logs. Logs will be stored in this file. If
+file rotation is enabled, a numer will be postfixed to each file. See
+**EL_FROTATE_NUMBER** in this page for more details.

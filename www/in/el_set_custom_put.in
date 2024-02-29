@@ -1,0 +1,38 @@
+NAME
+----
+**el_set_custom_put** - enables user to implement own printing device
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+   int el_set_custom_put(el_custom_put clbk, void *user);
+   int el_oset_custom_put(struct el *el, el_custom_put clbk, void *user);
+   typedef int (*el_custom_put)(const char *s, size_t slen, void *user);
+
+DESCRIPTION
+-----------
+.. include:: /in/el_custom_put.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   int custom_logger(const char *s, size_t slen, void *user) {
+       FILE *f = user;
+       /* s will contain string "i/print log" */
+       fwrite(s, slen, 1, f);
+       return 0;
+   }
+
+   FILE *f = fopen(log_file, "w");
+   el_set_custom_put(custom_logger, f);
+   el_print(ELI, "print log");
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------

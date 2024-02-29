@@ -1,0 +1,3 @@
+ERRORS
+   Function can return errors from **open**, **tcgetattr**,
+   **cfsetispeed** and **tcsetattr**.

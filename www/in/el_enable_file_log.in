@@ -1,0 +1,52 @@
+NAME
+----
+**el_enable_file_log** - configures and enables printing to file
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+   int el_enable_file_log(const char *path, unsigned short rotate_number,
+       long rotate_size);
+   int el_oenable_file_log(struct el *el, const char *path,
+       unsigned short rotate_number, long rotate_size);
+
+DESCRIPTION
+-----------
+This function will do multiple things. First it will configure log rotation.
+
+.. include:: /in/el_frotate_number.desc
+
+.. include:: /in/el_frotate_size.desc
+
+Next it will try to open file specified by *path*
+
+.. include:: /in/el_fpath.desc
+
+And at the end it will enable outputing to file.
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   /* Enable logging to file without rotating, file will grow
+    * without any limits, until it devours whole disk space */
+   el_enable_file_log("/var/log/file.log", 0, 0)
+
+   /* Enable logging to file, but also enable log rotation.
+    * Program will take maximum 10 files each of 1MB in size.
+    * When you enable log rotation do this in separate directory,
+    * because program will create multiple file.log.N files in
+    * directory where file.log is specified.
+    *
+    * In this case, file.log will always be a symlink to newest file */
+   el_enable_file_log("/var/log/progname/file.log", 10, )
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------
+.. include:: /in/el_fpath.err

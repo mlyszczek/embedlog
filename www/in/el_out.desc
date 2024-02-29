@@ -1,0 +1,45 @@
+Set to what *outputs* logs will be printed with any of the printing
+function. User can enable as many outputs as he desires - it can be all
+inputs or even none (if one wants to surpress logging for some time). To
+enable multiple outputs join values with **or** operator ( **\|** ).
+
+Currently following *outputs* can be enabled.
+
+EL_OUT_STDERR
+   Messages will be printed to standard error output
+
+EL_OUT_STDOUT
+   Messages will be printed to standard output
+
+EL_OUT_SYSLOG
+   Messages will be sent to syslog facility. This requires system
+   with implemented POSIX.1-2001 and any syslog daemon
+
+EL_OUT_FILE
+   Messages will be printed to file. To work user should set output
+   file with **EL_FPATH**. Log rotation can be configured with
+   **EL_FROTATE_NUMBER** and **EL_FROTATE_SIZE** options.
+
+EL_OUT_NET
+   Messages shall be printed to external server. This requires BSD
+   Sockets to be enabled on the clients system, and listening server.
+   (TODO Not implemented yet)
+
+EL_OUT_TTY
+   Prints messages directly to configured serial console. Apart from
+   setting this, user should also configure device and speed with
+   **EL_TTY_DEV**.
+
+EL_OUT_ALL
+   Enables all supported outputs at once
+
+EL_OUT_NONE
+   Disables every output - logs won't be printed at all
+
+EL_OUT_CUSTOM
+   Enables custom function to be called on log print. Pointer to
+   custom function needs to be set with **EL_CUSTOM_PUTS** option.
+
+Many of the outputs can be configured for special needs, and some of
+them need mandatory configuration. For information about output
+configuration see proper option description

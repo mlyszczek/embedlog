@@ -1,0 +1,31 @@
+NAME
+----
+**el_set_tty_dev** - sets and enables output to TTY device (like serial
+console).
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+   int el_set_tty_dev(const char *dev, unsigned speed);
+   int el_oset_tty_dev(struct el *el, const char *dev, unsigned speed);
+
+DESCRIPTION
+-----------
+.. include:: /in/el_tty.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   el_set_tty_dev("/dev/ttyS0", B115200);
+   el_print("this goes to /dev/ttyS0");
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------
+.. include:: /in/el_tty.err

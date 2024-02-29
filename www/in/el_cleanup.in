@@ -1,0 +1,41 @@
+NAME
+-----
+**el_cleanup** - cleans all resources allocated by |el_init| and
+|el_option| calls.
+**el_destroy** - cleans all resurces allocated by |el_new|.
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   include <embedlog.h>
+
+   int el_cleanup(void)
+   int el_ocleanup(struct el *el)
+   int el_destroy(struct el *el)
+
+DESCRIPTION
+-----------
+|el_cleanup| flushes all remaining buffers and frees any
+resources allocated through the life of the library. After clean up,
+library calls cannot be used without initialization.
+
+|el_ocleanup| works just the same, but accepts custom *el* object
+as argument.
+
+|el_destroy| works just the same, but must be used when *el*
+object has been created with |el_new| function.
+
+RETURN VALUE
+------------
+Functions return 0 upon successful cleanup or -1 on errors. When -1 was
+returned no resources were freed, and library functions still can be
+used.
+
+ERRORS
+------
+|el_cleanup| function cannot fail. |el_ocleanup| and
+|el_destroy| may return:
+
+EINVAL
+   Passed el object is not valid

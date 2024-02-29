@@ -1,0 +1,3 @@
+ERRORS
+   EINVAL
+      specified *level* is invalid (bigger than EL_DBG).

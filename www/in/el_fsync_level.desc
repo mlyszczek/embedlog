@@ -1,0 +1,10 @@
+**EL_FSYNC_LEVEL** defines which log levels are always synced.
+If level of printed message is *level* or less (that is higher
+priority), it will be synced to disk every single time regardless of
+**EL_FSYNC_EVERY** option. Messages with level **EL_FATAL** (that is
+also default value for level sync) are synced always regardless of
+any options set. Messages printed with functions that don't take log
+level, will be treated as messages with **EL_DBG** level. If *level*
+is set to **EL_DBG** every message printed with any function will be
+immediately synced to drive (careful with that, this will impact
+performance a great deal if you print a lot of debug messages).

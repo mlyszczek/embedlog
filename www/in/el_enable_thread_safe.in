@@ -1,0 +1,30 @@
+NAME
+----
+**el_enable_thread_safe** - enable thread safety checks
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+   int el_enable_thread_safe(int enable);
+   int el_oenable_thread_safe(struct el *el, int enable);
+
+DESCRIPTION
+-----------
+.. include:: /in/el_thread_safe.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   el_enable_thread_safe(1);
+   el_enable_thread_safe(0);
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------
+.. include:: /in/el_thread_safe.err

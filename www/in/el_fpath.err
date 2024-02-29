@@ -1,0 +1,16 @@
+ERRORS
+   EINVAL
+      Input parameter is NULL
+
+   ENAMETOOLONG
+      File name is too long
+
+   Function can also fail and set *errno* for any of the errors
+   specified for the routing **fopen**\ (3)
+
+If function fails with **EINVAL** or **ENAMETOOLONG**, file is not
+opened and any calls that logs to file will result in failure. Any
+other error is in reality just a warning, meaning file could not have
+been opened now, but embedlog will try to reopen in each time it logs
+to file. **EINVAL** and **ENAMETOOLONG** are unrecovery errors, and
+embedlog will never store any log in that situation.

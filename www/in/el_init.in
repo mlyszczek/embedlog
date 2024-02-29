@@ -1,0 +1,99 @@
+NAME
+----
+**el_init** - initializes library and el for printing.
+
+SYNOPSIS
+--------
+
+.. code-block:: c
+
+   include <embedlog.h>
+
+   int el_init(void)
+   int el_oinit(struct el *el)
+   struct el * el_new(void)
+
+DESCRIPTION
+===========
+
+There are two types of functions in **embedlog.** Functions that use
+global static structure inside library, these functions don't accept
+*el* argument with options, and just use that internal variable.
+
+Another type are functions that accept external *el* object. These
+functions are prefixed with **el_o**.
+
+|el_init| initializes static global option structure. This option
+structure is used by all functions that don't accept *el* object
+parameter. If you want to use only one instance of **embedlog**, this is
+the function you want to use.
+
+|el_oinit| initializes only *el* struct passed to it. Functions
+that accepts *el* object may be used. If you want to have multiple
+embedlog instances (ie. one for program logs, and one for queries) that
+stores logs differently - this is the function you want to use. Multiple
+embedlog objects will be also necessary on RTOSes with flat memory space.
+Object initialized with this function must be deinitialized with
+|el_ocleanup| function.
+
+|el_new| Works in the same way as |el_oinit| but function
+returns newly heap-allocated pointer to *el* struct. Object created with
+this function must be destroyed with |el_destroy| function.
+
+NOTES
+-----
+Keep in mind that using |el_oinit| function is suscible to ABI
+breakage. If stable ABI is important to you, use |el_new|
+function. Please check |el_overview| for more information about
+this.
+
+RETURN VALUE
+------------
+|el_init| cannot fail and always returns 0. |el_oinit|
+function will return 0 upon success and -1 on errors. |el_new|
+returns valid pointer on success and **NULL** when error occurs.
+
+ERRORS
+------
+|el_oinit| can return:
+
+EINVAL
+   *el* object is invalid (null).
+
+|el_new| can return:
+
+ENOMEM
+   Not enough memory in the system to perform necessary memory allocations.
+
+EXAMPLE
+-------
+
+.. code-block:: c
+
+   #include <embedlog.h>
+
+   int main(void)
+   {
+       struct el  el, *elp;
+
+       /* initialize default object and two custom el objects */
+       el_init();
+       el_oinit(&el);
+       elp = el_new();
+
+       /* make el to print to file and stderr, elp will print to
+        * default output - that is stderr only. */
+       el_enable_file_log("/tmp/test.log", 0, 0);
+
+       /* print messages */
+       el_print(ELI, "will print to stderr");
+       el_oprint(ELI, &el, "will print to file /tmp/test.log and stderr");
+       el_oprint(ELN, elp, "print to stderr");
+
+       /* cleanup after any initialization code (like fopen) */
+       el_destroy(elp);
+       el_ocleanup(&el);
+       el_cleanup();
+
+       return 0;
+   }

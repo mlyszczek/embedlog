@@ -1,0 +1,66 @@
+NAME
+----
+|el_set_timestamp| - configure timestamp printing for each log
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+
+   int el_set_timestamp(enum el_option_timestamp timestamp,
+       enum el_option_timestamp_timer timer,
+       enum el_option_timestamp_fractions fraction);
+   int el_oset_timestamp(struct el *el, enum el_option_timestamp timestamp
+       enum el_option_timestamp_timer timer,
+       enum el_option_timestamp_fractions fraction);
+
+DESCRIPTION
+-----------
+Function sets **EL_TS**, **EL_TS_TM** and **EL_TS_FRACT** in one go.
+
+.. include:: /in/el_ts.desc
+
+.. include:: /in/el_ts_tm.desc
+
+.. include:: /in/el_ts_fract.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   /* Disable timestamps. This is default behaviour */
+   el_set_timestamp(EL_TS_OFF, 0, 0);
+   el_print(ELI, "no timestamp");
+   /* log output */
+   /*   i/no timestamp */
+
+   /* Enable short timestamp without fraction seconds
+    * Measure time from system boot. */
+   el_set_timestamp(EL_TS_SHORT, EL_TS_TM_MONOTONIC, EL_TS_FRACT_OFF);
+   el_print(ELI, "short timestamp");
+   /* log output */
+   /*   i/[3234] i/short timestamp */
+
+   /* Enable long timestamp with millisecond precision,
+    * Measure real, clock time */
+   el_set_timestamp(EL_TS_LONG, EL_TS_TM_REALTIME, EL_TS_FRACT_MS);
+   el_print(ELI, "long timestamp with ms");
+   /* log output */
+   /*   i/[2024-02-29 10:23:47.361] i/long timestamp with ms */
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------
+EINVAL
+   Input argument is invalid
+
+ENOSYS
+   Timestamp support was not compiled in and setting this option
+   is disabled.
+
+ENODEV
+   Specified timer source was not compiled in and is not available

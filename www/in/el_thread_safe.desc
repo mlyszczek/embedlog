@@ -1,0 +1,22 @@
+By default, **embedlog** is not thread safe. While it may be
+relatively safe to use it in multi-thread environment when you are
+logging to **stdio** or **stderr**, this surely isn't the case for
+more complex outputs like printing to file. Also, without
+**EL_THREAD_SAFE** calling **el_pmemory**\ (3) may result in
+interlacing prints.
+
+So, when using embedlog in multi-threaded environment, it is advised
+to enable **EL_THREAD_SAFE** by passing 1 as *safe* argument.
+**embedlog** will then **pthread_mutex_lock**\ () whenever threads
+access *el* object.
+
+**EL_THREAD_SAFE** call must be performed when no other threads are
+accessing *el* object, since at this point it is not possible to lock
+the mutex. Common usage is to enable thread safety at the beggining -
+right after **el_init**\ (3), and leave it to be destroyed by
+**el_cleanup**\ (3).
+
+It is safe to call this option multiple time with same argument.
+**embedlog** will not allow for multiple initialization nor
+destruction of mutex. When options is called for the second time with
+same argument (like 1), nothing will happen and funciton will return 0.

@@ -526,7 +526,7 @@ AC_ARG_ENABLE([analyzer],
 AM_CONDITIONAL([ENABLE_ANALYZER], [test "x$enable_analyzer" = "xyes"])
 
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile tst/Makefile \
-                 man/Makefile examples/Makefile www/Makefile])
+                 examples/Makefile www/Makefile])
 
 AC_OUTPUT
 

@@ -1,0 +1,46 @@
+NAME
+----
+**el_enable_output** - enable one or more outputs.
+**el_disable_output** - disable one or more outputs.
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+
+   int el_enable_output(enum el_output output)
+   int el_oenable_output(struct el *el, enum el_output output);
+   int el_disable_output(enum el_output output)
+   int el_odisable_output(struct el *el, enum el_output output);
+
+DESCRIPTION
+-----------
+.. include:: /in/el_out.desc
+
+With this function you can enable or disable outputs without
+altering any previously set outputs.
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   /* Enable stdout outout (default stderr, is still enabled) */
+   el_enable_output(EL_OUT, EL_OUT_STDOUT);
+
+   /* Add file and network logging retaining stdout and stderr */
+   el_enable_output(EL_OUT, EL_OUT_NET | EL_OUT_FILE);
+
+   /* Remove only stderr from the outputs, all other will be rtained */
+   el_disable_output(EL_OUT, EL_OUT_STDERR);
+
+   /* Now disable net and file, leaving only stdout as result */
+   el_disable_output(EL_OUT, EL_OUT_NET | EL_OUT_FILE);
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------
+.. include:: /in/el_out.err

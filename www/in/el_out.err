@@ -1,0 +1,7 @@
+ERRORS
+   EINVAL
+      Specified *output* is invalid
+
+   ENODEV
+      Specified *output* is not implemented on current system
+      (support was not compiled into library)

@@ -1,0 +1,7 @@
+You can configure logger to add *prefix* to every message you print.
+*prefix* will be printed between log level info "i/" and you message.
+No spaces are added. If you set your *prefix* to simple **PREFIX**,
+printed message will be **i/PREFIXmy log message**, so you might want
+to add space there. If *prefix* is bigger than **EL_PREFIX_LEN**
+prefix will be truncated. To disable prefixing, simply set *prefix*
+to **NULL**.

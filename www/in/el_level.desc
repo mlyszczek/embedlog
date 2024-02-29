@@ -1,0 +1,15 @@
+Set what the current logging level shall be. Altough it
+accepts **enum el_level** type, this can be whatever number from
+range <0, 7>. The higher the level, the lower priority of the
+message. All messages that have lower priority (higher number) then
+currently set *level* will not be printed. There are 8 predefined
+levels, sorted by priority (highest first):
+
+| EL_FATAL
+| EL_ALERT
+| EL_CRIT
+| EL_ERROR
+| EL_WARN
+| EL_NOTICE
+| EL_INFO
+| EL_DBG

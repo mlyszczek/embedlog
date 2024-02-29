@@ -1,0 +1,187 @@
+NAME
+----
+**el_print**, **el_vprint**, **el_puts**, **el_perror** - prints message
+to previously configured outputs.
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+
+   int el_puts(const char *string);
+   int el_print(LEVEL, const char *fmt, ...);
+   int el_vprint(LEVEL, const char *fmt, va_list ap);
+   int el_perror(LEVEL, const char *fmt, ...);
+
+   int el_oputs(struct el *el, const char *string);
+   int el_oprint(LEVEL, struct el *el, const char *fmt, ...);
+   int el_ovprint(LEVEL, struct el *el, const char *fmt, va_list ap);
+   int el_operror(LEVEL, struct el *el, const char *fmt, ...);
+
+   #define EL_DEBUG(...) el_print(ELD, __VA_ARGS__)
+
+DESCRIPTION
+-----------
+Functions print log into configured outputs.
+
+**LEVEL** is a macro that expands to:
+
+.. code-block:: c
+
+   __FILE__, __LINE__, __func__, LOG_LEVEL
+
+It's pointless to pass these values each time you wnat to print, so these
+are defined as macros, one for each level
+
+.. code-block:: none
+
+   ELF    Fatal errors, usually precedes application crash
+   ELA    Alert, vey major error that should be fixed as soon as possible
+   ELC    Critical
+   ELE    Error
+   ELW    Warning
+   ELN    Normal log, but of high importance
+   ELI    Information message, shouldn't spam too much here
+   ELD    Debug messages, can spam as much as you'd like
+
+|el_print| function behaves similar to standard **printf**\ ()
+function from the standard library, but it adds (if enabled) additional
+information, such as *file* name, *line* number or *func* name from
+where log has been printed, log *level*, and timestamp of the message.
+*fmt* and variadic variables *...* have the same role as it is described
+in **printf** manual page.
+
+.. code-block:: c
+
+   el_print(ELI, "Info message");
+   el_print(ELF, "Fatal message with additional argument %d", 42);
+   /* This will print: */
+   /*  i/Info message
+    *  f/Fatal message with additional argument 42 */
+
+|el_puts| function prints *message* that is simple string.
+*message* is not altered in anyway - that means no automatic log levels,
+location of the log nor timestamp is printed - even if they are enabled.
+Logs printed with this functions are not filtered by log level, and will
+always be printed. Prints can still be suppressed by disabling output.
+
+|el_vprint| function behaves just like |el_print| but it
+accepts argument pointer *ap* instead of variadic variables. Check
+**vprintf** for more information.
+
+|el_perror| works the same way as |el_print| but will also
+print information about current errno that was set. If *fmt* is
+**NULL**, only information about errno will be printed. It is similar to
+**perror** function, but **perror** does not accept format, while
+this function does. It is guaranteed that |el_perror| functions will
+not modify **errno** value.
+
+.. code-block:: c
+
+   errno = ENOENT;
+   el_perror(ELE, "Error writing to %s", some_file);
+   /* This will print: */
+   /*   e/Error writing to /some/path
+    *   e/errno num: 2, strerror: No such file or directory */
+
+|el_print|, |el_vprint|, |el_perror|, are filtered based on
+their *level*.
+
+All of above functions have their counterpart that also accepts custom
+*el* object. This is useful if we want for example, print logs into one
+file, and program queries into another. It can also be used to print
+every level into different file. It will also be usefull on RTOS with
+flat memory space.
+
+When user defines **EL_OPTIONS_OBJECT** macros with **OEL\*** can be
+used to save yourself the trouble to type ``&opt_obj`` each time. This
+macro should be defined to what normally would be passed to
+**el_oprint** functions familly. It usually is used with **extern**
+keyword like
+
+.. code-block:: c
+
+   /* one time declaration */
+   extern struct el  log_foobar;
+   extern struct el  log_query;
+   #define EL_OPTIONS_OBJECT &log_foobar
+
+   /* Print using custom log object, note that function is called
+    * el_oprint, not el_print, and LEVEL macro is also prefixed
+    * with an "O", so it's OELN and not ELN */
+   el_oprint(OELN, "Notice message");
+   /* Only one object can be declared to be used with OEL* macros,
+    * if you need to print to multiple loggers, you then need to
+    * manually specify object */
+   el_oprint(ELN, &g_log_query, "Query logged");
+
+If you define **NOFINFO** in your project, ``**__FILE__**,
+**__LINE__**, **EL_FUNC_NAME**`` will be unconditionally set to
+**NULL** and **0** and no file information will be printed - even if it
+was enabled with |el_option|.
+
+If user has access to **c99** compiler, one can use **EL_DEBUG** for
+debuging messages only. Later when application is compiled with NDEBUG,
+all side effects as well as strings used will be stripped out from final
+binary - so no vital information will be leaked in such way. This is not
+possible on **c89** compiller due to absence of variadic variables in
+preprocesor macros.
+
+**EL_FUNC_NAME** will work only on **c99** compilers, where
+``**__func__**`` is defined, on **c89** compilers function name won't be
+printed, and setting **EL_FUNCINFO** won't help it.
+
+EXAMPLES
+--------
+Simple printing using default object
+
+.. literalinclude:: /../examples/print-simple.c
+   :language: c
+
+Same code, but print to custom made embedlog object
+
+.. literalinclude:: /../examples/print-with-object.c
+   :language: c
+
+RETURN VALUE
+------------
+All functions return 0 when whole message has been successfuly printed
+to all configured outputs. If message couldn't be printed, it was
+printed only partially, or was not send to at least one configured
+output -1 is returned. Note that only one error is returned even if
+there was multiple errors.
+
+ERRORS
+------
+All functions may return one of these on error
+
+EINVAL
+   Any of the input parameters is invalid.
+
+EBADF
+   Logging to file is enabled and filename was not set with **EL_FPATH** option
+
+EBADF
+   Logging to file is enabled, file was opened sucessfuly, but log
+   cannot be stored into file. This usually happen that file was
+   unlinked from the file system and **embedlog** couldn't create new
+   file again (no access to directory or directory doesn't exist at
+   all). Log is lost, but **embedlog** will try to recreate log file
+   everytime |el_print| is called.
+
+ENODEV
+   All possible outputs are disabled
+
+|el_print|, |el_vprint|, |el_perror|, may also return:
+
+ERANGE
+   Message will not be logged as message log level is lower than
+   configured one.
+
+ENOBUFS
+   Message is bigger than **EL_LOG_MAX** and will be truncated.
+
+When logging to file is enabled, all functions may also return errors
+from **fwrite** and if file rotation is enabled also from
+**fopen**

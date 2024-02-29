@@ -1,0 +1,38 @@
+NAME
+----
+**el_set_file_sync** - configures condition on which logs should be
+force synced to disk.
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+   int el_set_file_sync(long sync_every, enum el_level level);
+   int el_oset_file_sync(struct el *el, long sync_every, enum el_level level);
+
+DESCRIPTION
+-----------
+This function sets both **EL_FSYNC_EVERY** and **EL_FSYNC_LEVEL** options.
+
+.. include:: /in/el_fsync_every.desc
+
+.. include:: /in/el_fsync_level.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+  /* Sync logs once every 1024 bytes were written, or if log severity
+   * is higher than warning */
+  el_set_file_sync(1024, EL_WARN);
+
+  /* Sync all logs, with every print. In this case EL_WARN is useless */
+  el_set_file_sync(0, EL_WARN);
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------

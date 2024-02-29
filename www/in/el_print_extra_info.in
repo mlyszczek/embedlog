@@ -1,0 +1,41 @@
+NAME
+----
+**el_print_extra_info** - prepends usefull debugging info at beginning
+of log line.
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+   int el_print_extra_info(int print);
+   int el_oprint_extra_info(struct el *el, int print);
+
+DESCRIPTION
+-----------
+If set to 1, this will enable **EL_FINFO**, **EL_FUNCINFO** and
+**EL_PRINT_LEVEL**.
+
+.. include:: /in/el_finfo.desc
+
+.. include:: /in/el_funcinfo.desc
+
+.. include:: /in/el_print_level.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+  el_print_extra_info(0);
+  el_print(ELI, "some lonely log");
+  /* log output */
+  /*   some lonely log */
+
+  el_print_extra_info(1);
+  el_print(ELI, "some happy log");
+  /* log output */
+  /*   [source-file.c:73:function()] i/some happy log
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.

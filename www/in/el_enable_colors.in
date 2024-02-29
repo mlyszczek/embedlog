@@ -1,0 +1,32 @@
+NAME
+----
+**el_enable_colors** - enable pretty colors, depending on level log was
+printed with
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+   int el_enable_colors(int enable);
+   int el_oenable_colors(struct el *el, int enable);
+
+
+DESCRIPTION
+-----------
+.. include:: /in/el_colors.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   el_enable_colors(1);
+   el_enable_colors(0);
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------
+.. include:: /in/el_color.err

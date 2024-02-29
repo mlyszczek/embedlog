@@ -1,0 +1,12 @@
+**EL_FSYNC_EVERY** defines how often logs shall be synced to disk.
+Simply writing data to file descriptor is not enough, metadata also
+has to be synced or you are facing data loose on unexpected power
+loose. Yes, data will be on block device, but entry to it in file
+system will not be updated, thus system will think file did not
+change. To prevent that one must sync data and metadata periodically.
+Data will be synced every *size* of bytes written. It basically
+translates to 'how much data am I ready to loose?'. Set too high
+and you may loose a significant ammout of data on power lose. Set
+this too low and your performance goes out of the window. Setting
+this to 0 will result in all logs being flush ever time they are
+printed.

@@ -1,0 +1,3 @@
+EL_FINFO adds information about log location to each message in
+format [some_file.c:123]. Setting this to 0, will result in no file
+information at all

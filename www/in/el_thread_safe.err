@@ -1,0 +1,6 @@
+ERRORS
+   Function can return errors from **pthread_mutex_init**\ (), and
+   **pthread_mutex_destroy**\ ().
+
+   EINVAL
+      *safe* is different than 1 or 0

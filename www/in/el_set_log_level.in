@@ -1,0 +1,36 @@
+NAME
+----
+**el_set_log_level** - set new log level
+
+SYNOPSIS
+--------
+
+.. code-block:: c
+
+   #include <embedlog.h>
+
+   int el_set_log_level(enum el_level level);
+   int el_oset_log_level(struct el *el, enum el_level level);
+
+DESCRIPTION
+-----------
+.. include:: /in/el_level.desc
+
+EXAMPLES
+--------
+.. code-block:: c
+
+   /* print only alert and fatal logs */
+   el_set_log_level(EL_ALERT);
+   /* print only error, critical, alert and fatal */
+   el_set_log_level(EL_ERROR);
+   /* print all, including debug logs */
+   el_set_log_level(EL_DBG);
+
+RETURN VALUE
+------------
+0 on succes, or -1 and set **errno** on failure.
+
+ERRORS
+------
+.. include:: /in/el_level.err

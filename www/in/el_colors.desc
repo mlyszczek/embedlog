@@ -1,0 +1,6 @@
+If this is set to 1, output will be enriched with ANSI colors
+depending on the message severity. This option needs terminal
+supporting colors. You can store messages with colors to file, and
+then read them with colors on color-enabled terminal. If this is set
+to 0, no colors will be added. If you read file with colors in editor
+like **vim**, you will see control characters all over file.

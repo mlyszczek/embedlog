@@ -1,0 +1,109 @@
+NAME
+-----
+**el_pmemory**, **el_pmemory_table** - dump data in
+wireshark-lik or hexdump format to configured outputs.
+
+SYNOPSIS
+========
+.. code-block:: c
+
+   #include <embedlog.h>
+   
+   int el_pmemory(LEVEL, const void *memory, size_t mlen);
+   int el_pmemory_table(LEVEL, const void *memory, size_t mlen);
+   int el_opmemory(LEVEL, struct el *el, const void *memory, size_t mlen);
+   int el_opmemory_table(LEVEL, struct el *el, const void *memory, size_t mlen);
+
+DESCRIPTION
+===========
+
+(For information **LEVEL** argument, please refer to |el_print|)
+
+|el_pmemory| is designed to print memory location in a nice
+hex+ascii format. Function accepts pointer to *memory* and *mlen* number
+of bytes caller wants to print. If *mlen* is 0, function won't print
+anything and will return **EINVAL** error. Function doesn't care what is
+under passed address, memory block may contain strings with null
+characters '\0', integers, floats or even **struct** objects.
+
+Example output can look like this. We print all ascii table, to present
+printing of printable and non-printable values.
+
+.. code-block:: none
+
+   0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................
+   0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................
+   0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !"#$%&'()*+,-./
+   0x0030  30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f  0123456789:;<=>?
+   0x0040  40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO
+   0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[]^_
+   0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno
+   0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
+
+|el_pmemory_table| works just like |el_pmemory| but also
+prints table-like header and footer.
+
+.. code-block:: none
+
+   ------  -----------------------------------------------  ----------------
+   offset  hex                                              ascii
+   ------  -----------------------------------------------  ----------------
+   0x0000  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f  ................
+   0x0010  10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f  ................
+   0x0020  20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f   !"#$%&'()*+,-./
+   0x0030  30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f  0123456789:;<=>?
+   0x0040  40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO
+   0x0050  50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f  PQRSTUVWXYZ[]^_
+   0x0060  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f  `abcdefghijklmno
+   0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
+   ------  -----------------------------------------------  ----------------
+
+All standard rules about printing file info, and log filtering are the same
+as with |el_print|.
+
+EXAMPLES
+--------
+
+.. literalinclude:: /../examples/print-memory.c
+   :language: c
+
+RETURN VALUE
+------------
+All functions return 0 when whole message has been successfuly printed
+to all configured outputs. If message couldn't be printed, it was
+printed only partially, or was not send to at least one configured
+output -1 is returned. Note that only one error is returned even if
+there was multiple errors.
+
+ERRORS
+------
+All functions may return one of these on error
+
+EINVAL
+   Any of the input parameters is invalid.
+
+EBADF
+   Loggig to file is enabled and filename was not set with **EL_FPATH**
+   option
+
+EBADF
+   Logging to file is enabled, file was opened sucessfuly, but log
+   cannot be stored into file. This usually happen that file was
+   unlinked from the file system and **embedlog** couldn't create new
+   file again (no access to directory or directory doesn't exist at
+   all). Log is lost, but **embedlog** will try to recreate log file
+   everytime |el_print| is called.
+
+ENODEV
+   All possible outputs are disabled
+
+ERANGE
+   Message will not be logged as message log level is lower than
+   configured one.
+
+ENOBUFS
+   Message is bigger than **EL_LOG_MAX** and will be truncated.
+
+When logging to file is enabled, all functions may also return errors
+from **fwrite** and if file rotation is enabled also from
+**fopen**

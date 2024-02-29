@@ -1,0 +1,8 @@
+*size* defines file size at which files will be rotated. If message being
+printed would overflow rotate size, current file will be closed and
+new one will be created, and current message will be stored in that
+new file. It is guaranteed that file will not be bigger than value
+set in this option. If log printed into file is bigger than configure
+rotate size, message will be truncated, to prevent file bigger than
+configure rotate size. It's very rare situation as it doesn't make a
+lot of sense to set rotate size to such small value.

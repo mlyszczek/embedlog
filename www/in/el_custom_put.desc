@@ -1,0 +1,19 @@
+Sets function pointer for custom message print. Function will receive
+complete messsage (after processsing) to print, just as it would be
+printed to ie. stderr or another facility. Both binary and string
+data can be received this way.
+
+*s* points to a data buffer, it can be null terminated string, or
+arbitrary binary data - depending on which functions has been called.
+
+*slen* contains size of *s* buffer. If *s* is null terminated string,
+then *slen* contains length of string including null terminator
+character. For binary data, it contains size of binary buffer.
+
+*user* pointer can be used to pass own logger object where data shall
+be sent. For example it may contain pointer to **el** struct, if you
+don't use global el struct.
+
+Function cannot fail. If NULL is passed, custom function won't be
+called. It is still mandatory to enable custom printing with
+**el_option**\ (3) - **EL_OUT**.

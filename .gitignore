@@ -45,9 +45,6 @@ test.log
 test.trs
 tst/coverage.info
 tst/coveragereport/
-www/downloads.html
-www/manuals
-www/out
 coverage.info
 coveragereport/
 pvs-studio.log

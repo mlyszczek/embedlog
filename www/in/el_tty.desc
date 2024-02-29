@@ -1,0 +1,7 @@
+Tells *embedlog* to use *dev* serial device configured to *speed*.
+Serial device will also be configured to transmit in 8 bits of data,
+without parity and one stop bit (8N1). Logger uses only transmit pin
+(TX) and will translate all **LF** into **CR-LF**. If *speed* is
+configured to **B0,** serial port settings will not be altered,
+library will simply open port and will happily work on current serial
+settings.

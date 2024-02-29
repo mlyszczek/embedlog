@@ -1,0 +1,16 @@
+**EL_TS_FRACT** option controls how to display fractions of seconds. If high
+resolution is not needed or not supported, it's best to set this to
+lowest resolution possible. Table will show exacly what this is
+about. Example uses long timestamp, interesting part is after date
+after dot '.'.
+
+.. code-block:: none
+
+   +-----------------+-------------------------------+
+   |      value      |  resulting timestamp string   |
+   +=================+===============================+
+   | EL_TS_FRACT_OFF | 2018-04-17 22:02:57           |
+   | EL_TS_FRACT_MS  | 2018-04-17 22:02:57.070       |
+   | EL_TS_FRACT_US  | 2018-04-17 22:02:57.070518    |
+   | EL_TS_FRACT_NS  | 2018-04-17 22:02:57.070518782 |
+   +-----------------+-------------------------------+

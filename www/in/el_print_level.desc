@@ -1,0 +1,3 @@
+If EL_PRINT_LEVEL is set each log will have log level information prefix
+in format "l/" where 'l' is first character of level message is
+printed with.

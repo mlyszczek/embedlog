@@ -1,0 +1,411 @@
+NAME
+----
+**el_option** - sets optional configuration of the logger
+
+|el_print| print
+|el_option| change
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>
+
+   int el_option(int option, ...);
+   int el_ooption(struct el *el, int option, ...);
+
+DESCRIPTION
+-----------
+
+|el_option| allows user to configure logger's internal el object,
+to tune logging to users needs. This is quite raw function to fine tune
+every aspect of embedlog. For normal usage it may be more beneficial and
+simpler to use some function that use most common options. Often setting
+multiple options in one call. These functions are not necessary better
+or faster. They are just different way of setting **embedlog** options.
+
+Below is list of these functions and options they set.
+
+|el_set_log_level| asd
+
+.. code-block:: c
+
+   +-----------------------+-------------------+----------------------------------+
+   | function              | modified ioctl    | short description                |
+   +=======================+===================+==================================+
+   | el_set_log_level      | EL_LEVEL          | set new log level                |
+   +-----------------------+-------------------+----------------------------------+
+   | el_enable_output      | EL_OUT            | enable output(s)                 |
+   +-----------------------+-------------------+----------------------------------+
+   | el_disable_output     | EL_OUT            | disable output(s)                |
+   +-----------------------+-------------------+----------------------------------+
+   | el_set_prefix         | EL_PREFIX         | set new prefix for logs          |
+   +-----------------------+-------------------+----------------------------------+
+   | el_set_timestamp      | EL_TS             | Enable timestamps, set time      |
+   |                       | EL_TS_TM          | source, and optionally turn on   |
+   |                       | EL_TS_FRACT       | fraction of seconds in logging   |
+   +-----------------------+-------------------+----------------------------------+
+   | el_enable_colors      | EL_COLORS         | enable pretty colors in output   |
+   +-----------------------+-------------------+----------------------------------+
+   | el_print_extra_info   | EL_FINFO          | Adds to log information about    |
+   |                       | EL_FUNCINFO       | filename, line and function name |
+   |                       | EL_PRINT_LEVEL    | where log originated from        |
+   +-----------------------+-------------------+----------------------------------+
+   | el_set_custom_put     | EL_CUSTOM_PUT     | Set custom function for printing |
+   +-----------------------+-------------------+----------------------------------+
+   | el_enable_file_log    | EL_FROTATE_NUMBER | Enables logging to file, and     |
+   |                       | EL_FPATH          | optionally sets file rotate      |
+   |                       | EL_FROTATE_SIZE   | configuration                    |
+   |                       | EL_OUT_FILE       |                                  |
+   +-----------------------+-------------------+----------------------------------+
+   | el_set_file_sync      | EL_FSYNC_EVERY    | Configures conditions to         |
+   |                       | EL_FSYNC_LEVEL    + forcefully sync logs to disk     |
+   +-----------------------+-------------------+----------------------------------+
+   | el_set_tty_dev        | EL_TTY_DEV        | Enables printing to tty device   |
+   |                       | EL_OUT            |                                  |
+   +-----------------------+-------------------+----------------------------------+
+   | el_enable_thread_safe | EL_THREAD_SAFE    | Enables thread safety features   |
+   +-----------------------+-------------------+----------------------------------+
+
+OPTIONS
+--------
+Below is a list of *option* that can be configured. Value inside
+parenthesis determines argument types of variadic arguments *...*
+
+--------------------------------------------------------------------------------
+
+``EL_LEVEL (enum el_level level)`` [default: **EL_INFO**]
+
+.. include:: /in/el_level.desc
+
+.. code-block:: c
+
+   /* print only alert and fatal logs */
+   el_option(EL_LEVEL, EL_ALERT);
+   /* print only error, critical, alert and fatal */
+   el_option(EL_LEVEL, EL_ERROR);
+   /* print all, including debug logs */
+   el_option(EL_LEVEL, EL_DBG);
+
+.. include:: /in/el_level.err
+
+--------------------------------------------------------------------------------
+
+``EL_OUT (enum el_output outputs)`` [default: **EL_OUT_STDERR**]
+
+.. include:: /in/el_out.desc
+
+.. code-block:: c
+
+   /* Log only to stdout */
+   el_option(EL_OUT, EL_OUT_STDOUT);
+
+   /* Log to stderr, network and file simultaneously
+    * Note, this will disable previously set print to stdout! */
+   el_option(EL_OUT, EL_OUT_STDERR | EL_OUT_NET | EL_OUT_FILE);
+
+.. include:: /in/el_out.err
+
+--------------------------------------------------------------------------------
+
+``EL_PRINT_NL (int nl)`` [default: **1**]
+
+When enabled, new line marker will be added to each print. If you
+disable it, you will be able to create very long lines with
+consecutive print calls.
+
+.. code-block:: c
+
+   el_option(EL_PRINT_NL, 1);
+   el_print(ELI, "one");
+   el_print(ELI, "two");
+   el_print(ELI, "three");
+   /* log output: */
+   /*   i/one
+    *   i/two
+    *   i/three */
+
+   el_option(EL_PRINT_LEVEL, 0);
+   el_option(EL_PRINT_NL, 0);
+   el_print(ELI, "one");
+   el_print(ELI, "two");
+   el_print(ELI, "three");
+   /* log output: */
+   /*   onetwothree */
+   /* If you didn't disable, EL_PRINT_LEVEL (which by default is enabled)
+    * you would get: i/onei/twoi/three
+
+--------------------------------------------------------------------------------
+
+``EL_PREFIX (const char *prefix)`` [default: **none**]
+
+.. include:: /in/el_prefix.desc
+
+.. code-block:: c
+
+   el_option(EL_PREFIX, "my-prefix");
+   el_print(ELI, "some log");
+   /* log output */
+   /*   i/my-prefix: some log */
+
+   el_option(EL_PREFIX, NULL); /* default */
+   el_print(ELI, "some log");
+   /* log output */
+   /*   i/some log */
+
+--------------------------------------------------------------------------------
+
+``EL_COLORS (int colors)`` [default: **0**]
+
+.. include:: /in/el_colors.desc
+
+.. include:: /in/el_color.err
+
+--------------------------------------------------------------------------------
+
+``EL_TS (enum el_option_timestamp timestamp)`` [default: **EL_TS_OFF**]
+
+.. include:: /in/el_ts.desc
+
+.. code-block:: c
+
+   el_option(EL_TS, EL_TS_SHORT);
+   el_print(ELI, "some log");
+   /* log output */
+   /* [1709153777] i/some log */
+
+   el_option(EL_TS, EL_TS_LONG);
+   el_print(ELI, "some log");
+   /* log output */
+   /* [[2024-02-28 20:56:17]] i/some log */
+
+ERRORS
+   EINVAL
+      Input argument is invalid
+
+   ENOSYS
+      Timestamp support was not compiled in and setting this option
+      is disabled.
+
+--------------------------------------------------------------------------------
+
+``EL_TS_TM (enum el_option_timestamp_timer timer)`` [default: **EL_TS_TM_TIME**]
+
+.. include:: /in/el_ts_tm.desc
+
+.. code-block:: c
+
+   el_option(EL_TS_TM, EL_TS_TM_REALTIME);
+   el_option(EL_TS_TM, EL_TS_TM_TIME);
+
+ERRORS
+   EINVAL
+      Input argument is invalid
+
+   ENODEV
+      Specified timer source was not compiled in and is not available
+
+--------------------------------------------------------------------------------
+
+``EL_TS_FRACT (enum el_option_timestamp_fraction fraction)`` [default: **EL_TS_FRACT_OFF**]
+
+.. include:: /in/el_ts_fract.desc
+
+.. code-block:: c
+
+   el_option(EL_TS_FRAC, EL_TS_FRACT_OFF);
+   el_option(EL_TS_FRAC, EL_TS_FRACT_MS);
+
+ERRORS
+   EINVAL
+      Input argument is invalid
+
+--------------------------------------------------------------------------------
+
+``EL_PRINT_LEVEL (int print)`` [default: **1**]
+
+.. include:: /in/el_print_level.desc
+
+.. code-block:: none
+
+   el_option(EL_PRINT_LEVEL, 1);
+   c/this is critical message
+   n/this is just a notice
+   d/debug print
+
+If value is set to 0, level information will not be added, and above
+messages would like like this
+
+.. code-block:: none
+
+   el_option(EL_PRINT_LEVEL, 1);
+   this is critical message
+   this is just a notice
+   debug print
+
+ERRORS
+   EINVAL
+      Input argument is different than 1 or 0
+
+--------------------------------------------------------------------------------
+
+``EL_FINFO (int finfo)`` [default: **0**]
+
+.. include:: /in/el_finfo.desc
+
+.. code-block:: c
+
+   el_option(EL_FINFO, 1);
+   el_print(ELI, "some log");
+   /* log output */
+   /*   [some-file.c:68] i/some log */
+
+ERRORS
+   EINVAL
+      Input argument is different than 1 or 0
+
+--------------------------------------------------------------------------------
+
+``EL_FUNCINFO (int funcinfo)`` [default: **0**]
+
+.. include:: /in/el_funcinfo.desc
+
+.. code-block:: c
+
+   el_option(EL_FUNCINFO, 1);
+   el_print(ELI, "some log");
+   /* log output */
+   /*   [some_function()] i/some log */
+
+ERRORS
+   EINVAL
+      Input argument is different than 1 or 0
+
+--------------------------------------------------------------------------------
+
+``EL_CUSTOM_PUT (int (*el_custom_put)(const char *s, size_t slen, void *user), void *user)``
+
+.. include:: /in/el_custom_put.desc
+
+.. code-block:: c
+
+   int custom_logger(const char *s, size_t slen, void *user) {
+       FILE *f = user;
+       /* s will contain string "i/print log" */
+       fwrite(s, slen, 1, f);
+       return 0;
+   }
+
+   FILE *f = fopen(log_file, "w");
+   el_option(EL_CUSTOM_PUT, custom_logger, f);
+   el_option(EL_OUT, EL_OUT_CUSTOM);
+   el_print(ELI, "print log");
+
+
+--------------------------------------------------------------------------------
+
+``EL_FPATH (const char *path)`` [default: **unset**]
+
+.. include:: /in/el_fpath.desc
+
+.. include:: /in/el_fpath.err
+
+--------------------------------------------------------------------------------
+
+``EL_FROTATE_NUMBER (long number)`` [default: **0**]
+
+.. include:: /in/el_frotate_number.desc
+
+ERRORS
+   EINVAL
+      Input parameter is less than 0 or bigger than **USHRT_MAX**\ (65535).
+
+--------------------------------------------------------------------------------
+
+``EL_FROTATE_SYMLINK (int enable)`` [default: **1**]
+
+When **EL_FROTATE_NUMBER** is bigger than 0, this option is enabled
+and program runs on UNIX, **embedlog** will create symlink file in
+the same directory as rest of the logs with base name of *path* that
+is passed to **EL_FPATH**. So if "/var/log/program/program.log" path
+is passed, after some time more or less this file structure will be
+generated
+
+.. code-block:: none
+
+   /var/log/program/program.log.0
+   /var/log/program/program.log.1
+   /var/log/program/program.log.2
+   /var/log/program/program.log.3
+   /var/log/program/program.log -> program.log.3
+
+Symlink will always point to file directly in the same directory.
+Symlink file will always point to most recent log file. This option
+is enabled by default.
+
+ERRORS
+   EINVAL
+      Input parameter is not 0 or 1
+
+--------------------------------------------------------------------------------
+
+``EL_FROTATE_SIZE (long size)`` [default: **0**]
+
+.. include:: /in/el_frotate_size.desc
+
+ERRORS
+   EINVAL
+      Value is less than 1
+
+--------------------------------------------------------------------------------
+
+``EL_FSYNC_EVERY (long size)`` [default: 32768]
+
+.. include:: /in/el_fsync_every.desc
+
+ERRORS
+   EINVAL
+      Value is less than 0
+
+--------------------------------------------------------------------------------
+
+``EL_FSYNC_LEVEL (enum el_level level)`` [default: **EL_FATAL**]
+
+.. include:: /in/el_fsync_level.desc
+
+ERRORS
+   EINVAL
+      specified *level* is invalid (bigger than EL_DBG).
+
+--------------------------------------------------------------------------------
+
+``EL_TTY_DEV (const char *dev, speed_t speed)`` [default: **unset**]
+
+.. include:: /in/el_tty.desc
+
+.. include:: /in/el_tty.err
+
+--------------------------------------------------------------------------------
+
+``EL_THREAD_SAFE (int safe)`` [default: **0**]
+
+.. include:: /in/el_thread_safe.desc
+
+.. include:: /in/el_thread_safe.err
+
+RETURN VALUE
+------------
+On success 0 is returned. -1 is returned when any error occured.
+
+ERRORS
+------
+
+EINVAL
+   Passed *option* is invalid.
+
+ENOSYS
+   Passed *option* is not supported on this system (support was not
+   compiled)
+
+Also check for error description of specific option that failed for more
+informations

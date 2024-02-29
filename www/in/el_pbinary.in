@@ -1,0 +1,203 @@
+NAME
+----
+**el_pbinary** - print data and optional metadata in binary format
+
+SYNOPSIS
+--------
+.. code-block:: c
+
+   #include <embedlog.h>**
+
+   int el_putb(const void *memory, size_t mlen);
+   int el_oputb(struct el *el, const void *memory, size_t mlen);
+   int el_pbinary(enum el_level level, const void *memory, size_t mlen);
+   int el_opbinary(enum el_level level, struct el *el, const void *memory,
+        size_t mlen);
+
+DESCRIPTION
+-----------
+
+|el_putb| function dumps memory location into configured output
+That binary data will not be printed in ASCII like it is
+with |el_pmemory|. If *memory* contains **NULL** characters, they
+will be stored to file. If *memory* is for example ``char buf[] = {
+0xb0, 0xfc, 0x13, 0x37 }`` then exactly these bytes will be stored into
+file.
+
+|el_pbinary| is used to log binary data into block device. Both
+metadata and data itself are treated as binary data. Such files cannot
+be read with text tools like **less**, but rather need special program
+that will parse the file. This may be usefull when you need, for example
+to log every message on CAN bus. If there are a lot of messages, it may
+be better to store them in binary format as this may save *a lot* of
+space.
+
+|el_pbinary| uses specific format to store metadata to save as
+much space as possible. All numerical values in metadata are variadic in
+size. Order of fields are as follows:
+
+.. code-block:: none
+
+   +-------+------------+--------------+-------------+------+
+   | flags | ts_seconds | ts_fractions | data_length | data |
+   +-------+------------+--------------+-------------+------+
+
+The only mandatory fields are **flags**, **data_length** and **data**.
+**flags** determine what fields are present. **flags** field is always 1
+byte in size and its format is
+
+**ts_seconds** does not care if set timestamp is ``EL_TS_SHORT`` or
+``EL_TS_LONG``. As long as it's set, seconds will appear in the logs,
+and ``ts_seconds`` will be set to 1.
+
+.. code-block:: none
+
+   +------+-------+-----------------------------------------------------------+
+   | bits | value | description                                               |
+   +======+=======+===========================================================+
+   |    0 |   0   | both ts_seconds and ts_fraction will not appear           |
+   |      +-------+-----------------------------------------------------------+
+   |      |   1   | at least ts_seconds will appear, ts_fraction appearance   |
+   |      |       | depends on 1..2 bits values                               |
+   +------+-------+-----------------------------------------------------------+
+   | 1..2 |   0   | ts_fractions will not appear                              |
+   |      +-------+-----------------------------------------------------------+
+   |      |   1   | ts_fractions will hold milliseconds value                 |
+   |      +-------+-----------------------------------------------------------+
+   |      |   2   | ts_fractions will hold microseconds value                 |
+   |      +-------+-----------------------------------------------------------+
+   |      |   3   | ts_fractions will hold nanoseconds value                  |
+   +------+-------+-----------------------------------------------------------+
+   | 3..5 |  0..7 | severity of the log, 0 is the highest and 7 is the lowest |
+   +------+-------+-----------------------------------------------------------+
+   | 6..7 |  0..3 | reserved                                                  |
+   +------+-------+-----------------------------------------------------------+
+
+**ts_seconds**, **ts_fractions** and **data_length** are numerical
+values with dynamic size. Each byte of a numerical value can hold number
+up to 127 and oldest bit is used as continuation bit, if that bit is
+set, program should treat next byte as next part of the same numerical
+value. Below is table with example decimal values and it's encoded
+counterpart.
+
+.. code-block:: none
+
+    +---------------+--------------------------+
+    | decimal value | encoded hex value        |
+    +===============+==========================+
+    |             0 | 0x00                     |
+    |             1 | 0x01                     |
+    |             2 | 0x02                     |
+    |           127 | 0x7f                     |
+    |           128 | 0x80 0x01                |
+    |           129 | 0x81 0x01                |
+    |           255 | 0xff 0x01                |
+    |           256 | 0x80 0x02                |
+    |           257 | 0x81 0x02                |
+    |         16383 | 0xff 0x7f                |
+    |         16384 | 0x80 0x80 0x01           |
+    |         16385 | 0x81 0x80 0x01           |
+    |     438478374 | 0xa6 0xcc 0x8a 0xd1 0x01 |
+    |    2147483647 | 0xff 0xff 0xff 0xff 0x07 |
+    |    4294967295 | 0xff 0xff 0xff 0xff 0x0f |
+    +---------------+--------------------------+
+
+Encoded number are always **little-endian**, that is first byte is
+always the least significant byte.
+
+You can decode number with following code
+
+.. code-block:: c
+
+   static size_t decode_number
+   (
+       const void          *number,  /* number to decode */
+       unsigned long long  *out      /* decoded number */
+   )
+   {
+       const unsigned char *n;       /* just a 'number' as unsigned char */
+       size_t               i;       /* temporary index */
+       /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+       i = 0;
+       *out = 0;
+       n = number;
+       do
+       {
+           /* Take 7 bits, and append them to the out */
+           *out |= (n[i] & 0x7f) << (i * 7);
+
+           /* do this until number lacks of continuation bit */
+       }
+       while (n[i++] & 0x80);
+
+       /* return number of bytes processed from 'number' */
+
+       return i;
+   }
+
+**data** can be whatever you want of any size. |el_pbinary| uses
+only timestamp and log level, rest of the options in *el* are simply
+ignores.
+
+|el_pbinary| is filtered based on *level*. Log won't be stored
+unless it matches log level.
+
+Currently you can only output to file or custom routine function. If you
+try to print binary output to different output, it will be ignored.
+
+EXAMPLES
+--------
+Print few binary logs. In this example we print strings, because it's
+easier to show results, but you can use absolutely anything here. Just note
+that there is no processing. If you are on big endian machine, and you
+dump raw integers, when reading back log on little endian machine you
+will have to do endian swap!
+
+.. literalinclude:: /../examples/print-binary.c
+   :language: c
+
+You can then decode this file with ``decode-binary.c`` tool in examples.
+Output will be like this.
+
+.. code-block:: none
+
+   n/0x0000  6e 6f 74 20 73 6f 20 62 69 6e 61 72 79           not so binary
+   w/2024-02-28 19:14:34
+   w/0x0000  74 73 20 69 6e 2c 20 66 72 61 63 74 20 6f 75 74  ts in, fract out
+   f/2024-02-28 19:14:34.696323
+   f/0x0000  77 65 20 61 72 65 20 61 6c 6c 20 69 6e           we are all in
+
+RETURN VALUE
+------------
+All functions return 0 when whole message has been successfuly printed
+to all configured outputs. If message couldn't be printed, it was
+printed only partially, or was not send to at least one configured
+output -1 is returned. Note that only one error is returned even if
+there was multiple errors.
+
+ERRORS
+------
+All functions may return one of these on error
+
+EINVAL
+   Any of the input parameters is invalid.
+
+EBADF
+   Loggig to file is enabled and filename was not set with **EL_FPATH**
+   option
+
+EBADF
+   Logging to file is enabled, file was opened sucessfuly, but log
+   cannot be stored into file. This usually happen that file was
+   unlinked from the file system and **embedlog** couldn't create new
+   file again (no access to directory or directory doesn't exist at
+   all). Log is lost, but **embedlog** will try to recreate log file
+   everytime |el_print| is called.
+
+ENODEV
+   All possible outputs are disabled
+
+When logging to file is enabled, all functions may also return errors
+from **fwrite**\ () and if file rotation is enabled also from
+**fopen**\ ()

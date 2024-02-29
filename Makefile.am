@@ -1,13 +1,12 @@
 include Makefile.am.coverage
 ACLOCAL_AMFLAGS=-I m4
 
-SUBDIRS = include src tst man examples www
-EXTRA_DIST = man2html.sh gen-download-page.sh readme.md tap-driver.sh
+SUBDIRS = include src tst www examples
+EXTRA_DIST = gen-download-page.sh readme.rst tap-driver.sh
 
 www:
 	./gen-download-page.sh
-	./man2html.sh
-	make www -C www
+	make -C www html
 
 analyze:
 	make analyze -C src

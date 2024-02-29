@@ -1,0 +1,4 @@
+EL_FUNCINFO adds information about function from which message has
+been printed in format [funcname()] or if **EL_FINFO** is enabled
+[some_file.c:123:funcname()]. Setting this to 0 will result in no
+function information.

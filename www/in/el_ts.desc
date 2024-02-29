@@ -1,0 +1,13 @@
+**EL_TS** allows timestamp to be added to each log message. Possible values for
+*timestamp* are:
+
+EL_TS_OFF
+   Timestamp will not be added to messages
+
+EL_TS_SHORT
+   Short timestamp will be added to log in format
+   **[1503661223.537631]**
+
+EL_TS_LONG
+   Long timestamp will be added to log in format **[2017-08-25
+   11:40:23.537651]**

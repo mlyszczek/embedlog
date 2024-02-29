@@ -1,0 +1,10 @@
+* {
+	tab-size: 4;
+}
+
+a.reference:link,  a.reference:visited {
+	font-weight: bold;
+	font-decoration: none;
+	color: black;
+	font-family: "JetBrains Mono"
+}
