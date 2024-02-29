@@ -310,7 +310,7 @@ int el_set_custom_put(el_custom_put clbk, void *user);
 int el_enable_file_log(const char *path, unsigned short rotate_number,
 		long rotate_size);
 int el_set_file_sync(long sync_every, enum el_level level);
-int el_set_tty_dev(const char *dev, speed_t speed);
+int el_set_tty_dev(const char *dev, unsigned speed);
 int el_enable_thread_safe(int enable);
 
 int el_oset_log_level(struct el *el, enum el_level level);
@@ -326,7 +326,7 @@ int el_oset_custom_put(struct el *el, el_custom_put clbk, void *user);
 int el_oenable_file_log(struct el *el, const char *path,
 		unsigned short rotate_number, long rotate_size);
 int el_oset_file_sync(struct el *el, long sync_every, enum el_level level);
-int el_oset_tty_dev(struct el *el, const char *dev, speed_t speed);
+int el_oset_tty_dev(struct el *el, const char *dev, unsigned speed);
 int el_oenable_thread_safe(struct el *el, int enable);
 
 #ifdef __cplusplus
