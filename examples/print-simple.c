@@ -11,7 +11,7 @@ int el_demo_print_simple_main(void)
 int main(void)
 #endif
 {
-	/* first we nned to initialize logger to known state, embedlog
+	/* first we need to initialize logger to known state, embedlog
 	 * will print to stdout by default */
 	el_init();
 
@@ -24,7 +24,7 @@ int main(void)
 
 	/* we can change log level in runtime as we see fit, now enable
 	 * debug prints */
-	el_option(EL_LEVEL, EL_DBG);
+	el_set_log_level(EL_DBG);
 	el_print(ELD, "But now debug will be printed");
 
 	/* altough embedlog does not use dynamic allocation by itself,
