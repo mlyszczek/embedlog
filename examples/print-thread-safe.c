@@ -13,7 +13,7 @@ int main(void)
 {
 	el_init();
 
-	if (el_option(EL_THREAD_SAFE, 1) != 0)
+	if (el_enable_thread_safe(1))
 	{
 		el_perror(ELF, "Failed to enable thread safety");
 		el_cleanup();

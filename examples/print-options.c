@@ -24,7 +24,22 @@ int main(void)
 
 	el_init();
 
-	el_option(EL_PRINT_LEVEL, 0);
+	el_print(ELI, "most common options can be set with special functions");
+	el_set_timestamp(EL_TS_LONG, EL_TS_TM_REALTIME, EL_TS_FRACT_US);
+	el_print_extra_info(1);
+	el_print(ELI, "like, printing timestamp and log location in a file");
+	el_enable_colors(1);
+	el_print(ELI, "or enabling colors in output");
+	el_print(ELA, "to make it easy to spot error");
+	el_set_log_level(EL_DBG);
+	el_print(ELD, "These options are enough for vast majority of use cases. "
+			"But it more fine tuning is necessary, you can always use "
+			"el_option(3) function, to really fine tune your experience");
+
+	el_set_timestamp(EL_TS_OFF, 0, 0);
+	el_print_extra_info(0);
+	el_enable_colors(0);
+
 	el_print(ELI, "We can disable information about log level\b");
 	el_print(ELF, "message still will be filtered by log level");
 	el_print(ELA, "but there is no way to tell what level message is");
