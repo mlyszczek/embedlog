@@ -58,6 +58,28 @@ prints table-like header and footer.
    0x0070  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f  pqrstuvwxyz{|}~.
    ------  -----------------------------------------------  ----------------
 
+By setting **EL_PMEMORY_SPACE**, you can add padding after first 8 bytes
+printed. This could make log more readable for you. With that value set
+to 1, memory dump will look like this::
+
+   ------  ------------------------------------------------  -----------------
+   offset  hex                                               ascii
+   ------  ------------------------------------------------  -----------------
+   0x0040  40 41 42 43 44 45 46 47  48 49 4a 4b 4c 4d 4e 4f  @ABCDEFG HIJKLMNO
+   0x0050  50 51 52 53 54 55 56 57  58 59 5a 5b 5c 5d 5e 5f  PQRSTUVW XYZ[]^_
+   ------  ------------------------------------------------  -----------------
+
+This can be set to value up to 3::
+
+   ------  --------------------------------------------------  -------------------
+   offset  hex                                                 ascii
+   ------  --------------------------------------------------  -------------------
+   0x0040  40 41 42 43 44 45 46 47    48 49 4a 4b 4c 4d 4e 4f  @ABCDEFG   HIJKLMNO
+   0x0050  50 51 52 53 54 55 56 57    58 59 5a 5b 5c 5d 5e 5f  PQRSTUVW   XYZ[]^_
+   ------  --------------------------------------------------  -------------------
+
+Padding applies to both table, and non-table version of memory print.
+
 All standard rules about printing file info, and log filtering are the same
 as with |el_print|.
 

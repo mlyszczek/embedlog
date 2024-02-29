@@ -54,6 +54,10 @@
     prints single memory line, example line can look like this:
 
     0x0020: 6e 20 70 72 69 6e 74 61 62 6c 65 09 63 68 61 72  n printable.char
+
+    Or like this, if pmemory spacing is set to 1
+
+    0x0020: 6e 20 70 72 69 6e 74  61 62 6c 65 09 63 68 61 72  n printa ble.char
    ========================================================================== */
 
 
@@ -73,10 +77,16 @@ static int el_print_line
 	 * representation in hex and char */
 	char hex_data[EL_MEM_HEX_LEN + 1] = {0};
 	char char_data[EL_MEM_CHAR_LEN + 1] = {0};
+	char spacing[] = "   ";
 
 	/* calculate buf offset value */
 	const unsigned int offset = EL_MEM_LINE_SIZE * line_number;
 
+	/* pointers to current hex and char data */
+	char  *current_hex_pos = hex_data;
+	char  *current_char_pos = char_data;
+
+	unsigned char  current_byte;
 	size_t bn;  /* byte number */
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,24 +94,31 @@ static int el_print_line
 	/* fill data buffers with representation of bytes */
 	for (bn = 0; bn < line_size; ++bn)
 	{
-		unsigned char  current_byte;
-		char          *current_hex_pos;
-		char          *current_char_pos;
-		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
 		current_byte = *buf++;
-		current_hex_pos = hex_data + bn * EL_MEM_SINGLE_HEX_LEN;
-		current_char_pos = char_data + bn;
+
+		if (el->pmemory_space && bn == 8)
+		{
+			/* If this is 9th byte, then we already printed 8 bytes,
+			 * id pmemory_space is set, we add additional spaces */
+			sprintf(current_hex_pos, "%*s", el->pmemory_space, spacing);
+			sprintf(current_char_pos, "%*s", el->pmemory_space, spacing);
+			current_hex_pos += el->pmemory_space;
+			current_char_pos += el->pmemory_space;
+		}
 
 		sprintf(current_hex_pos, "%02x ", current_byte);
 		if (isprint(current_byte) == 0)  current_byte = '.';
 		*current_char_pos = current_byte;
+
+		/* Move pointers for current position of hex and char buffers */
+		current_hex_pos += EL_MEM_SINGLE_HEX_LEN;
+		current_char_pos++;
 	}
 
 	/* print constructed line */
 	return el_oprint_nb(file, num, func, level, el, "0x%04x  %-*s %s",
-			offset, EL_MEM_HEX_LEN, hex_data, char_data);
+			offset, EL_MEM_HEX_LEN - (3 - el->pmemory_space),
+			hex_data, char_data);
 }
 
 
@@ -131,6 +148,10 @@ static int el_print_line
     ------  -----------------------------------------------  ----------------
     0xNNNN  HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH HH  CCCCCCCCCCCCCCCC
     ------  -----------------------------------------------  ----------------
+
+    If pmemory space is set to 1, like will be like this:
+
+    0xNNNN  HH HH HH HH HH HH HH HH  HH HH HH HH HH HH HH HH  CCCCCCCC CCCCCCCC
    ========================================================================== */
 
 
@@ -149,6 +170,7 @@ static int el_pmem
 	/* String needed to print separator for array-like formating */
 	static const char *separator =
 		"-----------------------------------------------------------------------------";
+	static const char *spacing = "   ";
 
 	/* calculate some constants for this call based on mlen */
 	const size_t msg_size = mlen;
@@ -157,6 +179,7 @@ static int el_pmem
 
 	size_t  line_number;  /* current line number being printed */
 	int     rv;           /* return value of print functions */
+	int     table_shrink; /* how many extra '-' to add depending on spacing */
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -179,22 +202,32 @@ static int el_pmem
 	 * ------  -----------------------------------------------  ----------------
 	 */
 
+	/* separators in table print for hex and ascii are compile time statics,
+	 * with spacing this includes additional 3 characters, and so if spacing
+	 * is off, separator will be 3 characters longer than expected, like
+	 *
+	 *    --------
+	 *    fa fc
+	 *
+	 * When we don't print spacing, these 3 extra '-' should be removed.
+	 * Calculate how many bytes we have to remove to have nice alignment */
+	table_shrink = 3 - el->pmemory_space;
 	if (table)
 	{
 		rv = 0;
 		rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
 				EL_MEM_OFFSET_LEN - 2, separator,
-				EL_MEM_HEX_LEN - 1, separator,
-				EL_MEM_CHAR_LEN, separator);
+				EL_MEM_HEX_LEN - 1 - table_shrink, separator,
+				EL_MEM_CHAR_LEN - table_shrink, separator);
 
 		rv |= el_oprint_nb(file, num, func, level, el, "%-*s%-*s%s",
 				EL_MEM_OFFSET_LEN, "offset",
-				EL_MEM_HEX_LEN + 1, "hex", "ascii");
+				EL_MEM_HEX_LEN + 1 - table_shrink, "hex", "ascii");
 
 		rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
 				EL_MEM_OFFSET_LEN - 2, separator,
-				EL_MEM_HEX_LEN - 1, separator,
-				EL_MEM_CHAR_LEN, separator);
+				EL_MEM_HEX_LEN - 1 - table_shrink, separator,
+				EL_MEM_CHAR_LEN - table_shrink, separator);
 	}
 
 	/* print all lines that contains EL_MEM_LINE_SIZE bytes,
@@ -224,8 +257,8 @@ static int el_pmem
 	if (table)
 		rv |= el_oprint_nb(file, num, func, level, el, "%.*s  %.*s  %.*s",
 				EL_MEM_OFFSET_LEN - 2, separator,
-				EL_MEM_HEX_LEN - 1, separator,
-				EL_MEM_CHAR_LEN, separator);
+				EL_MEM_HEX_LEN - 1 - table_shrink, separator,
+				EL_MEM_CHAR_LEN - table_shrink, separator);
 
 	el_unlock(el);
 	return rv;

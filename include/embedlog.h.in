@@ -137,11 +137,12 @@ enum el_option
 	EL_FILE_SYNC_LEVEL= 17,  /* deprecated */
 
 	EL_THREAD_SAFE    = 18,
+	EL_PMEMORY_SPACE  = 20,
 
 	/* internal use only, should represent number of options, if
 	 * you add option, increment this by one (or by the number of
 	 * options you add). */
-	EL_OPT_ERROR      = 20
+	EL_OPT_ERROR      = 21
 };
 
 enum el_option_timestamp
@@ -225,6 +226,7 @@ struct el
 	unsigned int    funcinfo:1;
 	unsigned int    level:3;
 	unsigned int    level_current_msg:3;
+	unsigned int    pmemory_space:2;
 
 #if @ENABLE_OUT_FILE@
 	unsigned int    fsync_level:3;

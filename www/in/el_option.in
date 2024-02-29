@@ -249,6 +249,22 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+``EL_PMEMORY_SPACE (int spacing)`` [default: **0**]
+
+|el_pmemory| prints 16 bytes in a line. **EL_PMEMORY_SPACE** alows to add
+additional spacing in the middle between 8 bytes, to improve readability in
+some cases. Check |el_pmemory| how different spacing affects output.
+
+.. code-block:: c
+
+   el_option(EL_PMEMORY_SPACE, 2);
+
+ERRORS
+   EINVAL
+      *spacing* is not between 0 and 3.
+
+--------------------------------------------------------------------------------
+
 ``EL_FINFO (int finfo)`` [default: **0**]
 
 .. include:: /in/el_finfo.desc

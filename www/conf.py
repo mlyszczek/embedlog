@@ -29,6 +29,8 @@ autosectionlabel_prefix_document = True
 
 html_theme = 'alabaster'
 html_static_path = ['static']
+highlight_language = 'none'
+
 
 html_css_files = [
 	'http://static.bofc.pl/fonts.css',

@@ -95,19 +95,21 @@ extern struct el g_el;
 
 /* ==========================================================================
     length of all "HH ". EL_MEM_LINE_SIZE is externally defined during
-    compilation to tune the output
+    compilation to tune the output. We add +3 for possible spacing after
+    8 printed bytes.
    ========================================================================== */
 
 
-#define EL_MEM_HEX_LEN (EL_MEM_SINGLE_HEX_LEN * (EL_MEM_LINE_SIZE))
+#define EL_MEM_HEX_LEN (EL_MEM_SINGLE_HEX_LEN * (EL_MEM_LINE_SIZE) + 3)
 
 
 /* ==========================================================================
-    length of all "C" characters
+    length of all "C" characters. We add +3 for possible spacing after
+    8 printed bytes.
    ========================================================================== */
 
 
-#define EL_MEM_CHAR_LEN (EL_MEM_LINE_SIZE)
+#define EL_MEM_CHAR_LEN (EL_MEM_LINE_SIZE + 3)
 
 
 /* ==== defines for el_print function ======================================= */
