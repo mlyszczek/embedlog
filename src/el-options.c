@@ -1081,7 +1081,11 @@ int el_log_allowed
 	void          *user
 )
 {
-	return el_ooption(el, EL_CUSTOM_PUT, clbk, user);
+	el_ooption(el, EL_CUSTOM_PUT, clbk, user);
+	if (clbk)
+		return el_oenable_output(el, EL_OUT_CUSTOM);
+	else
+		return el_odisable_output(el, EL_OUT_CUSTOM);
 }
 
 
