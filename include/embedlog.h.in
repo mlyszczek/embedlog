@@ -73,6 +73,15 @@ extern "C" {
 #   define EL_FUNC_NAME NULL
 #endif
 
+/* Define PRINTFLIKE macro for warnings on misused el_print function */
+#if !defined(PRINTFLIKE)
+#   if defined(__GNUC__)
+#       define PRINTFLIKE(n,m) __attribute__((format(printf,n,m)))
+#   else
+#       define PRINTFLIKE(n,m)
+#   endif /* __GNUC__ */
+#endif /* PRINTFLIKE */
+
 /* enum values, new enums can be added, but values of already
  * existing enums *must* stay unchanged, to keep ABI stable! */
 
@@ -256,7 +265,7 @@ int el_cleanup(void);
 int el_option(int option, ...);
 int el_puts(const char *string);
 int el_print(const char *file, size_t line, const char *func,
-		enum el_level level, const char *fmt, ...);
+		enum el_level level, const char *fmt, ...) PRINTFLIKE(5, 6);
 int el_vprint(const char *file, size_t line, const char *func,
 		enum el_level level, const char *fmt, va_list ap);
 int el_pmemory(const char *file, size_t line, const char *func,
@@ -264,7 +273,7 @@ int el_pmemory(const char *file, size_t line, const char *func,
 int el_pmemory_table(const char *file, size_t line, const char *func,
 		enum el_level level, const void *memory, size_t mlen);
 int el_perror(const char *file, size_t line, const char *func,
-		enum el_level level, const char *fmt, ...);
+		enum el_level level, const char *fmt, ...) PRINTFLIKE(5, 6);
 int el_putb(const void *memory, size_t mlen);
 int el_pbinary(enum el_level level, const void *memory, size_t mlen);
 const struct el *el_get_el(void);
@@ -278,7 +287,8 @@ int el_ocleanup(struct el *el);
 int el_ooption(struct el *el, int option, ...);
 int el_oputs(struct el *el, const char *string);
 int el_oprint(const char *file, size_t line, const char *func,
-		enum el_level level, struct el *el, const char *fnt, ...);
+		enum el_level level, struct el *el, const char *fnt, ...)
+		PRINTFLIKE(6, 7);
 int el_ovprint(const char *file, size_t line, const char *func,
 		enum el_level level, struct el *el, const char *fmt,
 		va_list ap);
@@ -289,7 +299,8 @@ int el_opmemory_table(const char *file, size_t line, const char *func,
 		enum el_level level, struct el *el, const void *memory,
 		size_t mlen);
 int el_operror(const char *file, size_t line, const char *func,
-		enum el_level level, struct el *el, const char *fmt, ...);
+		enum el_level level, struct el *el, const char *fmt, ...)
+		PRINTFLIKE(6, 7);
 int el_oputb(struct el *el, const void *memory, size_t mlen);
 int el_opbinary(enum el_level level, struct el *el,
 		const void *memory, size_t mlen);
