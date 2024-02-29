@@ -5,7 +5,7 @@ SUBDIRS = include src tst www examples
 EXTRA_DIST = gen-download-page.sh readme.rst tap-driver.sh
 
 www:
-	./gen-download-page.sh
+	./gen-download-page.sh > www/downloads.rst
 	make -C www html
 
 analyze:

@@ -1107,15 +1107,16 @@ int el_log_allowed
 (
 	struct el     *el,    /* el object to set option to */
 	const char    *path,
-	long           rotate_number,
+	unsigned short rotate_number,
 	long           rotate_size
 
 )
 {
-	OK_OR_RETURN(el_ooption(el, EL_FPATH, path));
 	OK_OR_RETURN(el_ooption(el, EL_FROTATE_NUMBER, rotate_number));
-	OK_OR_RETURN(el_ooption(el, EL_FROTATE_SIZE, rotate_size));
+	if (rotate_number)
+		OK_OR_RETURN(el_ooption(el, EL_FROTATE_SIZE, rotate_size));
 	OK_OR_RETURN(el_enable_output(EL_OUT_FILE));
+	OK_OR_RETURN(el_ooption(el, EL_FPATH, path));
 
 	return 0;
 }
@@ -1126,7 +1127,7 @@ int el_log_allowed
 /* public api */ int el_enable_file_log
 (
 	const char    *path,
-	long           rotate_number,
+	unsigned short rotate_number,
 	long           rotate_size
 )
 {
@@ -1168,7 +1169,7 @@ int el_set_file_sync
 (
 	struct el     *el,    /* el object to set option to */
 	const char    *dev,
-	speed_t        speed
+	unsigned       speed
 )
 {
 	OK_OR_RETURN(el_ooption(el, EL_TTY_DEV, dev, speed));
@@ -1183,7 +1184,7 @@ int el_set_file_sync
 /* public api */ int el_set_tty_dev
 (
 	const char    *dev,
-	speed_t        speed
+	unsigned       speed
 )
 {
 	return el_oset_tty_dev(&g_el, dev, speed);
