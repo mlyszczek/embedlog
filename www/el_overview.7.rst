@@ -182,6 +182,21 @@ library.
 
 **You've been warned!**
 
+STRIPPING BIN FROM STRINGS
+--------------------------
+If you want to use **embedlog**, but during release strip all logs from
+final binary, you just have to globally define ``DISABLE_ALL_EMBEDLOG``
+
+``DISABLE_ALL_EMBEDLOG`` will change all embedlog functions into functions
+that return 0, so these can still be used in ``if()`` checks, or blocks,
+or anywhere else you would normally use **embedlog** functions. During
+compilation, compiler should optimize all calls, and linker should remove
+all embedlog code from final binary, saving space, and hiding all strings.
+
+This case is usefull during development and testing, when development may
+happen on fat MCU with a lot of memory, but final program should work on,
+smaller - and cheaper - MCU.
+
 EXAMPLE
 -------
 

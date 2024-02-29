@@ -260,6 +260,8 @@ struct el
 #endif
 };
 
+#ifndef DISABLE_ALL_EMBEDLOG
+
 int el_init(void);
 int el_cleanup(void);
 int el_option(int option, ...);
@@ -340,6 +342,63 @@ int el_oset_file_sync(struct el *el, long sync_every, enum el_level level);
 int el_oset_tty_dev(struct el *el, const char *dev, unsigned speed);
 int el_oenable_thread_safe(struct el *el, int enable);
 
+#else /* DISABLE_ALL_EMBEDLOG */
+static inline int el_nothing_int(void) { return 0; }
+static inline void *el_nothing_ptr(void) { return (void *)0; }
+
+#define el_init(...) el_nothing_int()
+#define el_cleanup(...) el_nothing_int()
+#define el_option(...) el_nothing_int()
+#define el_puts(...) el_nothing_int()
+#define el_print(...) el_nothing_int()
+#define el_vprint(...) el_nothing_int()
+#define el_pmemory(...) el_nothing_int()
+#define el_pmemory_table(...) el_nothing_int()
+#define el_perror(...) el_nothing_int()
+#define el_putb(...) el_nothing_int()
+#define el_pbinary(...) el_nothing_int()
+#define el_get_el(...) el_nothing_ptr()
+#define el_flush(...) el_nothing_int()
+#define el_new(...) el_nothing_ptr()
+#define el_destroy(...) el_nothing_int()
+#define el_oinit(...) el_nothing_int()
+#define el_ocleanup(...) el_nothing_int()
+#define el_ooption(...) el_nothing_int()
+#define el_oputs(...) el_nothing_int()
+#define el_oprint(...) el_nothing_int()
+#define el_ovprint(...) el_nothing_int()
+#define el_opmemory(...) el_nothing_int()
+#define el_opmemory_table(...) el_nothing_int()
+#define el_operror(...) el_nothing_int()
+#define el_oputb(...) el_nothing_int()
+#define el_opbinary(...) el_nothing_int()
+#define el_oflush(...) el_nothing_int()
+#define el_set_log_level(...) el_nothing_int()
+#define el_enable_output(...) el_nothing_int()
+#define el_disable_output(...) el_nothing_int()
+#define el_set_prefix(...) el_nothing_int()
+#define el_set_timestamp(...) el_nothing_int()
+#define el_enable_colors(...) el_nothing_int()
+#define el_print_extra_info(...) el_nothing_int()
+#define el_set_custom_put(...) el_nothing_int()
+#define el_enable_file_log(...) el_nothing_int()
+#define el_set_file_sync(...) el_nothing_int()
+#define el_set_tty_dev(...) el_nothing_int()
+#define el_enable_thread_safe(...) el_nothing_int()
+#define el_oset_log_level(...) el_nothing_int()
+#define el_oenable_output(...) el_nothing_int()
+#define el_odisable_output(...) el_nothing_int()
+#define el_oset_prefix(...) el_nothing_int()
+#define el_oset_timestamp(...) el_nothing_int()
+#define el_oenable_colors(...) el_nothing_int()
+#define el_oprint_extra_info(...) el_nothing_int()
+#define el_oset_custom_put(...) el_nothing_int()
+#define el_oenable_file_log(...) el_nothing_int()
+#define el_oset_file_sync(...) el_nothing_int()
+#define el_oset_tty_dev(...) el_nothing_int()
+#define el_oenable_thread_safe(...) el_nothing_int()
+
+#endif /* DISABLE_ALL_EMBEDLOG */
 #ifdef __cplusplus
 }
 #endif

@@ -82,6 +82,7 @@ Implemented features are (most of them optionally configured in runtime):
 * print memory block in wireshark-like output
 * fully binary logs with binary data (like CAN frames) to save space
 * full thread safety using *pthread*
+* stripping binary from all strings and **embedlog** code in final release image
 
 Almost all of these features can be disabled to save some precious bytes of
 memory.
