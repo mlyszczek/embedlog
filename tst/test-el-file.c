@@ -2013,6 +2013,25 @@ static void options_f_enable_file_log(void)
 
 
 /* ==========================================================================
+   ========================================================================== */
+static void options_f_enable_file_log_no_rotate(void)
+{
+	long old_rotate = g_el.frotate_size;
+	mt_fok(el_enable_file_log(WORKDIR"/log", 0, 0));
+	mt_fail(g_el.frotate_number == 0);
+	mt_fail(g_el.frotate_size == old_rotate);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_enable_file_log_rotate_no_size(void)
+{
+	mt_ferr(el_enable_file_log(WORKDIR"/log", 2, 0), EINVAL);
+}
+
+
+/* ==========================================================================
              __               __
             / /_ ___   _____ / /_   ____ _ _____ ____   __  __ ____
            / __// _ \ / ___// __/  / __ `// ___// __ \ / / / // __ \
@@ -2118,6 +2137,8 @@ void el_file_test_group(void)
 	mt_run(file_rotate_path_too_long);
 	mt_run(file_rotate_fail);
 	mt_run(options_f_enable_file_log);
+	mt_run(options_f_enable_file_log_no_rotate);
+	mt_run(options_f_enable_file_log_rotate_no_size);
 #ifdef RUN_TESTS
 	mt_run(file_sync_always);
 	mt_run(file_sync_periodic);
