@@ -2,9 +2,6 @@ NAME
 ----
 **el_option** - sets optional configuration of the logger
 
-|el_print| print
-|el_option| change
-
 SYNOPSIS
 --------
 .. code-block:: c
@@ -25,8 +22,6 @@ multiple options in one call. These functions are not necessary better
 or faster. They are just different way of setting **embedlog** options.
 
 Below is list of these functions and options they set.
-
-|el_set_log_level| asd
 
 .. code-block:: c
 
