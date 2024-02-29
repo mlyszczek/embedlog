@@ -38,29 +38,6 @@
 
 
 /* ==========================================================================
-          __             __                     __   _
-     ____/ /___   _____ / /____ _ _____ ____ _ / /_ (_)____   ____   _____
-    / __  // _ \ / ___// // __ `// ___// __ `// __// // __ \ / __ \ / ___/
-   / /_/ //  __// /__ / // /_/ // /   / /_/ // /_ / // /_/ // / / /(__  )
-   \__,_/ \___/ \___//_/ \__,_//_/    \__,_/ \__//_/ \____//_/ /_//____/
-
-   ========================================================================== */
-
-
-#define FLAG_TS             (0x01)
-
-#define FLAG_TS_FRACT_NONE  (0x00)
-#define FLAG_TS_FRACT_NSEC  (0x01)
-#define FLAG_TS_FRACT_USEC  (0x02)
-#define FLAG_TS_FRACT_MSEC  (0x03)
-#define FLAG_TS_FRACT_MASK  (0x03)
-#define FLAG_TS_FRACT_SHIFT (1)
-
-#define FLAG_LEVEL_MASK     (0x07)
-#define FLAG_LEVEL_SHIFT    (3)
-
-
-/* ==========================================================================
                   _                __           ____
     ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
    / __ \ / ___// /| | / // __ `// __// _ \   / /_ / / / // __ \ / ___// ___/
@@ -92,18 +69,18 @@ static size_t el_flags
 #if ENABLE_TIMESTAMP
 	if (el->timestamp != EL_TS_OFF)
 	{
-		*buf |= FLAG_TS;
+		*buf |= EL_FLAG_TS;
 
 #   if ENABLE_FRACTIONS
 		/* fraction of seconds can be printed only when timestamp
 		 * is on */
 
-		*buf |= el->timestamp_fractions << FLAG_TS_FRACT_SHIFT;
+		*buf |= el->timestamp_fractions << EL_FLAG_TS_FRACT_SHIFT;
 #   endif
 	}
 #endif
 
-	*buf |= level << FLAG_LEVEL_SHIFT;
+	*buf |= level << EL_FLAG_LEVEL_SHIFT;
 	return 1;
 }
 
