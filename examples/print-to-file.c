@@ -12,11 +12,18 @@
 #define WORKDIR "/tmp/embedlog-example"
 
 #ifdef EMBEDLOG_DEMO_LIBRARY
-int el_demo_print_to_file_main(void)
+int el_demo_print_to_file_main(int argc, char *argv[])
 #else
-int main(void)
+int main(int argc, char *argv[])
 #endif
 {
+	int date_rotate = 0;
+	int ret;
+
+
+	if (argc == 2)
+		date_rotate = 1;
+
 	el_init();
 	el_set_timestamp(EL_TS_LONG, EL_TS_TM_REALTIME, 0);
 	el_print_extra_info(1);
@@ -32,7 +39,12 @@ int main(void)
 	 * create maximum 5 files, and non of those files will be larger
 	 * than 512. This is demo only, in real life you may want to set
 	 * file size to 1M or so. */
-	if (el_enable_file_log(WORKDIR"/log", 5, 512))
+	if (date_rotate)
+		ret = el_enable_file_log(WORKDIR"/log", EL_ROT_DATE_MIN, 0);
+	else
+		ret = el_enable_file_log(WORKDIR"/log", 5, 512);
+
+	if (ret)
 	{
 		/* embedlog will try to open file now, this may fail for
 		 * various of reasons */

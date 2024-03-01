@@ -51,6 +51,7 @@ Below is list of these functions and options they set.
    | |el_enable_file_log|    | EL_FROTATE_NUMBER | Enables logging to file, and     |
    |                          | EL_FPATH          | optionally sets file rotate      |
    |                          | EL_FROTATE_SIZE   | configuration                    |
+   |                          | EL_FROTATE_DATE   |                                  |
    |                          | EL_OUT_FILE       |                                  |
    +--------------------------+-------------------+----------------------------------+
    | |el_set_file_sync|      | EL_FSYNC_EVERY    | Configures conditions to         |
@@ -124,6 +125,9 @@ parenthesis determines argument types of variadic arguments *...*
    * - :ref:`EL_FROTATE_SIZE <manuals/options/el_option.3:el_frotate_size>`
      - ``long size``
      - ``0``
+   * - :ref:`EL_FROTATE_DATE <manuals/options/el_option.3:el_frotate_date>`
+     - ``el_option_rotate timeslice``
+     - ``EL_ROT_OFF``
    * - :ref:`EL_FSYNC_EVERY <manuals/options/el_option.3:el_fsync_every>`
      - ``long size``
      - ``32768``
@@ -471,6 +475,16 @@ EL_FROTATE_SIZE
 ERRORS
    EINVAL
       Value is less than 1
+
+EL_FROTATE_DATE
+^^^^^^^^^^^^^^^
+``EL_FROTATE_DATE (enum el_option_rotate timeslice)`` [default: **EL_ROT_OFF**]
+
+.. include:: /in/el_frotate_date.desc
+
+ERRORS
+   EINVAL
+      Invalid *timeslice* parameter
 
 --------------------------------------------------------------------------------
 

@@ -48,7 +48,7 @@
 
    ========================================================================== */
 
-#define OK_OR_RETURN(x) { int ret; if((ret = x)) return ret; }
+#define OK_OR_RETURN(x) do { int ret; if((ret = x)) return ret; } while (0)
 
 /* global el object, used with all functions that does not take "el"
  * as argument
@@ -441,15 +441,25 @@ static int el_vooption
 
 	case EL_FROTATE_NUMBER:
 	{
-		int previous_frotate; /* previous value of frotate number */
+		int need_reopen; /* should we repoen file after this operation? */
 		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 		value_int = va_arg(ap, int);
 		VALID(EINVAL, 0 <= value_int && value_int <= USHRT_MAX);
+
+		/* reopening of the file is needed if */
+		need_reopen =
+				/* current rotate type is not already based on size */
+				el->frotate_type != EL_ROT_FSIZE ||
+				/* or if we change rotate number from 0 to N */
+				(el->frotate_number == 0 && value_int);
+
 		el_lock(el);
-		previous_frotate = el->frotate_number;
 		el->frotate_number = (unsigned short)value_int;
+		/* If user sets frotate number to 0, it means he does not want
+		 * any rotate to happen, so set currnet rotate type to OFF */
+		el->frotate_type = el->frotate_number ? EL_ROT_FSIZE : EL_ROT_OFF;
 		ret = 0;
 
 		if (value_int > 0)
@@ -465,7 +475,7 @@ static int el_vooption
 		 * and even data loss, we reopen file as opening with log
 		 * rotation is a bit different. el_file_open() function
 		 * will close file before reopening */
-		if (previous_frotate == 0 && el->file) ret = el_file_open(el);
+		if (need_reopen && el->file) ret = el_file_open(el);
 
 		el_unlock(el);
 		return ret;
@@ -486,8 +496,46 @@ static int el_vooption
 		VALID(EINVAL, value_ulong >= 1);
 		el_lock(el);
 		el->frotate_size = value_ulong;
+		el->frotate_type = EL_ROT_FSIZE;
 		el_unlock(el);
 		return 0;
+
+
+	/* ==================================================================
+	        ___           __         __            __       __
+	       / _/____ ___  / /_ ___ _ / /_ ___   ___/ /___ _ / /_ ___
+	      / _// __// _ \/ __// _ `// __// -_) / _  // _ `// __// -_)
+	     /_/ /_/   \___/\__/ \_,_/ \__/ \__/  \_,_/ \_,_/ \__/ \__/
+	   ================================================================== */
+
+
+	case EL_FROTATE_DATE:
+	{
+		int need_reopen; /* should we repoen file after this operation? */
+		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+		value_int = va_arg(ap, int);
+		VALID(EINVAL, value_int <= EL_ROT_DATE_YEAR);
+		VALID(EINVAL, value_int >= EL_ROT_DATE_SEC);
+
+		/* If current rotate type is not already based on date,
+		 * we will have to reopen the file */
+		need_reopen = !EL_IS_ROT_DATE(el);
+
+		el_lock(el);
+		el->frotate_type = value_int;
+
+		/* if user turned on file rotation when file is already
+		 * opened without rotation then to prevent weird situations
+		 * and even data loss, we reopen file as opening with log
+		 * rotation is a bit different. el_file_open() function
+		 * will close file before reopening */
+		if (need_reopen && el->file) ret = el_file_open(el);
+
+		el_unlock(el);
+		return 0;
+	}
 
 
 	/* ==================================================================
@@ -1132,16 +1180,23 @@ int el_log_allowed
    ========================================================================== */
 /* public api */ int el_oenable_file_log
 (
-	struct el     *el,    /* el object to set option to */
-	const char    *path,
-	unsigned short rotate_number,
-	long           rotate_size
+	struct el  *el,    /* el object to set option to */
+	const char *path,
+	int        rotate_number,
+	long       rotate_size
 
 )
 {
-	OK_OR_RETURN(el_ooption(el, EL_FROTATE_NUMBER, rotate_number));
-	if (rotate_number)
-		OK_OR_RETURN(el_ooption(el, EL_FROTATE_SIZE, rotate_size));
+	if (rotate_number >= 0)
+		OK_OR_RETURN(el_ooption(el, EL_FROTATE_NUMBER, rotate_number));
+	else
+		/* If rotate number is negative, then this means user passed
+		 * EL_ROT_DATE enum and wants to date rotate */
+		OK_OR_RETURN(el_ooption(el, EL_FROTATE_DATE, rotate_number));
+
+	if (rotate_number > 0)
+			OK_OR_RETURN(el_ooption(el, EL_FROTATE_SIZE, rotate_size));
+
 	OK_OR_RETURN(el_enable_output(EL_OUT_FILE));
 	OK_OR_RETURN(el_ooption(el, EL_FPATH, path));
 
@@ -1153,9 +1208,9 @@ int el_log_allowed
    ========================================================================== */
 /* public api */ int el_enable_file_log
 (
-	const char    *path,
-	unsigned short rotate_number,
-	long           rotate_size
+	const char *path,
+	int         rotate_number,
+	long       rotate_size
 )
 {
 	return el_oenable_file_log(&g_el, path, rotate_number, rotate_size);

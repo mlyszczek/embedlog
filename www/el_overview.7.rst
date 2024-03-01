@@ -39,6 +39,11 @@ Logger incorporates features like:
   * ``CLOCK_MONOTONIC`` (requires POSIX)
   * configurable precision of fraction of seconds (mili, micro, nano)
 
+* file log rotation based on:
+
+  * file size - limit number of files and their sizes
+  * date - new file is created every day (or hour, or other choosen timeslice)
+
 * printing file and line information
 * 8 predefined log levels (total rip off from **syslog** (2) levels)
 * colorful output (for easy error spotting)

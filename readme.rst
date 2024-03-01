@@ -58,22 +58,27 @@ Implemented features are (most of them optionally configured in runtime):
 
 * printing to different outputs (simultaneously) like:
 
-    * syslog (very limited, works on *nuttx* for now)
-    * directly to serial device (like /dev/ttyS0)
-    * standard error (stderr)
-    * standard output (stdout)
-    * file (with optional log rotate, and syncing to prevent data loss)
-    * automatic file reopening on unexpected events (file deletion, SD remount)
-    * custom routine - can be anything **embedlog** just calls custom function
-      with string to print
+  * syslog (very limited, works on *nuttx* for now)
+  * directly to serial device (like /dev/ttyS0)
+  * standard error (stderr)
+  * standard output (stdout)
+  * file (with optional log rotate, and syncing to prevent data loss)
+  * automatic file reopening on unexpected events (file deletion, SD remount)
+  * custom routine - can be anything **embedlog** just calls custom function
+    with string to print
 
 * appending timestamp to every message
 
-    * clock_t
-    * time_t
-    * CLOCK_REALTIME (requires POSIX)
-    * CLOCK_MONOTONIC (requires POSIX)
-    * configurable precision of fraction of seconds (mili, micro, nano)
+  * clock_t
+  * time_t
+  * CLOCK_REALTIME (requires POSIX)
+  * CLOCK_MONOTONIC (requires POSIX)
+  * configurable precision of fraction of seconds (mili, micro, nano)
+
+* file log rotation based on:
+
+  * file size - limit number of files and their sizes
+  * date - new file is created every day (or hour, or other choosen timeslice)
 
 * print location of printed log (file and line)
 * print function name of printed log (required at least c99)

@@ -107,6 +107,43 @@ int file_synced;
    ========================================================================== */
 
 
+static void el_date_rotate_str
+(
+	struct el *el,
+	char      *out
+)
+{
+	const char *dfmt;
+	time_t now;
+	struct tm *tmp;
+	struct tm tm;
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+	switch (el->frotate_type)
+	{
+	case EL_ROT_DATE_YEAR: dfmt = "%Y"; break;
+	case EL_ROT_DATE_MON:  dfmt = "%Y-%m"; break;
+	case EL_ROT_DATE_DAY:  dfmt = "%Y-%m-%d"; break;
+	case EL_ROT_DATE_HOUR: dfmt = "%Y-%m-%d--%H"; break;
+	case EL_ROT_DATE_MIN:  dfmt = "%Y-%m-%d--%H-%M"; break;
+	case EL_ROT_DATE_SEC:  dfmt = "%Y-%m-%d--%H-%M-%S"; break;
+	}
+
+	now = time(NULL);
+#if ENABLE_REENTRANT
+	tmp = gmtime_r(&now, &tm);
+#else
+	tmp = gmtime(&now);
+#endif
+
+	/* Construct date format from current UTC time, we are
+	 * working on static variables, so we know it won't fail
+	 * or overflow timstr buffer */
+	strftime(out, 21, dfmt, tmp);
+}
+
+
 /* ==========================================================================
     Checks if file at "path" exists. Functions tries fastests method first,
     and slower last.
@@ -305,18 +342,34 @@ int el_file_open
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-	/* we need current_log filename for ourself - we modify its
-	 * last digit when we rotate file. In theory this could be
-	 * done in struct declaration, but PATH_MAX is such a waste
-	 * of memory and programs usually do not get even close to
-	 * that ammount. Allocate enough memory for fname and max
-	 * of 5 digits for rotate + null character */
-	pathlen = strlen(el->fname) + 6;
+	/* we need current_log filename for ourself - we modify it when
+	 * we rotate file. In theory this could be done in struct
+	 * declaration, but PATH_MAX is such a waste of memory and
+	 * programs usually do not get even close to that amount. So we
+	 * just add what is necessary. */
 
-	 /* realloc needs to be done each time open() is called, in
-	 * case log file is being changed via EL_FPATH option.  */
-	el->fcurrent_log = realloc(el->fcurrent_log, pathlen);
-	VALID(ENOMEM, el->fcurrent_log != NULL)
+	/* pathlen must be with null termination character, as this
+	 * variable is passed to snprintf() */
+	pathlen = strlen(el->fname) + 1;
+
+	if (el->frotate_type == EL_ROT_FSIZE)
+		/* Allocate enough memory for fname and max of 5 digits for
+		 * rotate + 1 for separator dot */
+		pathlen += 5 + 1;
+	else if (EL_IS_ROT_DATE(el))
+		/* if we are doing date base rotation, maximum additional
+		 * file length will be strlen(YYYY-mm-dd--HH-MM-SS) = 20 */
+		pathlen += 20 + 1;
+
+	if (el->fcurrent_log == NULL || pathlen > strlen(el->fcurrent_log))
+	{
+		/* If new pathlen is larger than length of current log file,
+		 * than we need to allocate more memory. If we never opened
+		 * file before, fcurrent_log will be NULL, in which case
+		 * we also must allocate memory */
+		el->fcurrent_log = realloc(el->fcurrent_log, pathlen);
+		VALID(ENOMEM, el->fcurrent_log != NULL)
+	}
 
 	if (el->file)
 	{
@@ -328,7 +381,10 @@ int el_file_open
 		el->file = NULL;
 	}
 
-	if (el->frotate_number)
+	/* We are opening new file, so we don't have current log file. */
+	el->fcurrent_log[0] = '\0';
+
+	if (el->frotate_type == EL_ROT_FSIZE && el->frotate_number)
 	{
 		FILE   *f;      /* opened file */
 		int     i;      /* simple interator for loop */
@@ -471,7 +527,36 @@ int el_file_open
 		}
 	}
 
-	/* rotation is disabled, simply open file with append flag */
+	if (EL_IS_ROT_DATE(el))
+	{
+		/* We are rotating by date. This it not as complex case
+		 * as with rotate by size, we just open file with current
+		 * date (based on rotate timescale */
+
+		char timstr[20 + 1];
+		size_t     pathl;      /* length of path after snprintf */
+		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+		el_date_rotate_str(el, timstr);
+
+		/* Construct file name with selected date rotation in format
+		 * user-filename.$date */
+		pathl = snprintf(el->fcurrent_log, pathlen, "%s.%s", el->fname, timstr);
+		if (pathl > PATH_MAX)
+		{
+			/* path is too long, we cannot safely create file
+			 * with suffix, return error as opening such
+			 * truncated file name could result in some data
+			 * lose on the disk.  */
+			el->fcurrent_log[0] = '\0';
+			errno = ENAMETOOLONG;
+			return -1;
+		}
+	}
+
+	/* rotation is disabled or we deal with date rotation, simply
+	 * open file with append flag */
 
 	if (strlen(el->fname) > pathlen)
 	{
@@ -481,7 +566,10 @@ int el_file_open
 		return -1;
 	}
 
-	strcpy(el->fcurrent_log, el->fname);
+	/* fcurrent log might have been already set (in date rotation),
+	 * so set fcurrent_log only when it was not already set */
+	if (el->fcurrent_log[0] == '\0')
+		strcpy(el->fcurrent_log, el->fname);
 
 	/* in case we couldn't open file, don't set clear
 	 * el->fcurrent_log - we will try to reopen this file each time
@@ -603,7 +691,7 @@ int el_file_putb
 		if (el_file_open(el) != 0)
 			return -1;
 
-	if (el->frotate_number)
+	if (el->frotate_type == EL_ROT_FSIZE && el->frotate_number)
 	{
 		/* we get here only when frotate is enabled. check if
 		 * writing to current file would result in exceding
@@ -620,6 +708,32 @@ int el_file_putb
 		 * configured frotate_size */
 		if (mlen > el->frotate_size)
 			mlen = el->frotate_size;
+	}
+
+	if (EL_IS_ROT_DATE(el))
+	{
+		/* If we are date rotating, check it time has come
+		 * to rotate the file. And by rotate I simply mean
+		 * open new file with new date. */
+
+		char        timstr[20 + 1];
+		const char *file_timstr;
+		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+		/* get current rotate time that should be */
+		el_date_rotate_str(el, timstr);
+		/* point file_timestr to beginning of date rotate suffix.
+		 * for file log.2024-01-01, it will point to 2024-01-01 */
+		file_timstr = el->fname + strlen(el->fname) + 1;
+
+		/* If timstr (current, now, value) is different than
+		 * file_timstr (currently opened file), it means that
+		 * second, minut, hour, day... has changed, and we need to
+		 * open new file */
+		if (strcmp(timstr, file_timstr))
+			if (el_file_open(el))
+				return -1;
 	}
 
 	if (fwrite(mem, mlen, 1, el->file) != 1) return -1;

@@ -163,17 +163,11 @@ static void test_cleanup(void)
 	unlink(WORKDIR"/log");
 	unlink(WORKDIR"/log-another");
 
-	for (i = 0; i != 5; ++i)
-	{
-		char path1[PATH_MAX] = WORKDIR"/log.";
-		char path2[PATH_MAX] = WORKDIR"/log-another.";
-		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	/* We may have different files, with different dates. Go lazy
+	 * route and remove them with system call */
 
-		path1[strlen(path1)] = '0' + i;
-		path2[strlen(path2)] = '0' + i;
-		unlink(path1);
-		unlink(path2);
-	}
+	/* WORKDIR is statically set, and we don't remove recursive */
+	system("rm -f "WORKDIR"/*");
 
 	el_cleanup();
 }
@@ -2006,8 +2000,9 @@ static void file_print_threaded(void)
    ========================================================================== */
 static void options_f_enable_file_log(void)
 {
-	mt_fok(el_enable_file_log(WORKDIR"/log", 25, 4326));
-	mt_fail(g_el.frotate_number == 25);
+	mt_fok(el_enable_file_log(WORKDIR"/log", 4, 4326));
+	mt_fail(g_el.frotate_type == EL_ROT_FSIZE);
+	mt_fail(g_el.frotate_number == 4);
 	mt_fail(g_el.frotate_size == 4326);
 }
 
@@ -2018,6 +2013,7 @@ static void options_f_enable_file_log_no_rotate(void)
 {
 	long old_rotate = g_el.frotate_size;
 	mt_fok(el_enable_file_log(WORKDIR"/log", 0, 0));
+	mt_fail(g_el.frotate_type == EL_ROT_OFF);
 	mt_fail(g_el.frotate_number == 0);
 	mt_fail(g_el.frotate_size == old_rotate);
 }
@@ -2028,6 +2024,219 @@ static void options_f_enable_file_log_no_rotate(void)
 static void options_f_enable_file_log_rotate_no_size(void)
 {
 	mt_ferr(el_enable_file_log(WORKDIR"/log", 2, 0), EINVAL);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void options_f_enable_file_log_date_rotate(void)
+{
+	mt_fok(el_enable_file_log(WORKDIR"/log", EL_ROT_DATE_SEC, 0));
+	mt_fail(g_el.frotate_type == EL_ROT_DATE_SEC);
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void file_date_rotate_seconds(void)
+{
+	setenv("FAKETIME", "2000-01-01 00:00:00", 1);
+	el_option(EL_FROTATE_DATE, EL_ROT_DATE_SEC);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-01 00:00:01", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-01 00:00:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-01 00:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2001-01-01 00:00:02", 1);
+	el_puts(s1);
+
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--00-00-00", s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--00-00-01", s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--00-00-02", s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--00-01-02", s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2001-01-01--00-00-02", s1));
+
+	unsetenv("FAKETIME");
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void file_date_rotate_minute(void)
+{
+	setenv("FAKETIME", "2000-01-01 00:00:00", 1);
+	el_option(EL_FROTATE_DATE, EL_ROT_DATE_MIN);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:00:01", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:00:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-01 00:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:01:02", 1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:01:32", 1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-02 00:01:32", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--00-00", s1 s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--00-01", s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-02--00-01", s1 s1));
+
+	unsetenv("FAKETIME");
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void file_date_rotate_hour(void)
+{
+	setenv("FAKETIME", "2000-01-01 00:00:00", 1);
+	el_option(EL_FROTATE_DATE, EL_ROT_DATE_HOUR);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:00:01", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-01 03:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 03:01:02", 1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 03:01:32", 1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-02 03:01:32", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--00", s1 s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-01--03", s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-02--03", s1 s1));
+
+	unsetenv("FAKETIME");
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void file_date_rotate_day(void)
+{
+	setenv("FAKETIME", "2000-01-01 00:00:00", 1);
+	el_option(EL_FROTATE_DATE, EL_ROT_DATE_DAY);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:00:01", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 00:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-01-04 03:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-04 03:01:02", 1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-04 03:01:32", 1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-02-04 03:01:32", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	mt_fok(file_check(WORKDIR"/log.2000-01-01", s1 s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-01-04", s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-02-04", s1 s1));
+
+	unsetenv("FAKETIME");
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void file_date_rotate_month(void)
+{
+	setenv("FAKETIME", "2000-01-01 00:00:00", 1);
+	el_option(EL_FROTATE_DATE, EL_ROT_DATE_MON);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 10:00:01", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-02 00:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2000-10-04 03:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-10-04 03:01:02", 1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-10-04 03:01:32", 1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2001-10-04 03:01:32", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	mt_fok(file_check(WORKDIR"/log.2000-01", s1 s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2000-10", s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2001-10", s1 s1));
+
+	unsetenv("FAKETIME");
+}
+
+
+/* ==========================================================================
+   ========================================================================== */
+static void file_date_rotate_year(void)
+{
+	setenv("FAKETIME", "2000-01-01 00:00:00", 1);
+	el_option(EL_FROTATE_DATE, EL_ROT_DATE_YEAR);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-01 10:00:01", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2000-01-02 00:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2003-10-04 03:01:02", 1);
+	el_puts(s1);
+	el_puts(s1);
+	setenv("FAKETIME", "2003-10-04 03:01:02", 1);
+	el_puts(s1);
+	setenv("FAKETIME", "2003-10-04 03:01:32", 1);
+	el_puts(s1);
+
+	setenv("FAKETIME", "2004-10-04 03:01:32", 1);
+	el_puts(s1);
+	el_puts(s1);
+
+	mt_fok(file_check(WORKDIR"/log.2000", s1 s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2003", s1 s1 s1 s1));
+	mt_fok(file_check(WORKDIR"/log.2004", s1 s1));
+
+	unsetenv("FAKETIME");
 }
 
 
@@ -2098,6 +2307,7 @@ void el_file_test_group(void)
 	mt_run(file_and_directory_reapear);
 	mt_run(file_filename_too_long);
 	mt_run(file_path_too_long);
+
 	mt_run(file_rotate_1_no_rotate);
 	mt_run(file_rotate_1_exact_print);
 	mt_run(file_rotate_1_overflow_but_no_rotate);
@@ -2139,6 +2349,13 @@ void el_file_test_group(void)
 	mt_run(options_f_enable_file_log);
 	mt_run(options_f_enable_file_log_no_rotate);
 	mt_run(options_f_enable_file_log_rotate_no_size);
+	mt_run(options_f_enable_file_log_date_rotate);
+	mt_run(file_date_rotate_seconds);
+	mt_run(file_date_rotate_minute);
+	mt_run(file_date_rotate_hour);
+	mt_run(file_date_rotate_day);
+	mt_run(file_date_rotate_month);
+	mt_run(file_date_rotate_year);
 #ifdef RUN_TESTS
 	mt_run(file_sync_always);
 	mt_run(file_sync_periodic);

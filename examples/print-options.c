@@ -35,6 +35,7 @@ int main(void)
 	el_print(ELD, "These options are enough for vast majority of use cases. "
 			"But it more fine tuning is necessary, you can always use "
 			"el_option(3) function, to really fine tune your experience");
+	el_puts("log");
 
 	el_set_timestamp(EL_TS_OFF, 0, 0);
 	el_print_extra_info(0);

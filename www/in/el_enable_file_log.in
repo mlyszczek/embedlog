@@ -8,19 +8,27 @@ SYNOPSIS
 
    #include <embedlog.h>
 
-   int el_enable_file_log(const char *path, unsigned short rotate_number,
+   int el_enable_file_log(const char *path, int rotate_number,
        long rotate_size);
 
    int el_oenable_file_log(struct el *el, const char *path,
-       unsigned short rotate_number, long rotate_size);
+       int rotate_number, long rotate_size);
 
 DESCRIPTION
 -----------
 This function will do multiple things. First it will configure log rotation.
 
+If you want to have limited number of files with limited size, you can
+specify log rotation in these values.
+
 .. include:: /in/el_frotate_number.desc
 
 .. include:: /in/el_frotate_size.desc
+
+If you want date log rotation, in place of *rotate_number* pass
+``enum el_option_rotate``.
+
+.. include:: /in/el_frotate_date.desc
 
 Next it will try to open file specified by *path*
 
@@ -43,7 +51,10 @@ EXAMPLES
     * directory where file.log is specified.
     *
     * In this case, file.log will always be a symlink to newest file */
-   el_enable_file_log("/var/log/progname/file.log", 10, )
+   el_enable_file_log("/var/log/progname/file.log", 10, 1024 * 1024)
+
+   /* Enable date log rotation. Once per day new file will be created */
+   el_enable_file_log("/var/log/progname/file.log", EL_ROT_DATE_DAY, 0)
 
 RETURN VALUE
 ------------
@@ -51,4 +62,10 @@ RETURN VALUE
 
 ERRORS
 ------
-.. include:: /in/el_fpath.err
+EINVAL
+   Input parameter is invalid
+ENAMETOOLONG
+   File name is too long
+
+Function can also fail and set errno for any of the errors specified for the
+routing fopen(3)

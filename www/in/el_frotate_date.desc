@@ -1,0 +1,50 @@
+**EL_FROTATE_DATE** enables log rotation based on date. When log is printed,
+**embedlog** checks if *timeslice* has passed. If so, a new file with
+new date will be opened.
+
+There is no file limit size in this mode. If you set rotation to happen once
+per day, log ``logfile.2024-03-01`` may be only 100kB, but next day
+``logfile.2024-03-02`` may be 1GB in size.  Program does not remove files in
+this mode
+
+If not log has heppend within configured timeslice, no empty files will be
+created, program wil just jump to newest date.
+
+For example, if *timeslice* is set to **EL_ROT_DATE_MIN**, new file will
+be created each time minute advances and new log is printed in that new minute.
+
+There are 6 possible timeslices.
+
++----------------------+------------------------------------+
+| timeslice            | example rotated output             |
++======================+====================================+
+| ``EL_ROT_DATE_SEC``  | | ``logname.2024-03-01--15-04-23`` |
+|                      | | ``logname.2024-03-01--15-04-24`` |
+|                      | | ``logname.2024-03-01--15-04-25`` |
+|                      | | ``logname.2024-03-01--15-04-36`` |
++----------------------+------------------------------------+
+| ``EL_ROT_DATE_MIN``  | | ``logname.2024-03-01--15-04``    |
+|                      | | ``logname.2024-03-01--15-05``    |
+|                      | | ``logname.2024-03-01--15-06``    |
+|                      | | ``logname.2024-03-01--15-08``    |
++----------------------+------------------------------------+
+| ``EL_ROT_DATE_HOUR`` | | ``logname.2024-03-01--15``       |
+|                      | | ``logname.2024-03-01--16``       |
+|                      | | ``logname.2024-03-01--18``       |
+|                      | | ``logname.2024-03-02--01``       |
++----------------------+------------------------------------+
+| ``EL_ROT_DATE_DAY``  | | ``logname.2024-03-01``           |
+|                      | | ``logname.2024-03-02``           |
+|                      | | ``logname.2024-03-03``           |
+|                      | | ``logname.2024-03-08``           |
++----------------------+------------------------------------+
+| ``EL_ROT_DATE_MON``  | | ``logname.2024-03``              |
+|                      | | ``logname.2024-04``              |
+|                      | | ``logname.2024-10``              |
+|                      | | ``logname.2024-12``              |
++----------------------+------------------------------------+
+| ``EL_ROT_DATE_YEAR`` | | ``logname.2024``                 |
+|                      | | ``logname.2025``                 |
+|                      | | ``logname.2026``                 |
+|                      | | ``logname.2028``                 |
++----------------------+------------------------------------+

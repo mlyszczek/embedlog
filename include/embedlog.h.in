@@ -131,6 +131,7 @@ enum el_option
 	EL_FROTATE_NUMBER = 14,
 	EL_FROTATE_SIZE   = 15,
 	EL_FROTATE_SYMLINK= 19,
+	EL_FROTATE_DATE   = 21,
 	EL_FSYNC_EVERY    = 16,
 	EL_FSYNC_LEVEL    = 17,
 	EL_FILE_SYNC_EVERY= 16,  /* deprecated */
@@ -142,7 +143,7 @@ enum el_option
 	/* internal use only, should represent number of options, if
 	 * you add option, increment this by one (or by the number of
 	 * options you add). */
-	EL_OPT_ERROR      = 21
+	EL_OPT_ERROR      = 22
 };
 
 enum el_option_timestamp
@@ -183,6 +184,27 @@ enum el_option_timestamp_fractions
 
 	EL_TS_FRACT_ERROR = 4
 };
+
+enum el_option_rotate
+{
+	/* Date related rotation. Strangely enough, these are negative
+	 * so that el_enable_file_log can distinguish between size
+	 * rotation and date rotation. */
+	EL_ROT_DATE_SEC  = -6,
+	EL_ROT_DATE_MIN  = -5,
+	EL_ROT_DATE_HOUR = -4,
+	EL_ROT_DATE_DAY  = -3,
+	EL_ROT_DATE_MON  = -2,
+	EL_ROT_DATE_YEAR = -1,
+
+	EL_ROT_OFF        = 0,
+
+	/* Rotate by file size */
+	EL_ROT_FSIZE      = 1,
+};
+
+#define EL_IS_ROT_DATE(el) ((el)->frotate_type <= EL_ROT_DATE_YEAR && \
+		(el)->frotate_type >= EL_ROT_DATE_SEC)
 
 /* Definition of binary format for flags */
 #define EL_FLAG_TS             (0x01)
@@ -232,6 +254,8 @@ struct el
 	unsigned int    fsync_level:3;
 	unsigned int    frotate_symlink:1;
 	unsigned int    frotate_number_count:3;
+	signed char     frotate_type;
+	unsigned short  frotate_datewatch;
 	unsigned short  frotate_number;
 	unsigned short  fcurrent_rotate;
 	unsigned long   frotate_size;
@@ -322,8 +346,7 @@ int el_set_timestamp(enum el_option_timestamp timestamp,
 int el_enable_colors(int enable);
 int el_print_extra_info(int print);
 int el_set_custom_put(el_custom_put clbk, void *user);
-int el_enable_file_log(const char *path, unsigned short rotate_number,
-		long rotate_size);
+int el_enable_file_log(const char *path, int rotate_number, long rotate_size);
 int el_set_file_sync(long sync_every, enum el_level level);
 int el_set_tty_dev(const char *dev, unsigned speed);
 int el_enable_thread_safe(int enable);
@@ -339,7 +362,7 @@ int el_oenable_colors(struct el *el, int enable);
 int el_oprint_extra_info(struct el *el, int print);
 int el_oset_custom_put(struct el *el, el_custom_put clbk, void *user);
 int el_oenable_file_log(struct el *el, const char *path,
-		unsigned short rotate_number, long rotate_size);
+		int rotate_number, long rotate_size);
 int el_oset_file_sync(struct el *el, long sync_every, enum el_level level);
 int el_oset_tty_dev(struct el *el, const char *dev, unsigned speed);
 int el_oenable_thread_safe(struct el *el, int enable);

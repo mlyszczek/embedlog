@@ -1,6 +1,6 @@
-If set to 0, file rotation will be disabled and logs will be printed
-into specified file without size limit. The only size limit is the
-one presented by the filesystem and architecture.
+If **FROTATE_NUMBER** is set to 0, file rotation will be disabled and logs
+will be printed into specified file without size limit. The only size limit
+is the one presented by the filesystem and architecture.
 
 If this value is bigger than 0, file rotation will be enabled. All
 files will have suffixes added to name set in EL_FPATH. For example,
@@ -20,3 +20,14 @@ padded zeroes depends in *number* passed. For bigger than 10 it will
 be 1 zero, for bigger than 100 it will be 0 zeroes and so on. This is
 done to ease up sorting when one would want to concat all files with
 one simple **cat \***.
+
+Example file listing after multiple rotations may look like this::
+
+   $ ls -l /tmp/embedlog-example
+   total 20K
+   lrwxrwxrwx 1 lm- family   5 mar  1 19:50 log -> log.4
+   -rw-r----- 1 lm- family 496 mar  1 19:50 log.0
+   -rw-r----- 1 lm- family 470 mar  1 19:50 log.1
+   -rw-r----- 1 lm- family 496 mar  1 19:50 log.2
+   -rw-r----- 1 lm- family 470 mar  1 19:50 log.3
+   -rw-r----- 1 lm- family 496 mar  1 19:50 log.4
