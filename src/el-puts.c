@@ -18,15 +18,11 @@
                 | |   | |
                 |m|   |m|
    ==========================================================================
-          _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
        / // / / // /__ / // /_/ // /_/ //  __/  / __// // //  __/(__  )
       /_//_/ /_/ \___//_/ \__,_/ \__,_/ \___/  /_/  /_//_/ \___//____/
-
    ========================================================================== */
-
-
 #include "el-private.h"
 
 #include <errno.h>
@@ -35,21 +31,15 @@
 
 
 /* ==========================================================================
-                       __     __ _          ____
         ____   __  __ / /_   / /(_)_____   / __/__  __ ____   _____ _____
        / __ \ / / / // __ \ / // // ___/  / /_ / / / // __ \ / ___// ___/
       / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
      / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
     /_/
-   ========================================================================== */
-
-
-/* ==========================================================================
+   ==========================================================================
     puts string 's' to all enabled output facilities specified by default
     el object
    ========================================================================== */
-
-
 /* public api */ int el_puts
 (
 	const char  *s  /* string to put into output */
@@ -62,8 +52,6 @@
 /* ==========================================================================
     Just like el_oputs_nb() but can lock mutex.
    ========================================================================== */
-
-
 /* public api */ int el_oputs
 (
 	struct el   *el,   /* el defining printing style */
@@ -86,8 +74,6 @@
     puts string 's' to all enabled output facilities specified by el. Does
     not do any locking, thus _nb (non blocking).
    ========================================================================== */
-
-
 int el_oputs_nb
 (
 	struct el   *el,  /* el defining printing style */
@@ -147,8 +133,6 @@ int el_oputs_nb
     puts memory 'mem' to all supported output facilities specified by
     default el object. Not all outputs support printing binary data
    ========================================================================== */
-
-
 /* public api */ int el_putb
 (
 	const void  *mem,  /* memory location to 'print' */
@@ -162,8 +146,6 @@ int el_oputs_nb
 /* ==========================================================================
     Just like el_oputb_nb() but also can perform pthread locking.
    ========================================================================== */
-
-
 /* public api */ int el_oputb
 (
 	struct el   *el,   /* el defining printing style */
@@ -188,8 +170,6 @@ int el_oputs_nb
 
     This functions does not do any locking - thus _nb (non blocking).
    ========================================================================== */
-
-
 int el_oputb_nb
 (
 	struct el   *el,      /* el defining printing style */

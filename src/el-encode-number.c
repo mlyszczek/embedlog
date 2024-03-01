@@ -23,10 +23,7 @@
       / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
      / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
     /_/
-   ========================================================================== */
-
-
-/* ==========================================================================
+   ==========================================================================
     This will code 'number' to into as small buffer as possible. Each byte
     of encoded value can hold 7 bits of data and 1 bit (oldest) of
     continuation information. If continuation bit is set, that means next
@@ -37,8 +34,6 @@
 
     returns number of bytes stored into 'out' buffer.
    ========================================================================== */
-
-
 size_t el_encode_number
 (
 #ifdef LLONG_MAX
@@ -59,8 +54,7 @@ size_t el_encode_number
 	do
 	{
 		/* put only youngest 7 bits into out -
-		 * that's a max number single byte can
-		 * hold */
+		 * that's a max number single byte can hold */
 		o[n] = number & 0x7f;
 
 		/* remove those 7 bits from number, they

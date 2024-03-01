@@ -2,7 +2,6 @@
     Licensed under BSD 2clause license See LICENSE file for more information
     Author: Michał Łyszczek <michal.lyszczek@bofc.pl>
    ========================================================================== */
-
 #ifndef EL_PRIVATE_H
 #define EL_PRIVATE_H 1
 
@@ -25,15 +24,11 @@ int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
 
 
 /* ==========================================================================
-          _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
        / // / / // /__ / // /_/ // /_/ //  __/  / __// // //  __/(__  )
       /_//_/ /_/ \___//_/ \__,_/ \__,_/ \___/  /_/  /_//_/ \___//____/
-
    ========================================================================== */
-
-
 #include "embedlog.h"
 #include "valid.h"
 
@@ -45,30 +40,23 @@ int vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
 
 
 /* ==========================================================================
-                  __        __            __
           ____ _ / /____   / /_   ____ _ / /  _   __ ____ _ _____ _____
          / __ `// // __ \ / __ \ / __ `// /  | | / // __ `// ___// ___/
         / /_/ // // /_/ // /_/ // /_/ // /   | |/ // /_/ // /   (__  )
         \__, //_/ \____//_.___/ \__,_//_/    |___/ \__,_//_/   /____/
        /____/
    ========================================================================== */
-
-
 extern struct el g_el;
 
 
 /* ==========================================================================
-                                       __                 __
             _____ ____   ____   _____ / /_ ____ _ ____   / /_ _____
            / ___// __ \ / __ \ / ___// __// __ `// __ \ / __// ___/
           / /__ / /_/ // / / /(__  )/ /_ / /_/ // / / // /_ (__  )
           \___/ \____//_/ /_//____/ \__/ \__,_//_/ /_/ \__//____/
-
    ========================================================================== */
 
-
 /* ==== defines for el_pmemory function ===================================== */
-
 
 /* ==========================================================================
     single line of el_pmemory will be similar to this
@@ -80,16 +68,12 @@ extern struct el g_el;
 /* ==========================================================================
     this defines length of "0xNNNN  " part.
    ========================================================================== */
-
-
 #define EL_MEM_OFFSET_LEN 8
 
 
 /* ==========================================================================
     length of the "HH " part
    ========================================================================== */
-
-
 #define EL_MEM_SINGLE_HEX_LEN 3
 
 
@@ -98,8 +82,6 @@ extern struct el g_el;
     compilation to tune the output. We add +3 for possible spacing after
     8 printed bytes.
    ========================================================================== */
-
-
 #define EL_MEM_HEX_LEN (EL_MEM_SINGLE_HEX_LEN * (EL_MEM_LINE_SIZE) + 3)
 
 
@@ -107,13 +89,10 @@ extern struct el g_el;
     length of all "C" characters. We add +3 for possible spacing after
     8 printed bytes.
    ========================================================================== */
-
-
 #define EL_MEM_CHAR_LEN (EL_MEM_LINE_SIZE + 3)
 
 
 /* ==== defines for el_print function ======================================= */
-
 
 /* ==========================================================================
     length of long timestamp in a single log. Timestamp format is
@@ -122,8 +101,6 @@ extern struct el g_el;
 
     which is 21 bytes long
    ========================================================================== */
-
-
 #define EL_PRE_TS_LONG_LEN 21
 
 
@@ -135,8 +112,6 @@ extern struct el g_el;
     which is 12 bytes long. This is maximum value for short timestamp, as it
     can be shorter.
    ========================================================================== */
-
-
 #define EL_PRE_TS_SHORT_LEN 12
 
 
@@ -149,16 +124,12 @@ extern struct el g_el;
 
     [yyyy-mm-dd hh:mm:ss.fffffffff]
    ========================================================================== */
-
-
 #define EL_PRE_TS_FRACT_LEN 10
 
 
 /* ==========================================================================
     Calculate what is the minimum needed length to hold longest timestamp
    ========================================================================== */
-
-
 #if ENABLE_TIMESTAMP
 #   define EL_PRE_TS_MAX (EL_PRE_TS_LONG_LEN + EL_PRE_TS_FRACT_LEN)
 #else
@@ -170,8 +141,6 @@ extern struct el g_el;
     Maximum length of line number. ie, if set to 1, range 0-9 is allowed,
     rendering [source-file.c:5] valid while [source-file.c:13] invalid.
    ========================================================================== */
-
-
 #define EL_PRE_FINFO_LINE_MAX_LEN 7
 
 
@@ -180,8 +149,6 @@ extern struct el g_el;
     EL_PRE_FINFO_LINE_MAX_LEN. So if EL_PRE_FINFO_LINE_MAX_LEN is 2, best to
     define it to 99, when 5 -> 99999.
    ========================================================================== */
-
-
 #define EL_PRE_FINFO_LINE_MAX_NUM 9999999l
 
 
@@ -195,8 +162,6 @@ extern struct el g_el;
     during compilation to suite users needs, 3 is for special characters
     "[:]". EL_PRE_FINFO_LINE_MAX_LEN can be redefined to any value.
    ========================================================================== */
-
-
 #if ENABLE_FINFO
 #   define EL_PRE_FINFO_LEN ((EL_FLEN_MAX) + 3 + EL_PRE_FINFO_LINE_MAX_LEN)
 #else
@@ -218,8 +183,6 @@ extern struct el g_el;
 
     EL_FUNCLEN_MAX is defined during compilation.
    ========================================================================== */
-
-
 #if ENABLE_FUNCINFO
 #   define EL_PRE_FUNCINFO_LEN ((EL_FUNCLEN_MAX) + 2 + 1 + 1)
 #else
@@ -233,8 +196,6 @@ extern struct el g_el;
     a situation where another preamble (like timestamp) is printed before
     level, and we need to delimiter them with space
    ========================================================================== */
-
-
 #define EL_PRE_LEVEL_LEN 3
 
 
@@ -243,8 +204,6 @@ extern struct el g_el;
 
         [2017-05-24 14:43:10.123456][source-file.c:12345:function()] e/prefix
    ========================================================================== */
-
-
 #if ENABLE_PREFIX
 #   define EL_PREFIX_LEN EL_PREFIX_MAX
 #else
@@ -260,8 +219,6 @@ extern struct el g_el;
     start coloring output, and 4 characters are neede to reset terminal
     color to default
    ========================================================================== */
-
-
 #if ENABLE_COLORS
 #   define EL_COLORS_LEN (5 + 4)
 #else
@@ -274,16 +231,12 @@ extern struct el g_el;
     defines length of final output not format. So "%s" can take even 100
     bytes. EL_LOG_MAX is defined externally during compilation.
    ========================================================================== */
-
-
 #define EL_BUF_MAX (EL_PRE_LEN + (EL_LOG_MAX) + EL_COLORS_LEN)
 
 
 /* ==========================================================================
     Defines if timestamp should be stored into buffer as string or binary
    ========================================================================== */
-
-
 #define TS_STRING (0)
 #define TS_BINARY (1)
 
@@ -297,22 +250,16 @@ extern struct el g_el;
     another check). This is basically an bitwise OR of all fields in enum
     el_output
    ========================================================================== */
-
-
 #define ALL_OUTS (EL_OUT_STDERR | EL_OUT_STDOUT | EL_OUT_SYSLOG | \
     EL_OUT_FILE | EL_OUT_NET | EL_OUT_TTY | EL_OUT_CUSTOM)
 
 
 /* ==========================================================================
-               ____                     __   _
               / __/__  __ ____   _____ / /_ (_)____   ____   _____
              / /_ / / / // __ \ / ___// __// // __ \ / __ \ / ___/
             / __// /_/ // / / // /__ / /_ / // /_/ // / / /(__  )
            /_/   \__,_//_/ /_/ \___/ \__//_/ \____//_/ /_//____/
-
    ========================================================================== */
-
-
 #if ENABLE_OUT_FILE
 int el_file_open(struct el *el);
 int el_file_puts(struct el *el, const char *s);
@@ -321,7 +268,7 @@ void el_file_cleanup(struct el *el);
 int el_file_flush(struct el *el);
 #endif
 
-    
+
 int el_oputb_nb(struct el *el, const void *mem, size_t mlen);
 int el_oputs_nb(struct el *el, const char *s);
 int el_ovprint_nb(const char *file, size_t num, const char *func,

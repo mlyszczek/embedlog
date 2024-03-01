@@ -29,15 +29,11 @@
                         \XXXXXXXXXXXXXXXXXXXXXXXXXX/
                           ""VXXXXXXXXXXXXXXXXXXV""
    ==========================================================================
-          _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
        / // / / // /__ / // /_/ // /_/ //  __/  / __// // //  __/(__  )
       /_//_/ /_/ \___//_/ \__,_/ \__,_/ \___/  /_/  /_//_/ \___//____/
-
    ========================================================================== */
-
-
 #include "el-private.h"
 
 #include <time.h>
@@ -46,8 +42,6 @@
 /* ==========================================================================
     returns seconds and nanoseconds calculated from clock() function
    ========================================================================== */
-
-
 #if ENABLE_TIMESTAMP
 #if ENABLE_CLOCK
 
@@ -75,8 +69,6 @@ static void el_ts_clock
 /* ==========================================================================
     returns seconds and nanoseconds calculated from time() function.
    ========================================================================== */
-
-
 #if ENABLE_TIMESTAMP
 
 static void el_ts_time
@@ -91,11 +83,10 @@ static void el_ts_time
 
 #endif /* ENABLE_TIMESTAMP */
 
+
 /* ==========================================================================
     returns seconds and nanoseconds calculated from clock_gettime function
    ========================================================================== */
-
-
 #if ENABLE_TIMESTAMP
 #if ENABLE_REALTIME || ENABLE_MONOTONIC
 
@@ -125,8 +116,6 @@ static void el_ts_clock_gettime
     number of bytes copied to 'buf'. If timestamp has been disabled during
     compilation time or in runtime during settings, function will return 0.
    ========================================================================== */
-
-
 size_t el_timestamp
 (
 	struct el  *el,     /* el defining printing style */
@@ -185,8 +174,7 @@ size_t el_timestamp
 
 	if (binary)
 	{
-		/* put encoded seconds timestamp in buf
-		*/
+		/* put encoded seconds timestamp in buf */
 
 #       ifdef LLONG_MAX
 		tl = el_encode_number((unsigned long long)s, (unsigned char *)buf);

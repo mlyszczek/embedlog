@@ -26,15 +26,11 @@
 
                     COW-OPERATION
    ==========================================================================
-          _               __            __         ____ _  __
          (_)____   _____ / /__  __ ____/ /___     / __/(_)/ /___   _____
         / // __ \ / ___// // / / // __  // _ \   / /_ / // // _ \ / ___/
        / // / / // /__ / // /_/ // /_/ //  __/  / __// // //  __/(__  )
       /_//_/ /_/ \___//_/ \__,_/ \__,_/ \___/  /_/  /_//_/ \___//____/
-
    ========================================================================== */
-
-
 #include "el-private.h"
 #include "el-utils.h"
 
@@ -56,41 +52,31 @@
 
 
 /* ==========================================================================
-                  __        __            __
           ____ _ / /____   / /_   ____ _ / /  _   __ ____ _ _____ _____
          / __ `// // __ \ / __ \ / __ `// /  | | / // __ `// ___// ___/
         / /_/ // // /_/ // /_/ // /_/ // /   | |/ // /_/ // /   (__  )
         \__, //_/ \____//_.___/ \__,_//_/    |___/ \__,_//_/   /____/
        /____/
    ========================================================================== */
-
-
 #ifdef RUN_TESTS
 
 /* there is no easy way to check if file has been fsynced to disk
  * or not, so we introduce this helper variable to know if we
- * executed syncing code or not
- */
+ * executed syncing code or not */
 int file_synced;
 
 #endif
 
 
 /* ==========================================================================
-          __             __                     __   _
      ____/ /___   _____ / /____ _ _____ ____ _ / /_ (_)____   ____   _____
     / __  // _ \ / ___// // __ `// ___// __ `// __// // __ \ / __ \ / ___/
    / /_/ //  __// /__ / // /_/ // /   / /_/ // /_ / // /_/ // / / /(__  )
    \__,_/ \___/ \___//_/ \__,_//_/    \__,_/ \__//_/ \____//_/ /_//____/
-
    ========================================================================== */
-
-
 #ifndef PATH_MAX
-/*
- * for systems that don't define PATH_MAX we use our MAX_PATH macro that  is
- * defined in config.h during ./configure process
- */
+/* for systems that don't define PATH_MAX we use our MAX_PATH macro that is
+ * defined in config.h during ./configure process */
 
 #define PATH_MAX MAX_PATH
 
@@ -98,25 +84,27 @@ int file_synced;
 
 
 /* ==========================================================================
-                  _                __           ____
     ____   _____ (_)_   __ ____ _ / /_ ___     / __/__  __ ____   _____ _____
    / __ \ / ___// /| | / // __ `// __// _ \   / /_ / / / // __ \ / ___// ___/
   / /_/ // /   / / | |/ // /_/ // /_ /  __/  / __// /_/ // / / // /__ (__  )
  / .___//_/   /_/  |___/ \__,_/ \__/ \___/  /_/   \__,_//_/ /_/ \___//____/
 /_/
+   ==========================================================================
+    Gets date string for current timeslice for current time.
+
+    So for, timeslice minute, it will save "YYYY-mm-dd--HH-MM" in out.
+    Caller has to make sure $out is at least 21 bytes long.
    ========================================================================== */
-
-
 static void el_date_rotate_str
 (
-	struct el *el,
-	char      *out
+	struct el    *el,   /* el object to work on */
+	char         *out   /* string for rotate postfix will be stored here */
 )
 {
-	const char *dfmt;
-	time_t now;
-	struct tm *tmp;
-	struct tm tm;
+	const char  *dfmt;  /* pointer to string format for strftime */
+	time_t       now;   /* current time since epoch */
+	struct tm   *tmp;   /* usable pointer from gmtime */
+	struct tm    tm;    /* when reentrant is enabled, it's passed to gmtime */
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -152,8 +140,6 @@ static void el_date_rotate_str
             0       file does not exist
             1       file exists
    ========================================================================== */
-
-
 static int el_file_exists
 (
 	const char  *path  /* file to check */
@@ -205,8 +191,6 @@ static int el_file_exists
     Symlink is optional and if it is not created no data is lost and
     returning error would confuse caller.
    ========================================================================== */
-
-
 static void el_symlink_to_newest_log
 (
 	struct el     *el  /* embedlog object to work on */
@@ -229,8 +213,6 @@ static void el_symlink_to_newest_log
     suffixed) function will remove oldest log file and new file will be
     created
     ========================================================================== */
-
-
 static int el_file_rotate
 (
 	struct el     *el
@@ -318,21 +300,15 @@ skip_rotate:
 
 
 /* ==========================================================================
-                       __     __ _          ____
         ____   __  __ / /_   / /(_)_____   / __/__  __ ____   _____ _____
        / __ \ / / / // __ \ / // // ___/  / /_ / / / // __ \ / ___// ___/
       / /_/ // /_/ // /_/ // // // /__   / __// /_/ // / / // /__ (__  )
      / .___/ \__,_//_.___//_//_/ \___/  /_/   \__,_//_/ /_/ \___//____/
     /_/
-   ========================================================================== */
-
-
-/* ==========================================================================
+   ==========================================================================
     opens log file specified in el and sets file position, so we can
     track it.
    ========================================================================== */
-
-
 int el_file_open
 (
 	struct el  *el  /* el object with file information */
@@ -588,8 +564,6 @@ int el_file_open
     Does whatever it takes to make sure that logs are flushed from any
     buffers to physical disk. It's not always possible, but boy, do we try.
    ========================================================================== */
-
-
 int el_file_flush
 (
 	struct el  *el  /* printing options */
@@ -609,8 +583,7 @@ int el_file_flush
 	 * metadata, parent directory might not get flushed and there
 	 * will not be entry for our file - meaning file will be lost
 	 * too, but such situations are ultra rare and there isn't
-	 * really much we can do about it here but praying.
-	 */
+	 * really much we can do about it here but praying. */
 
 #if HAVE_FSYNC && HAVE_FILENO
 
@@ -754,8 +727,6 @@ int el_file_putb
 /* ==========================================================================
     Puts string 's' into file if needed rotates file
    ========================================================================== */
-
-
 int el_file_puts
 (
 	struct el   *el,    /* printing options */
@@ -774,8 +745,6 @@ int el_file_puts
 /* ==========================================================================
     free resources allocated by this module
    ========================================================================== */
-
-
 void el_file_cleanup
 (
 	struct el  *el  /* file options */
