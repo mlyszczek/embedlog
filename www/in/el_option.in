@@ -67,8 +67,80 @@ OPTIONS
 Below is a list of *option* that can be configured. Value inside
 parenthesis determines argument types of variadic arguments *...*
 
+.. list-table::
+   :header-rows: 1
+
+   * - option
+     - arguments
+     - default value
+   * - :ref:`EL_LEVEL <manuals/options/el_option.3:el_level>`
+     - ``enum el_level level``
+     - ``EL_INFO``
+   * - :ref:`EL_OUT <manuals/options/el_option.3:el_out>`
+     - ``enum el_output outputs``
+     - ``EL_OUT_STDERR``
+   * - :ref:`EL_PRINT_NL <manuals/options/el_option.3:el_print_nl>`
+     - ``int nl``
+     - ``1``
+   * - :ref:`EL_PREFIX <manuals/options/el_option.3:el_prefix>`
+     - ``const char *prefix``
+     - ``none``
+   * - :ref:`EL_COLORS <manuals/options/el_option.3:el_colors>`
+     - ``int colors``
+     - ``0``
+   * - :ref:`EL_TS <manuals/options/el_option.3:el_ts>`
+     - ``enum el_option_timestamp timestamp``
+     - ``EL_TS_OFF``
+   * - :ref:`EL_TS_TM <manuals/options/el_option.3:el_ts_tm>`
+     - ``enum el_option_timestamp_timer timer``
+     - ``EL_TS_TM_TIME``
+   * - :ref:`EL_TS_FRACT <manuals/options/el_option.3:el_ts_fract>`
+     - ``enum el_option_timestamp_fraction fraction``
+     - ``EL_TS_FRACT_OFF``
+   * - :ref:`EL_PRINT_LEVEL <manuals/options/el_option.3:el_print_level>`
+     - ``int print``
+     - ``1``
+   * - :ref:`EL_PMEMORY_SPACE <manuals/options/el_option.3:el_pmemory_space>`
+     - ``int spacing``
+     - ``0``
+   * - :ref:`EL_FINFO <manuals/options/el_option.3:el_finfo>`
+     - ``int finfo``
+     - ``0``
+   * - :ref:`EL_FUNCINFO <manuals/options/el_option.3:el_funcinfo>`
+     - ``int funcinfo``
+     - ``0``
+   * - :ref:`EL_CUSTOM_PUT <manuals/options/el_option.3:el_custom_put>`
+     - ``el_custom_put, void *user``
+     - ``NULL``
+   * - :ref:`EL_FPATH <manuals/options/el_option.3:el_fpath>`
+     - ``const char *path``
+     - ``unset``
+   * - :ref:`EL_FROTATE_NUMBER <manuals/options/el_option.3:el_frotate_number>`
+     - ``long number``
+     - ``0``
+   * - :ref:`EL_FROTATE_SYMLINK <manuals/options/el_option.3:el_frotate_symlink>`
+     - ``int enable``
+     - ``1``
+   * - :ref:`EL_FROTATE_SIZE <manuals/options/el_option.3:el_frotate_size>`
+     - ``long size``
+     - ``0``
+   * - :ref:`EL_FSYNC_EVERY <manuals/options/el_option.3:el_fsync_every>`
+     - ``long size``
+     - ``32768``
+   * - :ref:`EL_FSYNC_LEVEL <manuals/options/el_option.3:el_fsync_level>`
+     - ``enum el_level level``
+     - ``EL_FATAL``
+   * - :ref:`EL_TTY_DEV <manuals/options/el_option.3:el_tty_dev>`
+     - ``const char *dev, speed_t speed``
+     - ``unset``
+   * - :ref:`EL_THREAD_SAFE <manuals/options/el_option.3:el_thread_safe>`
+     - ``int safe``
+     - ``0``
+
 --------------------------------------------------------------------------------
 
+EL_LEVEL
+^^^^^^^^
 ``EL_LEVEL (enum el_level level)`` [default: **EL_INFO**]
 
 .. include:: /in/el_level.desc
@@ -86,6 +158,8 @@ parenthesis determines argument types of variadic arguments *...*
 
 --------------------------------------------------------------------------------
 
+EL_OUT
+^^^^^^
 ``EL_OUT (enum el_output outputs)`` [default: **EL_OUT_STDERR**]
 
 .. include:: /in/el_out.desc
@@ -103,6 +177,8 @@ parenthesis determines argument types of variadic arguments *...*
 
 --------------------------------------------------------------------------------
 
+EL_PRINT_NL
+^^^^^^^^^^^
 ``EL_PRINT_NL (int nl)`` [default: **1**]
 
 When enabled, new line marker will be added to each print. If you
@@ -132,6 +208,8 @@ consecutive print calls.
 
 --------------------------------------------------------------------------------
 
+EL_PREFIX
+^^^^^^^^^
 ``EL_PREFIX (const char *prefix)`` [default: **none**]
 
 .. include:: /in/el_prefix.desc
@@ -150,6 +228,8 @@ consecutive print calls.
 
 --------------------------------------------------------------------------------
 
+EL_COLORS
+^^^^^^^^^
 ``EL_COLORS (int colors)`` [default: **0**]
 
 .. include:: /in/el_colors.desc
@@ -158,6 +238,8 @@ consecutive print calls.
 
 --------------------------------------------------------------------------------
 
+EL_TS
+^^^^^
 ``EL_TS (enum el_option_timestamp timestamp)`` [default: **EL_TS_OFF**]
 
 .. include:: /in/el_ts.desc
@@ -184,6 +266,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_TS_TM
+^^^^^^^^
 ``EL_TS_TM (enum el_option_timestamp_timer timer)`` [default: **EL_TS_TM_TIME**]
 
 .. include:: /in/el_ts_tm.desc
@@ -202,6 +286,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_TS_FRACT
+^^^^^^^^^^^
 ``EL_TS_FRACT (enum el_option_timestamp_fraction fraction)`` [default: **EL_TS_FRACT_OFF**]
 
 .. include:: /in/el_ts_fract.desc
@@ -217,6 +303,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_PRINT_LEVEL
+^^^^^^^^^^^^^^
 ``EL_PRINT_LEVEL (int print)`` [default: **1**]
 
 .. include:: /in/el_print_level.desc
@@ -244,6 +332,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_PMEMORY_SPACE
+^^^^^^^^^^^^^^^^
 ``EL_PMEMORY_SPACE (int spacing)`` [default: **0**]
 
 |el_pmemory| prints 16 bytes in a line. **EL_PMEMORY_SPACE** alows to add
@@ -260,6 +350,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FINFO
+^^^^^^^^
 ``EL_FINFO (int finfo)`` [default: **0**]
 
 .. include:: /in/el_finfo.desc
@@ -277,6 +369,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FUNCINFO
+^^^^^^^^^^^
 ``EL_FUNCINFO (int funcinfo)`` [default: **0**]
 
 .. include:: /in/el_funcinfo.desc
@@ -294,6 +388,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_CUSTOM_PUT
+^^^^^^^^^^^^^
 ``EL_CUSTOM_PUT (int (*el_custom_put)(const char *s, size_t slen, void *user), void *user)``
 
 .. include:: /in/el_custom_put.desc
@@ -315,6 +411,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FPATH
+^^^^^^^^
 ``EL_FPATH (const char *path)`` [default: **unset**]
 
 .. include:: /in/el_fpath.desc
@@ -323,6 +421,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FROTATE_NUMBER
+^^^^^^^^^^^^^^^^^
 ``EL_FROTATE_NUMBER (long number)`` [default: **0**]
 
 .. include:: /in/el_frotate_number.desc
@@ -333,6 +433,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FROTATE_SYMLINK
+^^^^^^^^^^^^^^^^^^
 ``EL_FROTATE_SYMLINK (int enable)`` [default: **1**]
 
 When **EL_FROTATE_NUMBER** is bigger than 0, this option is enabled
@@ -360,6 +462,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FROTATE_SIZE
+^^^^^^^^^^^^^^^
 ``EL_FROTATE_SIZE (long size)`` [default: **0**]
 
 .. include:: /in/el_frotate_size.desc
@@ -370,6 +474,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FSYNC_EVERY
+^^^^^^^^^^^^^^
 ``EL_FSYNC_EVERY (long size)`` [default: 32768]
 
 .. include:: /in/el_fsync_every.desc
@@ -380,6 +486,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_FSYNC_LEVEL
+^^^^^^^^^^^^^^
 ``EL_FSYNC_LEVEL (enum el_level level)`` [default: **EL_FATAL**]
 
 .. include:: /in/el_fsync_level.desc
@@ -390,6 +498,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_TTY_DEV
+^^^^^^^^^^
 ``EL_TTY_DEV (const char *dev, speed_t speed)`` [default: **unset**]
 
 .. include:: /in/el_tty.desc
@@ -398,6 +508,8 @@ ERRORS
 
 --------------------------------------------------------------------------------
 
+EL_THREAD_SAFE
+^^^^^^^^^^^^^^
 ``EL_THREAD_SAFE (int safe)`` [default: **0**]
 
 .. include:: /in/el_thread_safe.desc
