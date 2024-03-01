@@ -523,6 +523,7 @@ static int el_vooption
 		 * we will have to reopen the file */
 		need_reopen = !EL_IS_ROT_DATE(el);
 
+		ret = 0;
 		el_lock(el);
 		el->frotate_type = value_int;
 
@@ -534,7 +535,7 @@ static int el_vooption
 		if (need_reopen && el->file) ret = el_file_open(el);
 
 		el_unlock(el);
-		return 0;
+		return ret;
 	}
 
 
