@@ -21,6 +21,10 @@ man: Makefile
 	@echo fix broken tables
 	sed -i 's/^center;$$/box center;/' $(BUILDDIR)/man/*
 
+# sphinx-build clean does not remove _build dir
+clean-local:
+	rm -rf _build
+
 man_MANS = \
 	_build/man/el_cleanup.3 \
 	_build/man/el_destroy.3 \
