@@ -7,29 +7,18 @@ Quick intro
 .. code-block:: c
 
    #include <embedlog.h>
-   #include <errno.h>
 
    int main(void) {
-       const char *file = "/tmp/embedlog-test-file.log";
-
        el_init();
 
-       el_print(ELN, "first print");
-
+       /* Turn on timestamp and information from which log originates */
        el_set_timestamp(EL_TS_LONG, EL_TS_TM_REALTIME, EL_TS_FRACT_US);
-       el_print(ELW, "warning with timestamp");
-
        el_print_extra_info(1);
-       el_print(ELF, "fatal error, with code location");
-       el_print(ELD, "won't be printed, log level too low");
-       el_set_log_level(EL_DBG);
-       el_print(ELD, "but now it will be printed");
 
-       el_enable_file_log(file, 0, 0);
+       /* Enable log to file, create max 10 files, each of 1MB of max size */
+       el_enable_file_log("/tmp/embedlog-test-file.log", 10, 1024 * 1024);
        el_print(ELN, "from now on, logs will be printed to both file and stderr");
-
-       errno = ENAMETOOLONG;
-       el_perror(ELA, "simulated error, failed to open file: %s", file);
+       el_print(ELF, "log with fatal severity");
 
        el_cleanup();
        return 0;
@@ -37,14 +26,26 @@ Quick intro
 
 Above program will print::
 
-   n/first print
-   [2024-02-29 14:05:51.929779] w/warning with timestamp
-   [2024-02-29 14:05:51.929928][print-example.c:15:main()] f/fatal error, with code location
-   [2024-02-29 14:05:51.929933][print-example.c:16:main()] i/normal log with timestamp and code location
-   [2024-02-29 14:05:51.929937][print-example.c:19:main()] d/but now it will be printed
-   [2024-02-29 14:05:51.929980][print-example.c:22:main()] n/from now on, logs will be printed to both file and stderr
-   [2024-02-29 14:05:51.930005][print-example.c:25:main()] a/simulated error, failed to open file: /tmp/embedlog-test-file.log
-   [2024-02-29 14:05:51.930029][print-example.c:25:main()] a/errno num: 36, strerror: File name too long
+   [2024-02-29 14:05:51.929980][print-example.c:12:main()] n/from now on, logs will be printed to both file and stderr
+   [2024-02-29 14:05:51.930005][print-example.c:13:main()] f/log with fatal severity
+
+Dump memory locations in readable formats
+
+.. code-block:: c
+
+   const char *ascii = get_ascii_table();
+   el_pmemory(ELN, ascii, strlen(ascii));
+
+Output::
+
+   i/0x0000  00 01 02 03 04 05 06 07  08 09 0a 0b 0c 0d 0e 0f  ........ ........
+   i/0x0010  10 11 12 13 14 15 16 17  18 19 1a 1b 1c 1d 1e 1f  ........ ........
+   i/0x0020  20 21 22 23 24 25 26 27  28 29 2a 2b 2c 2d 2e 2f   !"#$%&' ()*+,-./
+   i/0x0030  30 31 32 33 34 35 36 37  38 39 3a 3b 3c 3d 3e 3f  01234567 89:;<=>?
+   i/0x0040  40 41 42 43 44 45 46 47  48 49 4a 4b 4c 4d 4e 4f  @ABCDEFG HIJKLMNO
+   i/0x0050  50 51 52 53 54 55 56 57  58 59 5a 5b 5c 5d 5e 5f  PQRSTUVW XYZ[\]^_
+   i/0x0060  60 61 62 63 64 65 66 67  68 69 6a 6b 6c 6d 6e 6f  `abcdefg hijklmno
+   i/0x0070  70 71 72 73 74 75 76 77  78 79 7a 7b 7c 7d 7e 7f  pqrstuvw xyz{|}~.
 
 About
 -----
@@ -115,6 +116,22 @@ Library is written in **C89** but some features require implemented **POSIX** to
 work. Also there are some additional features for users with **C99** compiler.
 
 To run unit tests, you also need `librb <https://librb.bofc.pl>`_
+
+Robustness
+----------
+Code is about 800 lines of code of which 300 are just to set and validate
+passed options. Code is also very heavily tested::
+
+   # total tests.......:61620
+   # passed tests......:61620
+   # failed tests......:   0
+   # total checks......:66181
+   # passed checks.....:66181
+   # failed checks.....:   0
+
+   Overall coverage rate:
+     lines...........: 89.5% (739 of 826 lines)
+     functions.......: 90.6% (77 of 85 functions)
 
 Compiling and installing
 ------------------------
