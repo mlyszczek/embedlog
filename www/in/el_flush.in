@@ -10,6 +10,7 @@ SYNOPSIS
    include <embedlog.h>
 
    int el_flush(void)
+
    int el_oflush(struct el *el)
 
 DESCRIPTION

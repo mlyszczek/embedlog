@@ -9,8 +9,9 @@ SYNOPSIS
    #include <embedlog.h>**
 
    int el_putb(const void *memory, size_t mlen);
-   int el_oputb(struct el *el, const void *memory, size_t mlen);
    int el_pbinary(enum el_level level, const void *memory, size_t mlen);
+
+   int el_oputb(struct el *el, const void *memory, size_t mlen);
    int el_opbinary(enum el_level level, struct el *el, const void *memory,
         size_t mlen);
 

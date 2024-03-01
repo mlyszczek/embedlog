@@ -7,8 +7,11 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
+
    int el_set_custom_put(el_custom_put clbk, void *user);
+
    int el_oset_custom_put(struct el *el, el_custom_put clbk, void *user);
+
    typedef int (*el_custom_put)(const char *s, size_t slen, void *user);
 
 DESCRIPTION

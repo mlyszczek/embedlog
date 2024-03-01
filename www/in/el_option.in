@@ -9,6 +9,7 @@ SYNOPSIS
    #include <embedlog.h>
 
    int el_option(int option, ...);
+
    int el_ooption(struct el *el, int option, ...);
 
 DESCRIPTION

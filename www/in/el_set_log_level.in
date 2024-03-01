@@ -10,6 +10,7 @@ SYNOPSIS
    #include <embedlog.h>
 
    int el_set_log_level(enum el_level level);
+
    int el_oset_log_level(struct el *el, enum el_level level);
 
 DESCRIPTION

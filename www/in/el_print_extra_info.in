@@ -8,7 +8,9 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
+
    int el_print_extra_info(int print);
+
    int el_oprint_extra_info(struct el *el, int print);
 
 DESCRIPTION

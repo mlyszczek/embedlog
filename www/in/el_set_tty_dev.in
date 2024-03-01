@@ -8,7 +8,9 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
+
    int el_set_tty_dev(const char *dev, unsigned speed);
+
    int el_oset_tty_dev(struct el *el, const char *dev, unsigned speed);
 
 DESCRIPTION

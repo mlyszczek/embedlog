@@ -7,7 +7,9 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
+
    int el_set_prefix(const char *prefix)
+
    int el_oset_prefix(struct el *el, const char *prefix);
 
 DESCRIPTION

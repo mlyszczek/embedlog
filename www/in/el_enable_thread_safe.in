@@ -7,7 +7,9 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
+
    int el_enable_thread_safe(int enable);
+
    int el_oenable_thread_safe(struct el *el, int enable);
 
 DESCRIPTION

@@ -10,8 +10,9 @@ SYNOPSIS
    #include <embedlog.h>
 
    int el_enable_output(enum el_output output)
-   int el_oenable_output(struct el *el, enum el_output output);
    int el_disable_output(enum el_output output)
+
+   int el_oenable_output(struct el *el, enum el_output output);
    int el_odisable_output(struct el *el, enum el_output output);
 
 DESCRIPTION

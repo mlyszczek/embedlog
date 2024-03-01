@@ -11,6 +11,7 @@ SYNOPSIS
    int el_set_timestamp(enum el_option_timestamp timestamp,
        enum el_option_timestamp_timer timer,
        enum el_option_timestamp_fractions fraction);
+
    int el_oset_timestamp(struct el *el, enum el_option_timestamp timestamp
        enum el_option_timestamp_timer timer,
        enum el_option_timestamp_fractions fraction);

@@ -7,8 +7,10 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
+
    int el_enable_file_log(const char *path, unsigned short rotate_number,
        long rotate_size);
+
    int el_oenable_file_log(struct el *el, const char *path,
        unsigned short rotate_number, long rotate_size);
 

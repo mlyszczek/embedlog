@@ -8,9 +8,10 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
-   int el_enable_colors(int enable);
-   int el_oenable_colors(struct el *el, int enable);
 
+   int el_enable_colors(int enable);
+
+   int el_oenable_colors(struct el *el, int enable);
 
 DESCRIPTION
 -----------

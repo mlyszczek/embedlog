@@ -8,9 +8,10 @@ SYNOPSIS
 .. code-block:: c
 
    #include <embedlog.h>
-   
+
    int el_pmemory(LEVEL, const void *memory, size_t mlen);
    int el_pmemory_table(LEVEL, const void *memory, size_t mlen);
+
    int el_opmemory(LEVEL, struct el *el, const void *memory, size_t mlen);
    int el_opmemory_table(LEVEL, struct el *el, const void *memory, size_t mlen);
 
