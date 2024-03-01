@@ -23,44 +23,43 @@ or faster. They are just different way of setting **embedlog** options.
 
 Below is list of these functions and options they set.
 
-.. code-block:: c
+.. parsed-literal::
 
-   +-----------------------+-------------------+----------------------------------+
-   | function              | modified ioctl    | short description                |
-   +=======================+===================+==================================+
-   | el_set_log_level      | EL_LEVEL          | set new log level                |
-   +-----------------------+-------------------+----------------------------------+
-   | el_enable_output      | EL_OUT            | enable output(s)                 |
-   +-----------------------+-------------------+----------------------------------+
-   | el_disable_output     | EL_OUT            | disable output(s)                |
-   +-----------------------+-------------------+----------------------------------+
-   | el_set_prefix         | EL_PREFIX         | set new prefix for logs          |
-   +-----------------------+-------------------+----------------------------------+
-   | el_set_timestamp      | EL_TS             | Enable timestamps, set time      |
-   |                       | EL_TS_TM          | source, and optionally turn on   |
-   |                       | EL_TS_FRACT       | fraction of seconds in logging   |
-   +-----------------------+-------------------+----------------------------------+
-   | el_enable_colors      | EL_COLORS         | enable pretty colors in output   |
-   +-----------------------+-------------------+----------------------------------+
-   | el_print_extra_info   | EL_FINFO          | Adds to log information about    |
-   |                       | EL_FUNCINFO       | filename, line and function name |
-   |                       | EL_PRINT_LEVEL    | where log originated from        |
-   +-----------------------+-------------------+----------------------------------+
-   | el_set_custom_put     | EL_CUSTOM_PUT     | Set custom function for printing |
-   +-----------------------+-------------------+----------------------------------+
-   | el_enable_file_log    | EL_FROTATE_NUMBER | Enables logging to file, and     |
-   |                       | EL_FPATH          | optionally sets file rotate      |
-   |                       | EL_FROTATE_SIZE   | configuration                    |
-   |                       | EL_OUT_FILE       |                                  |
-   +-----------------------+-------------------+----------------------------------+
-   | el_set_file_sync      | EL_FSYNC_EVERY    | Configures conditions to         |
-   |                       | EL_FSYNC_LEVEL    + forcefully sync logs to disk     |
-   +-----------------------+-------------------+----------------------------------+
-   | el_set_tty_dev        | EL_TTY_DEV        | Enables printing to tty device   |
-   |                       | EL_OUT            |                                  |
-   +-----------------------+-------------------+----------------------------------+
-   | el_enable_thread_safe | EL_THREAD_SAFE    | Enables thread safety features   |
-   +-----------------------+-------------------+----------------------------------+
+   +--------------------------+-------------------+----------------------------------+
+   | function                 | modified ioctl    | short description                |
+   +==========================+===================+==================================+
+   | |el_set_log_level|      | EL_LEVEL          | set new log level                |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_enable_output|      | EL_OUT            | enable output(s)                 |
+   | |el_disable_output|     |                   | disable output(s)                |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_set_prefix|         | EL_PREFIX         | set new prefix for logs          |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_set_timestamp|      | EL_TS             | Enable timestamps, set time      |
+   |                          | EL_TS_TM          | source, and optionally turn on   |
+   |                          | EL_TS_FRACT       | fraction of seconds in logging   |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_enable_colors|      | EL_COLORS         | enable pretty colors in output   |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_print_extra_info|   | EL_FINFO          | Adds to log information about    |
+   |                          | EL_FUNCINFO       | filename, line and function name |
+   |                          | EL_PRINT_LEVEL    | where log originated from        |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_set_custom_put|     | EL_CUSTOM_PUT     | Set custom function for printing |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_enable_file_log|    | EL_FROTATE_NUMBER | Enables logging to file, and     |
+   |                          | EL_FPATH          | optionally sets file rotate      |
+   |                          | EL_FROTATE_SIZE   | configuration                    |
+   |                          | EL_OUT_FILE       |                                  |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_set_file_sync|      | EL_FSYNC_EVERY    | Configures conditions to         |
+   |                          | EL_FSYNC_LEVEL    + forcefully sync logs to disk     |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_set_tty_dev|        | EL_TTY_DEV        | Enables printing to tty device   |
+   |                          | EL_OUT            |                                  |
+   +--------------------------+-------------------+----------------------------------+
+   | |el_enable_thread_safe| | EL_THREAD_SAFE    | Enables thread safety features   |
+   +--------------------------+-------------------+----------------------------------+
 
 OPTIONS
 --------
