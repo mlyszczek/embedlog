@@ -83,15 +83,14 @@ static int file_check
 {
 	char     fc[128];
 	int      fd;
-	ssize_t  r;
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+	memset(fc, 0x00, sizeof(fc));
 	fd = open(f, O_RDONLY);
-	r = read(fd, fc, sizeof(fc));
+	read(fd, fc, sizeof(fc));
 	close(fd);
 
-	fc[r] = '\0';
 	if(strcmp(s, fc) != 0)  return -1;
 
 	return 0;
