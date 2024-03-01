@@ -89,8 +89,12 @@ memory.
 
 Functions description
 ---------------------
+Overview of the library (functions, use cases etc.) can be found at
+:ref:`el_overview(7) <el_overview.7:overview>` This is very good starting
+point to get to know library better.
+
 For detailed description of every function check out
-project documentation at https://embedlog.bofc.pl
+project documentation at `manual pages <manuals/index.html#manual-pages>`_
 
 Examples
 --------

@@ -47,25 +47,92 @@ Logger incorporates features like:
 
 Library implements following functions:
 
-.. code-block:: c
+Basic functions are:
 
-   int el_init(void)
-   int el_cleanup(void)
-   int el_option(enum el_option option, ...)
-   int el_puts(const char *string)
-   int el_putb(const void *memory, size_t mlen)
-   int el_print(LEVEL, const char *fmt, ...)
-   int el_vprint(LEVEL, const char *fmt, va_list ap)
-   int el_perror(LEVEL, const char *fmt, ...)
-   int el_pmemory(LEVEL, const void *memory, size_t mlen)
-   int el_pmemory_table(LEVEL, const void *memory, size_t mlen)
-   int el_pbinary(enum el_level level, const void *memory, size_t mlen)
-   int el_flush(void)
-   const struct el *el_get_el(void)
+.. list-table::
+   :header-rows: 1
+
+   * - function
+     - description
+   * - |el_init|
+     - initialize embedlog, call before anything else
+   * - |el_cleanup|
+     - cleans up any resources allocated by el_init
+   * - |el_flush|
+     - flushes all buffers to respective underlying devices
+   * - |el_print|
+     - printf-like, prints log, with previously configured options
+   * - |el_perror|
+     - prints log, and errno string, saves you time to type strerror(errno)
+   * - |el_pmemory|
+     - dumps memory location in wireshark/hexdump like format
+
+There are multiple different print functions when standard is not enough:
+
+.. list-table::
+   :header-rows: 1
+
+   * - function
+     - description
+   * - |el_print|
+     - standard printf-like function
+   * - |el_perror|
+     - standard perror function, but it's also printf-like (perror(3) does not take fmt)
+   * - |el_pmemory|
+     - dumps memory in wireshark/hexdump like format
+   * - |el_pmemory_table|
+     - like el_pmemory, but also adds ascii table
+   * - |el_vprint|
+     - just like |el_print| but takes **va_arg** instead format
+   * - |el_pbinary|
+     - used to print fully binary logs (with binary metadata) to save space
+   * - |el_puts|
+     - like puts(3), these logs won't be processed and will be printed as-is
+   * - |el_putb|
+     - similar to |el_puts| but used for binary logging
+
+Printing can be altered to suit your needs:
+
+.. list-table::
+   :header-rows: 1
+
+   * - |el_enable_output|
+     - allows you to enable specified outputs
+   * - |el_enable_file_log|
+     - configures and enables logging to file with (or without) log rotation
+   * - |el_set_timestamp|
+     - configures how (and if) timestamps should be printed with each log
+   * - |el_print_extra_info|
+     - configures if extra info should be added to logs (file, line and
+       function or log origin)
+   * - |el_set_file_sync|
+     - configures how often **embedlog** should sync logs, to prevent data
+       loss on program crash or power loss.
+   * - |el_enable_colors|
+     - enable ANSI colors, different log level will have different color
+   * - |el_set_log_level|
+     - set maximum log level to print (like you can leave only warning and more
+       severe logs on production)
+   * - |el_set_prefix|
+     - add custom prefix, that will be added to each log, usefull when multiple
+       programs log to single output (like serial device)
+   * - |el_set_custom_put|
+     - can be used to implement own printing, embedlog will pass fully processed
+       string.
+   * - |el_enable_thread_safe|
+     - can be used if you want to print from multiple threads
+   * - |el_set_tty_dev|
+     - configure and enable tty (serial device) output
+   * - |el_disable_output|
+     - disable specified outputs
+   * - |el_option|
+     - if above functions are not enough, this can be used to really fine tune
+       embedlog behaviour.
 
 Each function has its equivalent function that accepts *el* object as
-argument. This is helpful if we want to have more than one, separated
-loggers in a single program, or when using embedlog on RTOS. Few examples are:
+argument. These functions have ``el_o`` prefix instead of ``el_``. This is
+helpful if we want to have more than one, separated loggers in a single
+program, or when using embedlog on RTOS. Few examples are:
 
 .. code-block:: c
 
