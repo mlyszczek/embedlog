@@ -18,7 +18,8 @@ test_CFLAGS = -I$(top_builddir)/include \
 test_LDFLAGS = $(COVERAGE_LDFLAGS)
 test_LDADD = -lrb $(top_builddir)/src/.libs/libembedlog.a
 
-test_wrapper: test
+test_wrapper_SOURCES=
+test_wrapper$(EXEEXT): test
 	echo 'LD_PRELOAD=/usr/lib64/libfaketime.so FAKETIME_NO_CACHE=1 TZ=UTC ./test' > $@
 	chmod +x $@
 
