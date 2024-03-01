@@ -120,7 +120,9 @@ To run unit tests, you also need `librb <https://librb.bofc.pl>`_
 Robustness
 ----------
 Code is about 800 lines of code of which 300 are just to set and validate
-passed options. Code is also very heavily tested::
+passed options. -Wall and -Wextra are standard, and code is code is passed
+through sanitizers and static code analyzers before release.
+Code is also very heavily tested::
 
    # total tests.......:61620
    # passed tests......:61620
