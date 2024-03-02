@@ -11,7 +11,7 @@ import glob
 project = 'embedlog'
 copyright = '2024, Michał Łyszczek'
 author = 'Michał Łyszczek'
-release = 'v0.7.0'
+release = 'v0.7.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

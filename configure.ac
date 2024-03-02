@@ -1,4 +1,4 @@
-AC_INIT([embedlog], [0.7.0], [michal.lyszczek@bofc.pl])
+AC_INIT([embedlog], [0.7.1], [michal.lyszczek@bofc.pl])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_LANG([C])
 AC_PROG_CC
