@@ -83,3 +83,5 @@ EXTRA_DIST = $(man_MANS)
 
 $(man_MANS) &:
 	@$(SPHINXBUILD) -M man "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@echo fix broken tables
+	sed -i 's/^center;$$/box center;/' $(BUILDDIR)/man/*
