@@ -3,7 +3,7 @@ will be printed into specified file without size limit. The only size limit
 is the one presented by the filesystem and architecture.
 
 If this value is bigger than 0, file rotation will be enabled. All
-files will have suffixes added to name set in EL_FPATH. For example,
+files will have suffixes added to name set in **path**. For example,
 *program.log.0*. Files are enumareted from *.0* to *.n*, where *n* is
 set rotate number. File with suffix *.0* is the oldest one, and the
 higher the number, the newer the file is. If logger reaches maximum
