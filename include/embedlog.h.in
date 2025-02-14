@@ -15,10 +15,6 @@
 #   include <pthread.h>
 #endif
 
-#if HAVE_TERMIOS_H
-#   include <termios.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
